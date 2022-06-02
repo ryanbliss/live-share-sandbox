@@ -1,0 +1,36 @@
+{
+  "name": "live-share-sandbox",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "start": "start-server-and-test start:server 7070 vite",
+    "start:server": "npx @fluidframework/azure-local-service@latest",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@codemirror/state": "^0.19.6",
+    "@codemirror/view": "^0.19.6",
+    "@codesandbox/sandpack-react": "^1.0.4",
+    "@fluid-experimental/react-inputs": "^0.59.3003",
+    "@microsoft/live-share": "~0.3.1",
+    "@microsoft/live-share-media": "~0.3.1",
+    "@microsoft/teams-js": "2.0.0-experimental.0",
+    "fluid-framework": "~0.59.0",
+    "lodash": "^4.17.21",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "url": "^0.11.0"
+  },
+  "devDependencies": {
+    "@fluidframework/test-client-utils": "~0.59.0",
+    "@types/lodash": "^4.14.182",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@vitejs/plugin-react": "^1.3.0",
+    "start-server-and-test": "^1.11.6",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.9"
+  }
+}
