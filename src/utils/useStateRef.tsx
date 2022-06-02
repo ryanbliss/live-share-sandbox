@@ -1,9 +1,9 @@
 import { useState, useRef, useCallback, MutableRefObject } from "react";
 
 export function useStateRef<T>(initialValue: T): [
-    T,
-    MutableRefObject<T>,
-    (value: T) => void,
+  T,
+  MutableRefObject<T>,
+  (value: T) => void,
 ] {
   const reference = useRef(initialValue);
   const [state, setState] = useState(reference.current);
@@ -17,8 +17,8 @@ export function useStateRef<T>(initialValue: T): [
   );
 
   return [
-      state,
-      reference,
-      setValue,
+    state,
+    reference,
+    setValue,
   ];
 }

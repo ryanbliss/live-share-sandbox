@@ -1,7 +1,4 @@
-import { AppTemplate } from "./AppTemplate"
-import { HeaderTemplate } from "./HeaderTemplate"
+import { AppTemplate } from "./AppTemplate";
+import { HeaderTemplate } from "./HeaderTemplate";
 
-export {
-    AppTemplate,
-    HeaderTemplate,
-}
+export { AppTemplate, HeaderTemplate };

@@ -1,4 +1,3 @@
-
 export const HeaderTemplate = `
 export default function Header() {
   return (
