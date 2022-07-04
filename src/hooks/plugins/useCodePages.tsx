@@ -1,15 +1,20 @@
 import { useCallback, useEffect, MutableRefObject, useRef } from "react";
-import { SharedMap, SharedString } from "fluid-framework";
+import { IFluidContainer, SharedMap, SharedString } from "fluid-framework";
 import {
   ISharedStringHelperTextChangedEventArgs,
   SharedStringHelper,
 } from "@fluid-experimental/react-inputs";
 import { useStateRef } from "../../utils/useStateRef";
+import { EmptyReactComponent } from "../../sandpack-templates";
 
-export function useCodePages(codePagesMap: SharedMap | undefined): {
+export function useCodePages(
+  codePagesMap: SharedMap | undefined,
+  container: IFluidContainer | undefined
+): {
   pages: Map<string, SharedStringHelper>;
   files: Map<string, string>;
   filesRef: MutableRefObject<Map<string, string>>;
+  onAddPage: (pageName: string) => void;
 } {
   const [pages, pagesRef, setPages] = useStateRef<
     Map<string, SharedStringHelper>
@@ -40,6 +45,24 @@ export function useCodePages(codePagesMap: SharedMap | undefined): {
     }
     setPages(_pages);
   }, [codePagesMap, pagesRef, setPages, setFiles]);
+
+  const onAddPage = useCallback(
+    (pageName: string) => {
+      if (container) {
+        container
+          .create(SharedString)
+          .then((sharedString) => {
+            (container.initialObjects.codePagesMap as SharedMap).set(
+              `/${pageName}.js`,
+              sharedString.handle
+            );
+            sharedString.insertText(0, EmptyReactComponent);
+          })
+          .catch((error) => console.error(error));
+      }
+    },
+    [container]
+  );
 
   useEffect(() => {
     if (codePagesMap) {
@@ -108,5 +131,6 @@ export function useCodePages(codePagesMap: SharedMap | undefined): {
     pages,
     files,
     filesRef,
+    onAddPage,
   };
 }

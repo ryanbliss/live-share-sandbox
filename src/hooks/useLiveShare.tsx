@@ -30,6 +30,7 @@ import { AppTemplate, HeaderTemplate } from "../sandpack-templates";
 export function useLiveShare(): {
   loading: boolean;
   error: Error | undefined;
+  container: IFluidContainer | undefined;
   codePagesMap: SharedMap | undefined;
   sandpackObjectsMap: SharedMap | undefined;
 } {
@@ -135,6 +136,7 @@ export function useLiveShare(): {
   return {
     loading: !container,
     error,
+    container,
     codePagesMap: initialObjects
       ? (initialObjects?.codePagesMap as SharedMap)
       : undefined,

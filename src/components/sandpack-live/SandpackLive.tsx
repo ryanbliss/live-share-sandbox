@@ -5,7 +5,7 @@ import {
   SandpackProvider,
   SandpackThemeProvider,
 } from "@codesandbox/sandpack-react";
-import { SharedMap } from "fluid-framework";
+import { IFluidContainer, SharedMap } from "fluid-framework";
 import { useCodePages } from "../../hooks/plugins/useCodePages";
 import { CodeMirrorRef } from "@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror";
 import SandpackEditor from "./sandpack-editor/SandpackEditor";
@@ -14,6 +14,7 @@ import { EditorSelection } from "@codemirror/state";
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
   codePagesMap: SharedMap | undefined;
+  container: IFluidContainer | undefined;
 }
 
 const SandpackLive: FC<ISandpackLiveProps> = (props) => {
@@ -21,7 +22,8 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     pages,
     files: codePageFiles,
     filesRef: codePageFilesRef,
-  } = useCodePages(props.codePagesMap);
+    onAddPage,
+  } = useCodePages(props.codePagesMap, props.container);
   const [sandpackFiles, setSandpackFiles] = useState<any>({});
   const codemirrorInstance = useRef<any>();
   const activeFileRef = useRef<string | undefined>();
@@ -88,6 +90,23 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
 
   return (
     <div>
+      <div
+        style={{
+          position: "absolute",
+          right: "50%",
+          top: 0,
+          zIndex: 1000,
+        }}
+      >
+        <button
+          onClick={() => {
+            // TODO: open prompt to name new page
+            onAddPage("Component");
+          }}
+        >
+          Add
+        </button>
+      </div>
       <SandpackProvider
         // Try out the included templates below!
         template={props.template}
