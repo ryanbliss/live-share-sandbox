@@ -1,5 +1,5 @@
 import { AppTemplate } from "./AppTemplate";
 import { HeaderTemplate } from "./HeaderTemplate";
-import { EmptyReactComponent } from "./EmptyReactComponent";
+import { buildEmptyReactComponent } from "./EmptyReactComponent";
 
-export { AppTemplate, HeaderTemplate, EmptyReactComponent };
+export { AppTemplate, HeaderTemplate, buildEmptyReactComponent };
