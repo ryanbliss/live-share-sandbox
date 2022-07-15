@@ -19,6 +19,7 @@ import {
 } from "../../live-share-hooks/plugins/useFollowModeState";
 import { usePresence } from "../../live-share-hooks/plugins/usePresence";
 import { SandpackFileExplorer } from "./sandpack-files/SandpackFileExplorer";
+import { useStateRef } from "../../utils/useStateRef";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -35,6 +36,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     files: codePageFiles,
     filesRef: codePageFilesRef,
     onAddPage,
+    setFiles,
   } = useCodePages(props.codePagesMap, props.container);
 
   const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
@@ -53,9 +55,12 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     followingUserId
   );
 
-  const [sandpackFiles, setSandpackFiles] = useState<any>({});
+  const [sandpackFiles, sandpackFilesRef, setSandpackFiles] = useStateRef<any>(
+    {}
+  );
   const codemirrorInstance = useRef<any>();
   const activeFileRef = useRef<string | undefined>();
+  const previousActiveFileRef = useRef<string | undefined>();
 
   const mappedSandpackFiles = useMemo(() => {
     const _files: any = {};
@@ -67,8 +72,9 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         readOnly: false,
       };
     });
+    console.log(_files);
     return _files;
-  }, [sandpackFiles, currentPageKey, localUserIsEligiblePresenter]);
+  }, [sandpackFiles, currentPageKey]);
 
   const onApplyTemplateChange = useCallback(() => {
     const _files: any = {};
@@ -118,13 +124,20 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
       console.log("setting sandpack files");
       setSandpackFiles(_files);
     }
-  }, [codePageFiles, sandpackFiles, activeFileRef, setSandpackFiles]);
+  }, [codePageFiles, sandpackFiles, setSandpackFiles]);
 
   useEffect(() => {
     if (codePageFiles.size > 1) {
       onApplyTemplateChange();
     }
   }, [onApplyTemplateChange, codePageFiles]);
+
+  useEffect(() => {
+    if (currentPageKey !== previousActiveFileRef.current) {
+      previousActiveFileRef.current = currentPageKey;
+      setFiles(codePageFilesRef.current);
+    }
+  }, [currentPageKey, codePageFiles]);
 
   if (codePageFiles.size < 2) {
     return null;
@@ -145,7 +158,10 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
             onInitiateFollowMode();
           }
         }}
+        followModeActive={!!followingUserId}
         onAddPage={onAddPage}
+        onInitiateFollowMode={onInitiateFollowMode}
+        onEndFollowMode={onEndFollowMode}
       />
       <SandpackProvider
         // Try out the included templates below!

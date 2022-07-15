@@ -15,6 +15,7 @@ export function useCodePages(
   files: Map<string, string>;
   filesRef: MutableRefObject<Map<string, string>>;
   onAddPage: (pageName: string) => void;
+  setFiles: (value: Map<string, string>) => void;
 } {
   const [pages, pagesRef, setPages] = useStateRef<
     Map<string, SharedStringHelper>
@@ -77,9 +78,7 @@ export function useCodePages(
   const onTextChange = useCallback(
     (event: ISharedStringHelperTextChangedEventArgs | undefined) => {
       console.log("onTextChange local", event?.isLocal, pagesRef.current.size);
-      if (pagesRef.current.size > 0 && event?.isLocal) {
-        return;
-      }
+
       let valueHasChanged = false;
       const _files: Map<string, string> = new Map();
       pagesRef.current.forEach((sharedStringHelper, fileName) => {
@@ -90,6 +89,12 @@ export function useCodePages(
         }
         _files.set(fileName, newText);
       });
+
+      if (pagesRef.current.size > 0 && event?.isLocal) {
+        console.log("updating local ref");
+        filesRef.current = _files;
+        return;
+      }
       if (valueHasChanged) {
         console.log("onTextChange change for local is", event?.isLocal);
         setFiles(_files);
@@ -132,5 +137,6 @@ export function useCodePages(
     files,
     filesRef,
     onAddPage,
+    setFiles,
   };
 }
