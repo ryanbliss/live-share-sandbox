@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   SandpackLayout,
   SandpackPreview,
@@ -11,7 +11,6 @@ import { useCodePages } from "../../live-share-hooks/plugins/useCodePages";
 import { CodeMirrorRef } from "@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror";
 import SandpackEditor from "./sandpack-editor/SandpackEditor";
 import { EditorSelection } from "@codemirror/state";
-import { TextInputPopover } from "../text-input-popover/text-input-popover";
 import { EphemeralPresence, EphemeralState } from "@microsoft/live-share";
 import {
   IFollowModeStateValue,
