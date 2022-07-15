@@ -10,6 +10,12 @@ export const getFlexRowStyles = makeStyles({
     minHeight: 0,
     minWidth: 0,
   },
+  expandVertical: {
+    height: "100%",
+  },
+  expandHorizontal: {
+    width: "100%",
+  },
   fill: {
     width: "100%",
     height: "100%",
@@ -65,6 +71,12 @@ export const getFlexColumnStyles = makeStyles({
      * computing height wrt child components */
     minHeight: 0,
     minWidth: 0,
+  },
+  expandVertical: {
+    height: "100%",
+  },
+  expandHorizontal: {
+    width: "100%",
   },
   fill: {
     width: "100%",

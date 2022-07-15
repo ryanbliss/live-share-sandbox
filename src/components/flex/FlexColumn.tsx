@@ -4,7 +4,7 @@ import { getFlexColumnStyles } from "./FlexStyles";
 
 interface IFlexColumnProps {
   children: ReactNode;
-  fill?: boolean;
+  expand?: "horizontal" | "vertical" | "fill";
   hAlign?: "start" | "center" | "end";
   vAlign?: "start" | "center" | "end";
   marginSpacer?: "small" | "medium" | "large";
@@ -15,7 +15,7 @@ interface IFlexColumnProps {
 
 export const FlexColumn: FC<IFlexColumnProps> = ({
   children,
-  fill,
+  expand,
   hAlign,
   vAlign,
   marginSpacer,
@@ -26,7 +26,9 @@ export const FlexColumn: FC<IFlexColumnProps> = ({
   const flexColumnStyles = getFlexColumnStyles();
   const mergedClasses = mergeClasses(
     flexColumnStyles.root,
-    fill ? flexColumnStyles.fill : "",
+    expand === "vertical" ? flexColumnStyles.expandVertical : "",
+    expand === "horizontal" ? flexColumnStyles.expandHorizontal : "",
+    expand === "fill" ? flexColumnStyles.fill : "",
     hAlign === "center" ? flexColumnStyles.hAlignCenter : "",
     hAlign === "end" ? flexColumnStyles.hAlignEnd : "",
     hAlign === "start" ? flexColumnStyles.hAlignStart : "",
