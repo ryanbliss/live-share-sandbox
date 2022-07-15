@@ -10,6 +10,7 @@ import { useCodePages } from "../../hooks/plugins/useCodePages";
 import { CodeMirrorRef } from "@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror";
 import SandpackEditor from "./sandpack-editor/SandpackEditor";
 import { EditorSelection } from "@codemirror/state";
+import { TextInputPopover } from "../text-input-popover/text-input-popover";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -94,18 +95,11 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         style={{
           position: "absolute",
           right: "50%",
-          top: 0,
-          zIndex: 1000,
+          top: 6,
+          zIndex: 1,
         }}
       >
-        <button
-          onClick={() => {
-            // TODO: open prompt to name new page
-            onAddPage("Component");
-          }}
-        >
-          Add
-        </button>
+        <TextInputPopover title="File name" onDone={onAddPage} />
       </div>
       <SandpackProvider
         // Try out the included templates below!
