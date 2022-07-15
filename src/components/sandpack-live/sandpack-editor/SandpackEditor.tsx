@@ -69,7 +69,7 @@ const SandpackEditor: FC<ISandpackEditorProps> = (props) => {
   return (
     <SandpackCodeEditor
       ref={codemirrorInstance}
-      showTabs
+      showTabs={false}
       extensions={[
         EditorView.updateListener.of((v: ViewUpdate) => {
           if (v.docChanged) {

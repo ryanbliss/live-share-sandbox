@@ -2,11 +2,21 @@ import { FluentProvider, teamsDarkTheme } from "@fluentui/react-components";
 import "./App.css";
 import PageWrapper from "./components/page-wrapper/PageWrapper";
 import SandpackLive from "./components/sandpack-live/SandpackLive";
-import { useLiveShare } from "./hooks/useLiveShare";
+import { useLiveShare } from "./live-share-hooks/useLiveShare";
+import { useTeamsContext } from "./teams-js-hooks/useTeamsContext";
 
 function App() {
-  const { loading, error, container, codePagesMap, sandpackObjectsMap } =
-    useLiveShare();
+  const {
+    loading,
+    error,
+    container,
+    codePagesMap,
+    sandpackObjectsMap,
+    followModeState,
+    presence,
+  } = useLiveShare();
+
+  const teamsContext = useTeamsContext();
 
   return (
     <div className="App">
@@ -26,7 +36,10 @@ function App() {
           <SandpackLive
             template={"react"}
             codePagesMap={codePagesMap}
+            followModeState={followModeState}
+            presence={presence}
             container={container}
+            teamsContext={teamsContext}
           />
         </PageWrapper>
       </FluentProvider>
