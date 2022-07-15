@@ -3,10 +3,10 @@
  * Licensed under the MIT License.
  */
 
-import { EphemeralState, TeamsFluidClient } from "@microsoft/live-share";
+import { EphemeralState, TeamsFluidClient, EphemeralEvent, EphemeralPresence } from "@microsoft/live-share";
+import { EphemeralMediaSession } from "@microsoft/live-share-media";
 import { LOCAL_MODE_TENANT_ID } from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
-import { EphemeralMediaSession } from "@microsoft/live-share-media";
 import {
   ContainerSchema,
   IFluidContainer,
@@ -15,7 +15,6 @@ import {
   SharedString,
 } from "fluid-framework";
 import { useEffect, useState } from "react";
-import { EphemeralEvent, EphemeralPresence } from "@microsoft/live-share";
 import { AppTemplate, HeaderTemplate } from "../sandpack-templates";
 import { IFollowModeStateValue } from "./plugins/useFollowModeState";
 

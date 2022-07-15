@@ -19,6 +19,11 @@ import {
 import { usePresence } from "../../live-share-hooks/plugins/usePresence";
 import { SandpackFileExplorer } from "./sandpack-files/SandpackFileExplorer";
 import { useStateRef } from "../../utils/useStateRef";
+import {
+  LiveShareSandboxApi,
+  PackageJson,
+  ReactIndexJs,
+} from "../../sandpack-templates";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -68,6 +73,24 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         code: sandpackFiles[key],
         hidden: false,
         active: key === currentPageKey,
+        readOnly: false,
+      };
+      // _files["/LiveShareSandboxApi.js"] = {
+      //   code: LiveShareSandboxApi,
+      //   hidden: true,
+      //   active: false,
+      //   readOnly: true,
+      // };
+      _files["/index.js"] = {
+        code: ReactIndexJs,
+        hidden: true,
+        active: "/index.js" === currentPageKey,
+        readOnly: true,
+      };
+      _files["/package.json"] = {
+        code: PackageJson,
+        hidden: false,
+        active: "/package.json" === currentPageKey,
         readOnly: false,
       };
     });
@@ -166,6 +189,21 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         // Try out the included templates below!
         template={props.template}
         files={mappedSandpackFiles}
+        options={{
+          bundlerURL: "https://sandpack-bundler.pages.dev",
+        }}
+        // customSetup={{
+        //   dependencies: {
+        //     "@microsoft/live-share-media": "0.3.1",
+        //     // "fluid-framework": "0.59.3003",
+        //     "@fluidframework/test-client-utils": "0.59.2003",
+        //     buffer: "latest",
+        //     url: "latest",
+        //     stream: "latest",
+        //     assert: "latest",
+        //     emitter: "latest",
+        //   },
+        // }}
       >
         <SandpackThemeProvider theme={"dark"} style={{ height: "100vh" }}>
           <SandpackLayout>
