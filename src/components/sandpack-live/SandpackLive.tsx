@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   SandpackLayout,
   SandpackPreview,
@@ -6,15 +6,27 @@ import {
   SandpackThemeProvider,
 } from "@codesandbox/sandpack-react";
 import { IFluidContainer, SharedMap } from "fluid-framework";
-import { useCodePages } from "../../hooks/plugins/useCodePages";
+import * as microsoftTeams from "@microsoft/teams-js";
+import { useCodePages } from "../../live-share-hooks/plugins/useCodePages";
 import { CodeMirrorRef } from "@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror";
 import SandpackEditor from "./sandpack-editor/SandpackEditor";
 import { EditorSelection } from "@codemirror/state";
+import { TextInputPopover } from "../text-input-popover/text-input-popover";
+import { EphemeralPresence, EphemeralState } from "@microsoft/live-share";
+import {
+  IFollowModeStateValue,
+  useFollowModeState,
+} from "../../live-share-hooks/plugins/useFollowModeState";
+import { usePresence } from "../../live-share-hooks/plugins/usePresence";
+import { SandpackFileExplorer } from "./sandpack-files/SandpackFileExplorer";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
   codePagesMap: SharedMap | undefined;
+  followModeState: EphemeralState<IFollowModeStateValue> | undefined;
+  presence: EphemeralPresence | undefined;
   container: IFluidContainer | undefined;
+  teamsContext: microsoftTeams.app.Context | undefined;
 }
 
 const SandpackLive: FC<ISandpackLiveProps> = (props) => {
@@ -24,9 +36,39 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     filesRef: codePageFilesRef,
     onAddPage,
   } = useCodePages(props.codePagesMap, props.container);
+
+  const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
+    useFollowModeState(props.followModeState, props.teamsContext?.user?.id);
+
+  const {
+    localUser,
+    localUserIsEligiblePresenter,
+    users,
+    currentPageKey,
+    onChangeCurrentPageKey,
+  } = usePresence(
+    props.presence,
+    props.teamsContext,
+    "/App.js",
+    followingUserId
+  );
+
   const [sandpackFiles, setSandpackFiles] = useState<any>({});
   const codemirrorInstance = useRef<any>();
   const activeFileRef = useRef<string | undefined>();
+
+  const mappedSandpackFiles = useMemo(() => {
+    const _files: any = {};
+    Object.keys(sandpackFiles).forEach((key) => {
+      _files[key] = {
+        code: sandpackFiles[key],
+        hidden: false,
+        active: key === currentPageKey,
+        readOnly: false,
+      };
+    });
+    return _files;
+  }, [sandpackFiles, currentPageKey, localUserIsEligiblePresenter]);
 
   const onApplyTemplateChange = useCallback(() => {
     const _files: any = {};
@@ -90,27 +132,25 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
 
   return (
     <div>
-      <div
-        style={{
-          position: "absolute",
-          right: "50%",
-          top: 0,
-          zIndex: 1000,
+      <SandpackFileExplorer
+        files={sandpackFiles}
+        selectedFileKey={currentPageKey}
+        onChangeSelectedFile={(fileName) => {
+          onChangeCurrentPageKey(fileName);
+          if (
+            followingUserId &&
+            followingUserId !== localUser?.userId &&
+            localUserIsEligiblePresenter
+          ) {
+            onInitiateFollowMode();
+          }
         }}
-      >
-        <button
-          onClick={() => {
-            // TODO: open prompt to name new page
-            onAddPage("Component");
-          }}
-        >
-          Add
-        </button>
-      </div>
+        onAddPage={onAddPage}
+      />
       <SandpackProvider
         // Try out the included templates below!
         template={props.template}
-        files={sandpackFiles}
+        files={mappedSandpackFiles}
       >
         <SandpackThemeProvider theme={"dark"} style={{ height: "100vh" }}>
           <SandpackLayout>

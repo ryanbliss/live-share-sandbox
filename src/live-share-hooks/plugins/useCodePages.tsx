@@ -5,7 +5,7 @@ import {
   SharedStringHelper,
 } from "@fluid-experimental/react-inputs";
 import { useStateRef } from "../../utils/useStateRef";
-import { EmptyReactComponent } from "../../sandpack-templates";
+import { buildEmptyReactComponent } from "../../sandpack-templates";
 
 export function useCodePages(
   codePagesMap: SharedMap | undefined,
@@ -56,7 +56,7 @@ export function useCodePages(
               `/${pageName}.js`,
               sharedString.handle
             );
-            sharedString.insertText(0, EmptyReactComponent);
+            sharedString.insertText(0, buildEmptyReactComponent(pageName));
           })
           .catch((error) => console.error(error));
       }

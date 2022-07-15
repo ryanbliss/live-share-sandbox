@@ -1,8 +1,10 @@
-export const EmptyReactComponent = `
-export default function YourComponent() {
+export const buildEmptyReactComponent = (componentName: string) => {
+  return `
+export default function ${componentName}() {
   return (
     <>
     </>
   )
 }
 `;
+};

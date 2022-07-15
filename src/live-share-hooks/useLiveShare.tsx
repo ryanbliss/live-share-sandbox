@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-import { TeamsFluidClient } from "@microsoft/live-share";
+import { EphemeralState, TeamsFluidClient } from "@microsoft/live-share";
 import { LOCAL_MODE_TENANT_ID } from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
 import { EphemeralMediaSession } from "@microsoft/live-share-media";
@@ -17,6 +17,7 @@ import {
 import { useEffect, useState } from "react";
 import { EphemeralEvent, EphemeralPresence } from "@microsoft/live-share";
 import { AppTemplate, HeaderTemplate } from "../sandpack-templates";
+import { IFollowModeStateValue } from "./plugins/useFollowModeState";
 
 /**
  * Hook that creates/loads the apps shared objects.
@@ -33,6 +34,10 @@ export function useLiveShare(): {
   container: IFluidContainer | undefined;
   codePagesMap: SharedMap | undefined;
   sandpackObjectsMap: SharedMap | undefined;
+  followModeState:
+    | EphemeralState<IFollowModeStateValue>
+    | undefined;
+  presence: EphemeralPresence | undefined;
 } {
   const [results, setResults] = useState<
     | {
@@ -108,6 +113,8 @@ export function useLiveShare(): {
       initialObjects: {
         codePagesMap: SharedMap,
         sandpackObjectsMap: SharedMap,
+        followModeState: EphemeralState<IFollowModeStateValue | undefined>,
+        presence: EphemeralPresence,
       },
       dynamicObjectTypes: [
         SharedMap,
@@ -142,6 +149,12 @@ export function useLiveShare(): {
       : undefined,
     sandpackObjectsMap: initialObjects
       ? (initialObjects?.sandpackObjectsMap as SharedMap)
+      : undefined,
+    followModeState: initialObjects
+      ? (initialObjects?.followModeState as EphemeralState<IFollowModeStateValue>)
+      : undefined,
+    presence: initialObjects
+      ? (initialObjects?.presence as EphemeralPresence)
       : undefined,
   };
 }
