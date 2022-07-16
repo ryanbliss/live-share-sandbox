@@ -31,9 +31,10 @@ export const PackageJson = `
     "lodash": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-scripts": "^5.0.0"
+    "react-scripts": "^5.0.0",
+    "url": "latest"
   },
-  devDependencies: {
+  "devDependencies": {
     "@babel/core": "^7.17.8",
     "@babel/node": "^7.16.8",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
@@ -82,7 +83,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   entry: {
-    app: "./src/index.tsx",
+    app: "./index.js",
   },
   output: {
     path: path.resolve(__dirname, "build"),
@@ -103,9 +104,15 @@ module.exports = {
           options: {
             babelrc: false,
             configFile: false,
-            presets: ["@babel/preset-env", "@babel/preset-react", "@babel/preset-typescript"],
+            presets: [
+              "@babel/preset-env",
+              "@babel/preset-react",
+              "@babel/preset-typescript",
+            ],
             plugins: ["@babel/plugin-proposal-class-properties"],
-            include: [path.resolve("@fluidframework/server-services-client/dist")],
+            include: [
+              path.resolve("@fluidframework/server-services-client/dist"),
+            ],
             exclude: /node_modules\/(?!@fluidframework).+/,
           },
         },
@@ -147,7 +154,7 @@ module.exports = {
       ignoreOrder: false,
     }),
     new HtmlWebpackPlugin({
-      title: "Microsoft Teams - YouTube Tab",
+      title: "Live Share Sandbox",
       template: path.join(__dirname, "public", "index.html"),
     }),
   ],
