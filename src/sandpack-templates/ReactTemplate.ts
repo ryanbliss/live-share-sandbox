@@ -297,3 +297,83 @@ module.exports = merge(common, {
   plugins: [],
 });
 `;
+
+export const BabelRC = `
+{
+  "presets": [
+      "@babel/env",
+      "@babel/react",
+      "@babel/preset-typescript"
+  ],
+  "plugins": [
+      "@babel/plugin-proposal-class-properties"
+  ]
+}
+`;
+
+export const ESLintRC = `
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  // Specifies the ESLint parser
+  extends: ['plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended', 'plugin:storybook/recommended'],
+  parserOptions: {
+    ecmaVersion: 2018,
+    // Allows for the parsing of modern ECMAScript features
+    sourceType: 'module' // Allows for the use of imports
+
+  },
+  rules: {
+    // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
+    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-member-accessibility': 'off',
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/interface-name-prefix': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off'
+  }
+};
+`;
+
+export const PrettierRC = `
+module.exports = {
+  semi: true,
+  trailingComma: 'all',
+  printWidth: 120,
+  tabWidth: 2,
+  useTabs: false,
+  endOfLine: 'auto',
+};
+`;
+
+export const TSConfigJSON = `
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "sourceMap": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["src", "index.d.ts"]
+}
+`
+
+export const IndexDTS = `
+declare module "*.jpg";
+declare module "*.png";
+declare module "*.svg";
+`;

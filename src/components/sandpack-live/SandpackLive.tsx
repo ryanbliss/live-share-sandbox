@@ -20,11 +20,16 @@ import { usePresence } from "../../live-share-hooks/plugins/usePresence";
 import { SandpackFileExplorer } from "./sandpack-files/SandpackFileExplorer";
 import { useStateRef } from "../../utils/useStateRef";
 import {
+  BabelRC,
+  ESLintRC,
+  IndexDTS,
   LiveShareSandboxApi,
   PackageJson,
+  PrettierRC,
   ReactIndexCSS,
   ReactIndexJs,
   ReactIntexHTML,
+  TSConfigJSON,
   WebpackCommonConfig,
   WebpackDevConfig,
   WebpackProdConfig,
@@ -128,6 +133,36 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
       code: WebpackProdConfig,
       hidden: false,
       active: "/webpack.prod.js" === currentPageKey,
+      readOnly: false,
+    };
+    _files["/.babelrc"] = {
+      code: BabelRC,
+      hidden: false,
+      active: "/.babelrc" === currentPageKey,
+      readOnly: false,
+    };
+    _files["/.eslint.js"] = {
+      code: ESLintRC,
+      hidden: false,
+      active: "/.eslint.js" === currentPageKey,
+      readOnly: false,
+    };
+    _files["/.prettierrc.js"] = {
+      code: PrettierRC,
+      hidden: false,
+      active: "/.prettierrc.js" === currentPageKey,
+      readOnly: false,
+    };
+    _files["/tsconfig.json"] = {
+      code: TSConfigJSON,
+      hidden: false,
+      active: "/tsconfig.json" === currentPageKey,
+      readOnly: false,
+    };
+    _files["/index.d.ts"] = {
+      code: IndexDTS,
+      hidden: false,
+      active: "/tsconfig.json" === currentPageKey,
       readOnly: false,
     };
     console.log(_files);

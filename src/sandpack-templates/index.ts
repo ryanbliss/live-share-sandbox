@@ -10,6 +10,11 @@ import {
   WebpackProdConfig,
   ReactIndexCSS,
   ReactIntexHTML,
+  BabelRC,
+  ESLintRC,
+  PrettierRC,
+  TSConfigJSON,
+  IndexDTS,
 } from "./ReactTemplate";
 
 export {
@@ -23,5 +28,10 @@ export {
   WebpackCommonConfig,
   WebpackDevConfig,
   WebpackProdConfig,
+  BabelRC,
+  ESLintRC,
+  PrettierRC,
+  TSConfigJSON,
+  IndexDTS,
   buildEmptyReactComponent,
 };
