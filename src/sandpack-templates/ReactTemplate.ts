@@ -17,6 +17,12 @@ export const PackageJson = `
   "main": "/index.js",
   "private": true,
   "version": "0.0.0",
+  "scripts": {
+    "start": "webpack-dev-server --config webpack.config.js",
+    "build": "webpack --config webpack.prod.js",
+    "test": "jest",
+    "doctor": "eslint ./src/**/*.ts{,x} --fix",
+  },
   "dependencies": {
     "@microsoft/live-share": "~0.3.1",
     "@microsoft/live-share-media": "~0.3.1",
