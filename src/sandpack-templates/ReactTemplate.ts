@@ -48,8 +48,8 @@ export const PackageJson = `
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "start": "webpack-dev-server --config webpack.config.js",
-    "build": "webpack --config webpack.config.js",
+    "start": "webpack-dev-server --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js",
     "test": "jest",
     "doctor": "eslint ./src/**/*.ts{,x} --fix"
   },
@@ -182,7 +182,7 @@ export const PackageJson = `
 // }
 // `;
 
-export const WebpackConfig = `
+export const WebpackCommonConfig = `
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -267,4 +267,33 @@ module.exports = {
     }),
   ],
 };
+`;
+
+export const WebpackProdConfig = `
+/* eslint-disable @typescript-eslint/no-var-requires */
+const { merge } = require("webpack-merge");
+const common = require("./webpack.common.js");
+
+module.exports = merge(common, {
+  mode: "production",
+  plugins: [],
+});
+`;
+
+export const WebpackDevConfig = `
+/* eslint-disable @typescript-eslint/no-var-requires */
+const path = require("path");
+const { merge } = require("webpack-merge");
+const common = require("./webpack.common.js");
+
+module.exports = merge(common, {
+  mode: "development",
+  devtool: "inline-source-map",
+  devServer: {
+    static: { directory: path.join(__dirname, "src") },
+    compress: true,
+    hot: true,
+  },
+  plugins: [],
+});
 `;

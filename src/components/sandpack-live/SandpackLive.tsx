@@ -25,7 +25,9 @@ import {
   ReactIndexCSS,
   ReactIndexJs,
   ReactIntexHTML,
-  WebpackConfig,
+  WebpackCommonConfig,
+  WebpackDevConfig,
+  WebpackProdConfig,
 } from "../../sandpack-templates";
 
 interface ISandpackLiveProps {
@@ -110,10 +112,22 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     //   readOnly: true,
     // };
 
-    _files["/webpack.config.js"] = {
-      code: WebpackConfig,
+    _files["/webpack.common.js"] = {
+      code: WebpackCommonConfig,
       hidden: false,
-      active: "/webpack.config.js" === currentPageKey,
+      active: "/webpack.common.js" === currentPageKey,
+      readOnly: false,
+    };
+    _files["/webpack.dev.js"] = {
+      code: WebpackDevConfig,
+      hidden: false,
+      active: "/webpack.dev.js" === currentPageKey,
+      readOnly: false,
+    };
+    _files["/webpack.prod.js"] = {
+      code: WebpackProdConfig,
+      hidden: false,
+      active: "/webpack.prod.js" === currentPageKey,
       readOnly: false,
     };
     console.log(_files);

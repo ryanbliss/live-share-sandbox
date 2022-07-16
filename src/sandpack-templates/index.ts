@@ -5,7 +5,9 @@ import { LiveShareSandboxApi } from "./LiveShareSandboxApi";
 import {
   ReactIndexJs,
   PackageJson,
-  WebpackConfig,
+  WebpackCommonConfig,
+  WebpackDevConfig,
+  WebpackProdConfig,
   ReactIndexCSS,
   ReactIntexHTML,
 } from "./ReactTemplate";
@@ -18,6 +20,8 @@ export {
   ReactIndexCSS,
   ReactIntexHTML,
   PackageJson,
-  WebpackConfig,
+  WebpackCommonConfig,
+  WebpackDevConfig,
+  WebpackProdConfig,
   buildEmptyReactComponent,
 };
