@@ -34,7 +34,7 @@ function App() {
       >
         <PageWrapper loading={loading} error={error}>
           <SandpackLive
-            template={"react"}
+            template={"react-ts"}
             codePagesMap={codePagesMap}
             followModeState={followModeState}
             presence={presence}

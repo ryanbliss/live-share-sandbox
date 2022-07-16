@@ -54,7 +54,7 @@ export function useCodePages(
           .create(SharedString)
           .then((sharedString) => {
             (container.initialObjects.codePagesMap as SharedMap).set(
-              `/${pageName}.js`,
+              `/${pageName}.tsx`,
               sharedString.handle
             );
             sharedString.insertText(0, buildEmptyReactComponent(pageName));

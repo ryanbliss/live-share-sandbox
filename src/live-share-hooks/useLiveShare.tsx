@@ -88,7 +88,7 @@ export function useLiveShare(): {
         .create(SharedString)
         .then((sharedString) => {
           (container.initialObjects.codePagesMap as SharedMap).set(
-            "/App.js",
+            "/App.tsx",
             sharedString.handle
           );
           sharedString.insertText(0, AppTemplate);
@@ -98,7 +98,7 @@ export function useLiveShare(): {
         .create(SharedString)
         .then((sharedString) => {
           (container.initialObjects.codePagesMap as SharedMap).set(
-            "/Header.js",
+            "/Header.tsx",
             sharedString.handle
           );
           sharedString.insertText(0, HeaderTemplate);

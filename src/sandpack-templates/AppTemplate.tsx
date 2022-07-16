@@ -6,7 +6,7 @@ import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
 // import { TeamsFluidClient } from "./LiveShareSandboxApi";
 import { useEffect, useState, useRef } from "react";
 import Header from "./Header";
-import { SharedMap } from "fluid-framework";
+import { SharedMap } from "@fluidframework/map";
 
 export default function App() {
   const counterMapRef = useRef();
@@ -73,7 +73,7 @@ export default function App() {
       <p>Click the button to iterate the counter</p>
       <button onClick={() => {
         counterMapRef.current?.set("count", counterValue + 1);
-      }}></button>
+      }}>+1</button>
     </div>
   )
 }
