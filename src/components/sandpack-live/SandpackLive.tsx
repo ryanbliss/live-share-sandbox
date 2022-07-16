@@ -23,6 +23,7 @@ import {
   LiveShareSandboxApi,
   PackageJson,
   ReactIndexJs,
+  WebpackConfig,
 } from "../../sandpack-templates";
 
 interface ISandpackLiveProps {
@@ -91,6 +92,12 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         code: PackageJson,
         hidden: false,
         active: "/package.json" === currentPageKey,
+        readOnly: false,
+      };
+      _files["/webpack.config.js"] = {
+        code: WebpackConfig,
+        hidden: false,
+        active: "/webpack.config.js" === currentPageKey,
         readOnly: false,
       };
     });
@@ -191,6 +198,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         files={mappedSandpackFiles}
         options={{
           bundlerURL: "https://sandpack-bundler.pages.dev",
+          skipEval: true,
         }}
         // customSetup={{
         //   dependencies: {

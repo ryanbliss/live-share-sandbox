@@ -2,7 +2,7 @@ import { AppTemplate } from "./AppTemplate";
 import { HeaderTemplate } from "./HeaderTemplate";
 import { buildEmptyReactComponent } from "./EmptyReactComponent";
 import { LiveShareSandboxApi } from "./LiveShareSandboxApi";
-import { ReactIndexJs, PackageJson } from "./ReactTemplate";
+import { ReactIndexJs, PackageJson, WebpackConfig } from "./ReactTemplate";
 
 export {
   AppTemplate,
@@ -10,5 +10,6 @@ export {
   LiveShareSandboxApi,
   ReactIndexJs,
   PackageJson,
+  WebpackConfig,
   buildEmptyReactComponent,
 };
