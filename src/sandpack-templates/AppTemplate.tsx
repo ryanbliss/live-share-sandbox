@@ -1,12 +1,12 @@
 export const AppTemplate = `
 import * as microsoftTeams from "@microsoft/teams-js";
-import { SharedMap } from "fluid-framework";
 import { LOCAL_MODE_TENANT_ID } from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
 // in your production app, import from "@microsoft/live-share";
 // import { TeamsFluidClient } from "./LiveShareSandboxApi";
 import { useEffect, useState, useRef } from "react";
 import Header from "./Header";
+import { SharedMap } from "fluid-framework";
 
 export default function App() {
   const counterMapRef = useRef();
@@ -38,7 +38,7 @@ export default function App() {
 
       // Define container callback (optional).
       // * This is only called once when the container is first created.
-      const onFirstInitialize = (container: IFluidContainer) => {
+      const onFirstInitialize = (container) => {
         console.log("useSharedObjects: onFirstInitialize called");
         // Setup any initial state here
       };

@@ -22,7 +22,9 @@ import { useStateRef } from "../../utils/useStateRef";
 import {
   LiveShareSandboxApi,
   PackageJson,
+  ReactIndexCSS,
   ReactIndexJs,
+  ReactIntexHTML,
   WebpackConfig,
 } from "../../sandpack-templates";
 
@@ -76,31 +78,44 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         active: key === currentPageKey,
         readOnly: false,
       };
-      // _files["/LiveShareSandboxApi.js"] = {
-      //   code: LiveShareSandboxApi,
-      //   hidden: true,
-      //   active: false,
-      //   readOnly: true,
-      // };
-      _files["/index.js"] = {
-        code: ReactIndexJs,
-        hidden: true,
-        active: "/index.js" === currentPageKey,
-        readOnly: true,
-      };
-      _files["/package.json"] = {
-        code: PackageJson,
-        hidden: false,
-        active: "/package.json" === currentPageKey,
-        readOnly: false,
-      };
-      _files["/webpack.config.js"] = {
-        code: WebpackConfig,
-        hidden: false,
-        active: "/webpack.config.js" === currentPageKey,
-        readOnly: false,
-      };
     });
+    _files["/index.js"] = {
+      code: ReactIndexJs,
+      hidden: true,
+      active: "/index.js" === currentPageKey,
+      readOnly: true,
+    };
+    _files["/public/index.html"] = {
+      code: ReactIntexHTML,
+      hidden: true,
+      active: "/public/index.html" === currentPageKey,
+      readOnly: true,
+    };
+    _files["/styles.css"] = {
+      code: ReactIndexCSS,
+      hidden: true,
+      active: "/styles.css" === currentPageKey,
+      readOnly: true,
+    };
+    _files["/package.json"] = {
+      code: PackageJson,
+      hidden: false,
+      active: "/package.json" === currentPageKey,
+      readOnly: false,
+    };
+    // _files["/LiveShareSandboxApi.js"] = {
+    //   code: LiveShareSandboxApi,
+    //   hidden: true,
+    //   active: false,
+    //   readOnly: true,
+    // };
+
+    _files["/webpack.config.js"] = {
+      code: WebpackConfig,
+      hidden: false,
+      active: "/webpack.config.js" === currentPageKey,
+      readOnly: false,
+    };
     console.log(_files);
     return _files;
   }, [sandpackFiles, currentPageKey]);
@@ -194,22 +209,22 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
       />
       <SandpackProvider
         // Try out the included templates below!
-        template={props.template}
+        // template={props.template}
         files={mappedSandpackFiles}
-        options={{
-          bundlerURL: "https://sandpack-bundler.pages.dev",
-          skipEval: true,
-        }}
+        options={
+          {
+            // bundlerURL: "https://sandpack-bundler.pages.dev",
+            // skipEval: true,
+          }
+        }
         // customSetup={{
         //   dependencies: {
         //     "@microsoft/live-share-media": "0.3.1",
-        //     // "fluid-framework": "0.59.3003",
+        //     "fluid-framework": "0.59.3003",
         //     "@fluidframework/test-client-utils": "0.59.2003",
-        //     buffer: "latest",
-        //     url: "latest",
-        //     stream: "latest",
-        //     assert: "latest",
-        //     emitter: "latest",
+        //     react: "^18.0.0",
+        //     "react-dom": "^18.0.0",
+        //     "react-scripts": "^4.0.0",
         //   },
         // }}
       >

@@ -1,14 +1,44 @@
 export const ReactIndexJs = `
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
+import React, { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./styles.css";
 
-ReactDOM.render(
-  <React.StrictMode>
+import App from "./App";
+
+const root = createRoot(document.getElementById("root"));
+root.render(
+  <StrictMode>
     <App />
-  </React.StrictMode>,
- document.getElementById('root')
+  </StrictMode>
 );
+`;
+
+export const ReactIndexCSS = `
+body {
+  margin: 0;
+  min-height: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: calc(1em * 0.625);
+  display: "inline-block";
+}
+`;
+
+export const ReactIntexHTML = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
 `;
 
 export const PackageJson = `
@@ -19,16 +49,16 @@ export const PackageJson = `
   "version": "0.0.0",
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.js",
-    "build": "webpack --config webpack.prod.js",
+    "build": "webpack --config webpack.config.js",
     "test": "jest",
-    "doctor": "eslint ./src/**/*.ts{,x} --fix",
+    "doctor": "eslint ./src/**/*.ts{,x} --fix"
   },
   "dependencies": {
     "@microsoft/live-share": "~0.3.1",
     "@microsoft/live-share-media": "~0.3.1",
     "@microsoft/teams-js": "2.0.0-experimental.0",
-    "fluid-framework": "~0.59.0",
-    "lodash": "^4.17.21",
+    "fluid-framework": "0.59.4000",
+    "@fluidframework/test-client-utils": "0.59.4001",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "^5.0.0",
@@ -41,8 +71,7 @@ export const PackageJson = `
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
-    "@fluidframework/test-client-utils": "^0.54.2",
-    "@fluidframework/tinylicious-client": "^0.58.1000",
+    
     "babel-jest": "^27.5.1",
     "babel-loader": "^8.2.4",
     "css-loader": "^6.7.1",
@@ -70,9 +99,88 @@ export const PackageJson = `
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4",
     "webpack-merge": "^5.8.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
 `;
+
+// export const PackageJson = `
+// {
+//   "name": "live-share-sandbox",
+//   "main": "/index.js",
+//   "version": "0.1.0",
+//   "private": true,
+//   "author": "Ryan Bliss",
+//   "license": "MIT",
+//   "dependencies": {
+//     "@fluentui/react-components": "^9.0.1",
+//     "@fluidframework/test-client-utils": "~0.59.0",
+//     "@microsoft/live-share": "~0.3.1",
+//     "@microsoft/live-share-media": "~0.3.1",
+//     "@microsoft/teams-js": "2.0.0-experimental.0",
+//     "@testing-library/jest-dom": "^5.16.2",
+//     "@testing-library/react": "^12.1.3",
+//     "@testing-library/user-event": "^13.5.0",
+//     "fluid-framework": "~0.59.0",
+//     "react": "^18.0.0",
+//     "react-dom": "^18.0.0",
+//     "react-router-dom": "^6.2.2",
+//     "react-scripts": "^4.0.0",
+//     "uuid": "^8.3.2",
+//     "web-vitals": "^2.1.4"
+//   },
+//   "devDependencies": {
+//     "eslint-config-prettier": "^8.3.0",
+//     "eslint-plugin-prettier": "^3.4.1",
+//     "eslint": "^7.32.0",
+//     "prettier": "^2.5.0",
+//     "start-server-and-test": "^1.11.6"
+//   },
+//   "scripts": {
+//     "clean": "npx shx rm -rf build",
+//     "start": "react-scripts start",
+//     "start:server": "npx @fluidframework/azure-local-service@latest",
+//     "build": "react-scripts build",
+//     "test": "react-scripts test",
+//     "eject": "react-scripts eject"
+//   },
+//   "eslintConfig": {
+//     "extends": [
+//       "react-app",
+//       "react-app/jest"
+//     ]
+//   },
+//   "browserslist": {
+//     "production": [
+//       ">0.2%",
+//       "not dead",
+//       "not op_mini all"
+//     ],
+//     "development": [
+//       "last 1 chrome version",
+//       "last 1 firefox version",
+//       "last 1 safari version"
+//     ]
+//   }
+// }
+// `;
 
 export const WebpackConfig = `
 /* eslint-disable @typescript-eslint/no-var-requires */
