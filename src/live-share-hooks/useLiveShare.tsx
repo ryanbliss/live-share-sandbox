@@ -12,8 +12,8 @@ import {
   IFluidContainer,
   SharedDirectory,
   SharedMap,
-  SharedString,
 } from "fluid-framework";
+import { SharedString } from "@fluidframework/sequence";
 import { useEffect, useState } from "react";
 import { AppTemplate, HeaderTemplate } from "../sandpack-templates";
 import { IFollowModeStateValue } from "./plugins/useFollowModeState";
@@ -72,6 +72,17 @@ export function useLiveShare(): {
     // - logger: A fluid logger to use.
     const clientProps = {
       connection,
+      // getFluidContainerId: (): Promise<string | undefined> => {
+      //   let containerId: string | undefined;
+      //   const searchParams = new URL(window.location.href).searchParams;
+      //   if (searchParams.has("containerId")) {
+      //     containerId = new URL(window.location.href).searchParams.get("containerId")!;
+      //   }
+      //   return Promise.resolve(containerId);
+      // },
+      // setFluidContainerId: (containerId: string): void => {
+      //   const containerId = this.getLocalTestContainerId();
+      // },
     };
 
     // To reset the stored container-id, uncomment below:

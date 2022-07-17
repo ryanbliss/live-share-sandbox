@@ -19,6 +19,11 @@ import {
 import { usePresence } from "../../live-share-hooks/plugins/usePresence";
 import { SandpackFileExplorer } from "./sandpack-files/SandpackFileExplorer";
 import { useStateRef } from "../../utils/useStateRef";
+import {
+  LiveShareSandboxApi,
+  WindowMessagingApi,
+} from "../../sandpack-templates";
+import { useSandpackMessages } from "../../sandpack-hooks/useSandpackMessages";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -71,84 +76,18 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         readOnly: false,
       };
     });
-    // _files["/index.tsx"] = {
-    //   code: ReactIndexJs,
-    //   hidden: true,
-    //   active: "/index.tsx" === currentPageKey,
-    //   readOnly: true,
-    // };
-    // _files["/public/index.html"] = {
-    //   code: ReactIntexHTML,
-    //   hidden: true,
-    //   active: "/public/index.html" === currentPageKey,
-    //   readOnly: true,
-    // };
-    // _files["/styles.css"] = {
-    //   code: ReactIndexCSS,
-    //   hidden: true,
-    //   active: "/styles.css" === currentPageKey,
-    //   readOnly: true,
-    // };
-    // _files["/package.json"] = {
-    //   code: PackageJson,
-    //   hidden: false,
-    //   active: "/package.json" === currentPageKey,
-    //   readOnly: false,
-    // };
-    // _files["/LiveShareSandboxApi.js"] = {
-    //   code: LiveShareSandboxApi,
-    //   hidden: true,
-    //   active: false,
-    //   readOnly: true,
-    // };
-    // _files["/webpack.common.js"] = {
-    //   code: WebpackCommonConfig,
-    //   hidden: false,
-    //   active: "/webpack.common.js" === currentPageKey,
-    //   readOnly: false,
-    // };
-    // _files["/webpack.dev.js"] = {
-    //   code: WebpackDevConfig,
-    //   hidden: false,
-    //   active: "/webpack.dev.js" === currentPageKey,
-    //   readOnly: false,
-    // };
-    // _files["/webpack.prod.js"] = {
-    //   code: WebpackProdConfig,
-    //   hidden: false,
-    //   active: "/webpack.prod.js" === currentPageKey,
-    //   readOnly: false,
-    // };
-    // _files["/.babelrc"] = {
-    //   code: BabelRC,
-    //   hidden: false,
-    //   active: "/.babelrc" === currentPageKey,
-    //   readOnly: false,
-    // };
-    // _files["/.eslint.js"] = {
-    //   code: ESLintRC,
-    //   hidden: false,
-    //   active: "/.eslint.js" === currentPageKey,
-    //   readOnly: false,
-    // };
-    // _files["/.prettierrc.js"] = {
-    //   code: PrettierRC,
-    //   hidden: false,
-    //   active: "/.prettierrc.js" === currentPageKey,
-    //   readOnly: false,
-    // };
-    // _files["tsconfig.json"] = {
-    //   code: TSConfigJSON,
-    //   hidden: false,
-    //   active: "/tsconfig.json" === currentPageKey,
-    //   readOnly: false,
-    // };
-    // _files["/index.d.ts"] = {
-    //   code: IndexDTS,
-    //   hidden: false,
-    //   active: "/index.d.ts" === currentPageKey,
-    //   readOnly: false,
-    // };
+    _files["/LiveShareSandboxApi.ts"] = {
+      code: LiveShareSandboxApi,
+      hidden: true,
+      active: false,
+      readOnly: true,
+    };
+    _files["/WindowMessagingApi.ts"] = {
+      code: WindowMessagingApi,
+      hidden: true,
+      active: false,
+      readOnly: true,
+    };
     console.log(_files);
     return _files;
   }, [sandpackFiles, currentPageKey]);
@@ -254,8 +193,9 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
           dependencies: {
             "@microsoft/live-share": "~0.3.1",
             "@microsoft/live-share-media": "~0.3.1",
-            "fluid-framework": "~0.59.0",
-            "@fluidframework/test-client-utils": "~0.59.0",
+            "fluid-framework": "~0.59.3000",
+            "@fluidframework/test-client-utils": "~0.59.3000",
+            "@fluidframework/sequence": "~0.59.3000",
             react: "^18.0.0",
             "react-dom": "^18.0.0",
             "react-scripts": "^4.0.0",

@@ -11,6 +11,7 @@ import { SandpackCodeEditor, useSandpack } from "@codesandbox/sandpack-react";
 import { CodeMirrorRef } from "@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror";
 import { EditorView, ViewUpdate } from "@codemirror/view";
 import { SharedStringHelper } from "@fluid-experimental/react-inputs";
+import { useSandpackMessages } from "../../../sandpack-hooks/useSandpackMessages";
 
 interface ISandpackEditorProps {
   pages: Map<string, SharedStringHelper>;
@@ -29,6 +30,7 @@ const SandpackEditor: FC<ISandpackEditorProps> = (props) => {
     codemirrorInstance,
   } = props;
   const { sandpack } = useSandpack();
+  useSandpackMessages();
   const { files, activeFile } = sandpack;
 
   const activePage = useMemo(() => {
