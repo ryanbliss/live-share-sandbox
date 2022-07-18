@@ -55,7 +55,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
   } = usePresence(
     props.presence,
     props.teamsContext,
-    "/App.js",
+    "/App.tsx",
     followingUserId
   );
 
