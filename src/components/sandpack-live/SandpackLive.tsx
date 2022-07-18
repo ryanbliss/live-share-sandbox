@@ -132,8 +132,9 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
           });
 
           cmInstance.update([trans]);
+        } else {
+          valueChanged = true;
         }
-        valueChanged = true;
       }
     });
     if (valueChanged) {
