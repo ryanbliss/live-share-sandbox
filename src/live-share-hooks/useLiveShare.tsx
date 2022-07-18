@@ -154,17 +154,9 @@ export function useLiveShare(): {
     loading: !container,
     error,
     container,
-    codePagesMap: initialObjects
-      ? (initialObjects?.codePagesMap as SharedMap)
-      : undefined,
-    sandpackObjectsMap: initialObjects
-      ? (initialObjects?.sandpackObjectsMap as SharedMap)
-      : undefined,
-    followModeState: initialObjects
-      ? (initialObjects?.followModeState as EphemeralState<IFollowModeStateValue>)
-      : undefined,
-    presence: initialObjects
-      ? (initialObjects?.presence as EphemeralPresence)
-      : undefined,
+    codePagesMap: initialObjects?.codePagesMap as SharedMap | undefined,
+    sandpackObjectsMap: initialObjects?.sandpackObjectsMap as SharedMap | undefined,
+    followModeState: initialObjects?.followModeState as EphemeralState<IFollowModeStateValue> | undefined,
+    presence: initialObjects?.presence as EphemeralPresence | undefined,
   };
 }
