@@ -8,24 +8,24 @@ function App() {
   const teamsContext = useTeamsContext();
 
   return (
-    <LiveShareProvider>
-      <div className="App">
-        <FluentProvider
-          theme={teamsDarkTheme}
-          style={{
-            minHeight: "0px",
-            position: "absolute",
-            left: "0",
-            right: "0",
-            top: "0",
-            bottom: "0",
-            overflow: "hidden",
-          }}
-        >
+    <div className="App">
+      <FluentProvider
+        theme={teamsDarkTheme}
+        style={{
+          minHeight: "0px",
+          position: "absolute",
+          left: "0",
+          right: "0",
+          top: "0",
+          bottom: "0",
+          overflow: "hidden",
+        }}
+      >
+        <LiveShareProvider>
           <SandpackLive template={"react-ts"} teamsContext={teamsContext} />
-        </FluentProvider>
-      </div>
-    </LiveShareProvider>
+        </LiveShareProvider>
+      </FluentProvider>
+    </div>
   );
 }
 
