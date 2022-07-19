@@ -20,6 +20,7 @@ import { useSandpackMessages } from "../../../sandpack-hooks/useSandpackMessages
 import { EditorSelection, Text } from "@codemirror/state";
 import { CodeMirrorRef } from "@codesandbox/sandpack-react/dist/types/components/CodeEditor/CodeMirror";
 import { debounce } from "lodash";
+import { useLiveShareContext } from "../../../live-share-hooks/useLiveShare";
 
 interface ISandpackEditorProps {
   pages: Map<string, SharedStringHelper>;
@@ -43,7 +44,8 @@ const SandpackEditor: FC<ISandpackEditorProps> = (props) => {
   } = props;
   const { sandpack } = useSandpack();
   const { updateCode } = useActiveCode();
-  useSandpackMessages();
+  const { userDidCreateContainerRef } = useLiveShareContext();
+  useSandpackMessages(userDidCreateContainerRef);
   const { activeFile } = sandpack;
 
   const activePage = useMemo(() => {

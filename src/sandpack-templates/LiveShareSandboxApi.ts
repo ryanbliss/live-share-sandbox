@@ -169,8 +169,10 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
     services: AzureContainerServices;
     created: boolean;
   }> {
-    this.testContainerId = await this.getTestContainerIdFromParent();
-    console.log("containerId 1", this.testContainerId);
+    if (this.isTesting) {
+      this.testContainerId = await this.getTestContainerIdFromParent();
+      console.log("testContainerId received from parent", this.testContainerId);
+    }
     // Define container schema
     const schema = {
       initialObjects: {
@@ -189,8 +191,6 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
     };
 
     const overrideInitialObjectHandles: any = {};
-    const keys = Object.keys(fluidContainerSchema.initialObjects);
-
     let listener: any;
 
     const getSandboxContainerResults = async (
@@ -243,6 +243,7 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
 
       // TODO: need to check if user is the presenter or some other mechanism for who to create these
       if (startingLength < targetInitialObjectsLength) {
+        console.log("Creating initial sandpackObjectsMap values");
         // We need to set the Sandpack initial objects to the sandpackObjectsMap
         for (
           let createIndex = 0;
@@ -263,6 +264,7 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
           onContainerFirstCreated(container);
         }
       } else if (startingLength > 0) {
+        console.log("Using existing sandpackObjectsMap values");
         sandpackObjectsMap.forEach((handle, key) => {
           overrideInitialObjectHandles[key] = handle;
         });

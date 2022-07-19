@@ -23,28 +23,28 @@ import {
 } from "../../sandpack-templates";
 import { useContainerEditable } from "../../live-share-hooks/fluid-helpers/useContainerEditable";
 import { FlexColumn, FlexItem } from "../flex";
+import { useLiveShareContext } from "../../live-share-hooks/useLiveShare";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
-  codePagesMap: SharedMap | undefined;
-  followModeState: EphemeralState<IFollowModeStateValue> | undefined;
-  presence: EphemeralPresence | undefined;
-  container: IFluidContainer | undefined;
   teamsContext: microsoftTeams.app.Context | undefined;
 }
 
 const SandpackLive: FC<ISandpackLiveProps> = (props) => {
+  const { codePagesMap, followModeState, presence, container } =
+    useLiveShareContext();
+
   const {
     pages,
     files: codePageFiles,
     filesRef: codePageFilesRef,
     onAddPage,
     setFiles,
-  } = useCodePages(props.codePagesMap, props.container);
-  const { editableRef } = useContainerEditable(props.container);
+  } = useCodePages(codePagesMap, container);
+  const { editableRef } = useContainerEditable(container);
 
   const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
-    useFollowModeState(props.followModeState, props.teamsContext?.user?.id);
+    useFollowModeState(followModeState, props.teamsContext?.user?.id);
 
   const {
     localUser,
@@ -52,12 +52,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     users,
     currentPageKey,
     onChangeCurrentPageKey,
-  } = usePresence(
-    props.presence,
-    props.teamsContext,
-    "/App.tsx",
-    followingUserId
-  );
+  } = usePresence(presence, props.teamsContext, "/App.tsx", followingUserId);
 
   const [sandpackFiles, setSandpackFiles] = useState<SandpackFiles>({});
   const codemirrorInstance = useRef<any>();
