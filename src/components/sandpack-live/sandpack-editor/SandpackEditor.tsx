@@ -40,8 +40,14 @@ const SandpackEditor: FC<ISandpackEditorProps> = (props) => {
   }, [pages, activeFile, activeFileRef]);
 
   const onPostDocumentChange = useCallback(
-    (fromA: number, toA: number, fromB: number, toB: number, inserted: Text) => {
-      const text = inserted.sliceString(0, inserted.length, '\n');
+    (
+      fromA: number,
+      toA: number,
+      fromB: number,
+      toB: number,
+      inserted: Text
+    ) => {
+      const text = inserted.sliceString(0, inserted.length, "\n");
       if (!activePage || activePage?.getText() === text) return;
       // if (!editableRef.current) {
       //   const cmInstance = (
@@ -97,12 +103,12 @@ const SandpackEditor: FC<ISandpackEditorProps> = (props) => {
         if (v.docChanged) {
           console.log("EditorView.updateListener: docChanged");
           v.changes.iterChanges((fromA, toA, fromB, toB, inserted) => {
-            console.log(inserted.sliceString(0, inserted.length, '/n'));
+            console.log(inserted.sliceString(0, inserted.length, "/n"));
             onPostDocumentChange(fromA, toA, fromB, toB, inserted);
           }, false);
         }
       }),
-    ]
+    ];
   }, [onPostDocumentChange]);
 
   return (
@@ -111,7 +117,15 @@ const SandpackEditor: FC<ISandpackEditorProps> = (props) => {
       showTabs={false}
       // readOnly={!editable}
       extensions={extensions}
-      style={{ height: "100vh" }}
+      style={{
+        position: "absolute",
+        right: "50%",
+        top: 0,
+        left: 0,
+        bottom: 0,
+        height: "100%",
+        width: "50%",
+      }}
     />
   );
 };

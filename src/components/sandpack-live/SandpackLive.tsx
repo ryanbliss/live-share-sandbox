@@ -1,4 +1,12 @@
-import { FC, MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  FC,
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   SandpackLayout,
   SandpackPreview,
@@ -25,6 +33,7 @@ import {
 } from "../../sandpack-templates";
 import { useSandpackMessages } from "../../sandpack-hooks/useSandpackMessages";
 import { useContainerEditable } from "../../live-share-hooks/fluid-helpers/useContainerEditable";
+import { FlexColumn, FlexItem, FlexRow } from "../flex";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -43,9 +52,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     onAddPage,
     setFiles,
   } = useCodePages(props.codePagesMap, props.container);
-  const {
-    editableRef,
-  } = useContainerEditable(props.container);
+  const { editableRef } = useContainerEditable(props.container);
 
   const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
     useFollowModeState(props.followModeState, props.teamsContext?.user?.id);
@@ -163,63 +170,77 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
   }
 
   return (
-    <div>
-      <SandpackFileExplorer
-        files={sandpackFiles}
-        selectedFileKey={currentPageKey}
-        onChangeSelectedFile={(fileName) => {
-          onChangeCurrentPageKey(fileName);
-          if (
-            followingUserId &&
-            followingUserId !== localUser?.userId &&
-            localUserIsEligiblePresenter
-          ) {
-            onInitiateFollowMode();
+    <>
+      <FlexItem noShrink>
+        <SandpackFileExplorer
+          files={sandpackFiles}
+          selectedFileKey={currentPageKey}
+          onChangeSelectedFile={(fileName) => {
+            onChangeCurrentPageKey(fileName);
+            if (
+              followingUserId &&
+              followingUserId !== localUser?.userId &&
+              localUserIsEligiblePresenter
+            ) {
+              onInitiateFollowMode();
+            }
+          }}
+          followModeActive={!!followingUserId}
+          onAddPage={onAddPage}
+          onInitiateFollowMode={onInitiateFollowMode}
+          onEndFollowMode={onEndFollowMode}
+        />
+      </FlexItem>
+      <FlexColumn expand="fill" style={{ position: "relative" }}>
+        <SandpackProvider
+          // Try out the included templates below!
+          template={props.template}
+          files={mappedSandpackFiles}
+          options={
+            {
+              // bundlerURL: "https://sandpack-bundler.pages.dev",
+              // skipEval: true,
+            }
           }
-        }}
-        followModeActive={!!followingUserId}
-        onAddPage={onAddPage}
-        onInitiateFollowMode={onInitiateFollowMode}
-        onEndFollowMode={onEndFollowMode}
-      />
-      <SandpackProvider
-        // Try out the included templates below!
-        template={props.template}
-        files={mappedSandpackFiles}
-        options={
-          {
-            // bundlerURL: "https://sandpack-bundler.pages.dev",
-            // skipEval: true,
-          }
-        }
-        customSetup={{
-          dependencies: {
-            "@microsoft/live-share": "~0.3.1",
-            "@microsoft/live-share-media": "~0.3.1",
-            "fluid-framework": "~0.59.3000",
-            "@fluidframework/test-client-utils": "~0.59.3000",
-            "@fluidframework/sequence": "~0.59.3000",
-            react: "^18.0.0",
-            "react-dom": "^18.0.0",
-            "react-scripts": "^4.0.0",
-          },
-        }}
-      >
-        <SandpackThemeProvider theme={"dark"} style={{ height: "100vh" }}>
-          <SandpackLayout>
-            <SandpackEditor
-              pages={pages}
-              codePageFiles={codePageFiles}
-              codePageFilesRef={codePageFilesRef}
-              activeFileRef={activeFileRef}
-              codemirrorInstance={codemirrorInstance}
-              editableRef={editableRef}
-            />
-            <SandpackPreview style={{ height: "100vh" }} />
-          </SandpackLayout>
-        </SandpackThemeProvider>
-      </SandpackProvider>
-    </div>
+          customSetup={{
+            dependencies: {
+              "@microsoft/live-share": "~0.3.1",
+              "@microsoft/live-share-media": "~0.3.1",
+              "fluid-framework": "~0.59.3000",
+              "@fluidframework/test-client-utils": "~0.59.3000",
+              "@fluidframework/sequence": "~0.59.3000",
+              react: "^18.0.0",
+              "react-dom": "^18.0.0",
+              "react-scripts": "^4.0.0",
+            },
+          }}
+        >
+          <SandpackThemeProvider theme={"dark"}>
+            <SandpackLayout>
+              <SandpackEditor
+                pages={pages}
+                codePageFiles={codePageFiles}
+                codePageFilesRef={codePageFilesRef}
+                activeFileRef={activeFileRef}
+                codemirrorInstance={codemirrorInstance}
+                editableRef={editableRef}
+              />
+              <SandpackPreview
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: "100%",
+                  width: "50%",
+                }}
+              />
+            </SandpackLayout>
+          </SandpackThemeProvider>
+        </SandpackProvider>
+      </FlexColumn>
+    </>
   );
 };
 
