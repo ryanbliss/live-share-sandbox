@@ -234,6 +234,27 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
     return new Promise(async (resolve) => {
       const sandpackObjectsMap = container.initialObjects
         .sandpackObjectsMap as SharedMap;
+
+      listener = async (changed: any, local: boolean, map: SharedMap) => {
+        console.log("sandpackObjectsMap changed", changed.key);
+        const handle = await map.get(changed.key);
+        if (handle) {
+          overrideInitialObjectHandles[changed.key] = handle;
+          if (
+            Object.keys(overrideInitialObjectHandles).length ===
+            targetInitialObjectsLength
+          ) {
+            const sandpackResults = await getSandboxContainerResults(
+              sandpackObjectsMap,
+              container
+            );
+            sandpackObjectsMap.off("valueChanged", listener);
+            resolve(sandpackResults);
+          }
+        }
+      };
+      sandpackObjectsMap.on("valueChanged", listener);
+
       const keys = Object.keys(fluidContainerSchema.initialObjects);
       const targetInitialObjectsLength = Object.keys(
         fluidContainerSchema.initialObjects
@@ -243,25 +264,26 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
 
       // TODO: need to check if user is the presenter or some other mechanism for who to create these
       if (startingLength < targetInitialObjectsLength) {
-        console.log("Creating initial sandpackObjectsMap values");
-        // We need to set the Sandpack initial objects to the sandpackObjectsMap
-        for (
-          let createIndex = 0;
-          createIndex < targetInitialObjectsLength;
-          createIndex++
-        ) {
-          const key = keys[createIndex];
-          const dds = await container.create(
-            fluidContainerSchema.initialObjects[key]
-          );
-          sandpackObjectsMap.set(key, dds.handle);
-          const handle = sandpackObjectsMap.get(key);
-          if (handle) {
-            overrideInitialObjectHandles[key] = handle;
+        const shouldCreateInitialObjects = await WindowMessagingApi.sendRequest<boolean>(
+          "getShouldCreateInitialObjects"
+        );
+        if (shouldCreateInitialObjects) {
+          console.log("Creating initial sandpackObjectsMap values");
+          // We need to set the Sandpack initial objects to the sandpackObjectsMap
+          for (
+            let createIndex = 0;
+            createIndex < targetInitialObjectsLength;
+            createIndex++
+          ) {
+            const key = keys[createIndex];
+            const dds = await container.create(
+              fluidContainerSchema.initialObjects[key]
+            );
+            sandpackObjectsMap.set(key, dds.handle);
           }
-        }
-        if (!!onContainerFirstCreated) {
-          onContainerFirstCreated(container);
+          if (!!onContainerFirstCreated) {
+            onContainerFirstCreated(container);
+          }
         }
       } else if (startingLength > 0) {
         console.log("Using existing sandpackObjectsMap values");
@@ -277,33 +299,15 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
           sandpackObjectsMap,
           container
         );
+        sandpackObjectsMap.off("valueChanged", listener);
         resolve(sandpackResults);
-      } else {
-        listener = async (changed: any, local: boolean, map: SharedMap) => {
-          console.log("sandpackObjectsMap changed", changed.key);
-          const handle = await map.get(changed.key);
-          if (handle) {
-            overrideInitialObjectHandles[changed.key] = handle;
-            if (
-              Object.keys(overrideInitialObjectHandles).length ===
-              targetInitialObjectsLength
-            ) {
-              const sandpackResults = await getSandboxContainerResults(
-                sandpackObjectsMap,
-                container
-              );
-              resolve(sandpackResults);
-            }
-          }
-        };
-        sandpackObjectsMap.on("valueChanged", listener);
       }
     });
   }
 
   private getTestContainerIdFromParent(): Promise<string> {
     return new Promise(async (resolve) => {
-      const containerId: string = await WindowMessagingApi.sendRequest<string>(
+      const containerId = await WindowMessagingApi.sendRequest<string>(
         "getContainerId"
       );
       resolve(containerId);
