@@ -3,21 +3,34 @@
  * Licensed under the MIT License.
  */
 
-import { EphemeralState, TeamsFluidClient } from "@microsoft/live-share";
+import { EphemeralState, TeamsFluidClient, EphemeralEvent, EphemeralPresence } from "@microsoft/live-share";
+import { EphemeralMediaSession } from "@microsoft/live-share-media";
 import { LOCAL_MODE_TENANT_ID } from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
-import { EphemeralMediaSession } from "@microsoft/live-share-media";
 import {
   ContainerSchema,
   IFluidContainer,
   SharedDirectory,
   SharedMap,
-  SharedString,
 } from "fluid-framework";
-import { useEffect, useState } from "react";
-import { EphemeralEvent, EphemeralPresence } from "@microsoft/live-share";
+import { SharedString } from "@fluidframework/sequence";
+import { createContext, FC, MutableRefObject, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { AppTemplate, HeaderTemplate } from "../sandpack-templates";
 import { IFollowModeStateValue } from "./plugins/useFollowModeState";
+import PageWrapper from "../components/page-wrapper/PageWrapper";
+
+export interface ILiveShareContext {
+  loading: boolean;
+  error: Error | undefined;
+  container: IFluidContainer | undefined;
+  codePagesMap: SharedMap | undefined;
+  sandpackObjectsMap: SharedMap | undefined;
+  followModeState:
+    | EphemeralState<IFollowModeStateValue>
+    | undefined;
+  presence: EphemeralPresence | undefined;
+  userDidCreateContainerRef: MutableRefObject<boolean> | undefined;
+}
 
 /**
  * Hook that creates/loads the apps shared objects.
@@ -28,17 +41,7 @@ import { IFollowModeStateValue } from "./plugins/useFollowModeState";
  *
  * @returns Shared objects managed by the apps fluid container.
  */
-export function useLiveShare(): {
-  loading: boolean;
-  error: Error | undefined;
-  container: IFluidContainer | undefined;
-  codePagesMap: SharedMap | undefined;
-  sandpackObjectsMap: SharedMap | undefined;
-  followModeState:
-    | EphemeralState<IFollowModeStateValue>
-    | undefined;
-  presence: EphemeralPresence | undefined;
-} {
+function useLiveShare(): ILiveShareContext {
   const [results, setResults] = useState<
     | {
         container: IFluidContainer;
@@ -48,8 +51,14 @@ export function useLiveShare(): {
     | undefined
   >();
   const [error, setError] = useState<Error | undefined>();
+  const userDidCreateContainerRef = useRef<boolean>(false);
+  const initalizedRef = useRef<boolean>(false);
 
   useEffect(() => {
+    if (initalizedRef.current) {
+      return;
+    }
+    initalizedRef.current = true;
     console.log("useSharedObjects: starting");
     // Check if user is in Teams
     const url = new URL(window.location.href);
@@ -73,6 +82,17 @@ export function useLiveShare(): {
     // - logger: A fluid logger to use.
     const clientProps = {
       connection,
+      // getFluidContainerId: (): Promise<string | undefined> => {
+      //   let containerId: string | undefined;
+      //   const searchParams = new URL(window.location.href).searchParams;
+      //   if (searchParams.has("containerId")) {
+      //     containerId = new URL(window.location.href).searchParams.get("containerId")!;
+      //   }
+      //   return Promise.resolve(containerId);
+      // },
+      // setFluidContainerId: (containerId: string): void => {
+      //   const containerId = this.getLocalTestContainerId();
+      // },
     };
 
     // To reset the stored container-id, uncomment below:
@@ -85,11 +105,12 @@ export function useLiveShare(): {
     // * This is only called once when the container is first created.
     const onFirstInitialize = (container: IFluidContainer) => {
       console.log("useSharedObjects: onFirstInitialize called");
+      userDidCreateContainerRef.current = true;
       container
         .create(SharedString)
         .then((sharedString) => {
           (container.initialObjects.codePagesMap as SharedMap).set(
-            "/App.js",
+            "/App.tsx",
             sharedString.handle
           );
           sharedString.insertText(0, AppTemplate);
@@ -99,7 +120,7 @@ export function useLiveShare(): {
         .create(SharedString)
         .then((sharedString) => {
           (container.initialObjects.codePagesMap as SharedMap).set(
-            "/Header.js",
+            "/Header.tsx",
             sharedString.handle
           );
           sharedString.insertText(0, HeaderTemplate);
@@ -136,7 +157,7 @@ export function useLiveShare(): {
         setResults(results);
       })
       .catch((err) => setError(err));
-  }, []);
+  });
 
   const container = results?.container;
   const initialObjects = container?.initialObjects;
@@ -144,17 +165,40 @@ export function useLiveShare(): {
     loading: !container,
     error,
     container,
-    codePagesMap: initialObjects
-      ? (initialObjects?.codePagesMap as SharedMap)
-      : undefined,
-    sandpackObjectsMap: initialObjects
-      ? (initialObjects?.sandpackObjectsMap as SharedMap)
-      : undefined,
-    followModeState: initialObjects
-      ? (initialObjects?.followModeState as EphemeralState<IFollowModeStateValue>)
-      : undefined,
-    presence: initialObjects
-      ? (initialObjects?.presence as EphemeralPresence)
-      : undefined,
+    codePagesMap: initialObjects?.codePagesMap as SharedMap | undefined,
+    sandpackObjectsMap: initialObjects?.sandpackObjectsMap as SharedMap | undefined,
+    followModeState: initialObjects?.followModeState as EphemeralState<IFollowModeStateValue> | undefined,
+    presence: initialObjects?.presence as EphemeralPresence | undefined,
+    userDidCreateContainerRef,
   };
+}
+
+export const LiveShareContext = createContext<ILiveShareContext>({
+  loading: true,
+  error: undefined,
+  container: undefined,
+  codePagesMap: undefined,
+  sandpackObjectsMap: undefined,
+  followModeState: undefined,
+  presence: undefined,
+  userDidCreateContainerRef: undefined,
+});
+
+export const LiveShareProvider: FC<{
+  children: ReactNode;
+}> = ({children}) => {
+  const liveShareValue = useLiveShare();
+
+  return (
+    <LiveShareContext.Provider value={liveShareValue}>
+      <PageWrapper loading={liveShareValue.loading} error={liveShareValue.error}>
+        { children }
+      </PageWrapper>
+    </LiveShareContext.Provider>
+  )
+}
+
+export const useLiveShareContext = (): ILiveShareContext => {
+  const liveShareContext = useContext(LiveShareContext);
+  return liveShareContext;
 }
