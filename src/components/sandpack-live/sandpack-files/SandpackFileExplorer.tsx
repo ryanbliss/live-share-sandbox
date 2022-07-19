@@ -6,9 +6,10 @@ import {
   ShareScreenStart24Filled,
   ShareScreenStop24Filled,
 } from "@fluentui/react-icons";
+import { SandpackFiles } from "@codesandbox/sandpack-react";
 
 interface ISandpackFileExplorerProps {
-  files: any;
+  files: SandpackFiles;
   selectedFileKey: string;
   followModeActive: boolean;
   onChangeSelectedFile: (fileName: string) => void;
