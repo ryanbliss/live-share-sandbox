@@ -114,6 +114,7 @@ export function useCodePages(
         setTimeout(() => {
           onTextChange(event);
         }, 0);
+        // onTextChange(event);
       };
       return handleTextChanged;
     }

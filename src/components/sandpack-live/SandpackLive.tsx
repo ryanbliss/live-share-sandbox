@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useMemo, useRef } from "react";
+import { FC, MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   SandpackLayout,
   SandpackPreview,
@@ -24,6 +24,7 @@ import {
   WindowMessagingApi,
 } from "../../sandpack-templates";
 import { useSandpackMessages } from "../../sandpack-hooks/useSandpackMessages";
+import { useContainerEditable } from "../../live-share-hooks/fluid-helpers/useContainerEditable";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -42,6 +43,9 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     onAddPage,
     setFiles,
   } = useCodePages(props.codePagesMap, props.container);
+  const {
+    editableRef,
+  } = useContainerEditable(props.container);
 
   const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
     useFollowModeState(props.followModeState, props.teamsContext?.user?.id);
@@ -59,9 +63,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     followingUserId
   );
 
-  const [sandpackFiles, sandpackFilesRef, setSandpackFiles] = useStateRef<any>(
-    {}
-  );
+  const [sandpackFiles, setSandpackFiles] = useState<any>({});
   const codemirrorInstance = useRef<any>();
   const activeFileRef = useRef<string | undefined>();
   const previousActiveFileRef = useRef<string | undefined>();
@@ -70,7 +72,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     const _files: any = {};
     Object.keys(sandpackFiles).forEach((key) => {
       _files[key] = {
-        code: sandpackFiles[key],
+        code: codePageFilesRef.current.get(key),
         hidden: false,
         active: key === currentPageKey,
         readOnly: false,
@@ -211,6 +213,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
               codePageFilesRef={codePageFilesRef}
               activeFileRef={activeFileRef}
               codemirrorInstance={codemirrorInstance}
+              editableRef={editableRef}
             />
             <SandpackPreview style={{ height: "100vh" }} />
           </SandpackLayout>

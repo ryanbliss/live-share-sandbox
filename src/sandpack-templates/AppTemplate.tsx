@@ -1,5 +1,4 @@
-export const AppTemplate = `
-import * as microsoftTeams from "@microsoft/teams-js";
+export const AppTemplate = `import * as microsoftTeams from "@microsoft/teams-js";
 import { LOCAL_MODE_TENANT_ID } from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
 // in your production app, import from "@microsoft/live-share";
@@ -102,5 +101,4 @@ export default function App() {
       )}
     </div>
   );
-}
-`;
+}`;
