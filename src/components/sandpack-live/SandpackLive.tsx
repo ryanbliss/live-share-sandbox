@@ -24,6 +24,7 @@ import {
 import { useContainerEditable } from "../../live-share-hooks/fluid-helpers/useContainerEditable";
 import { FlexColumn, FlexItem } from "../flex";
 import { useLiveShareContext } from "../../live-share-hooks/useLiveShare";
+import { MonacoEditor } from "./sandpack-editor/MonacoEditor";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -34,13 +35,10 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
   const { codePagesMap, followModeState, presence, container } =
     useLiveShareContext();
 
-  const {
-    pages,
-    files: codePageFiles,
-    filesRef: codePageFilesRef,
-    onAddPage,
-    setFiles,
-  } = useCodePages(codePagesMap, container);
+  const { codeFiles, codeFilesRef, onAddPage } = useCodePages(
+    codePagesMap,
+    container
+  );
   const { editableRef } = useContainerEditable(container);
 
   const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
@@ -61,16 +59,13 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
 
   const mappedSandpackFiles = useMemo<SandpackFiles>(() => {
     const _files: SandpackFiles = {};
-    Object.keys(sandpackFiles).forEach((key) => {
-      const code = codePageFilesRef.current.get(key);
-      if (code) {
-        _files[key] = {
-          code,
-          hidden: false,
-          active: key === currentPageKey,
-          readOnly: false,
-        };
-      }
+    codeFiles.forEach((file, key) => {
+      _files[key] = {
+        code: file.text,
+        hidden: false,
+        active: key === currentPageKey,
+        readOnly: false,
+      };
     });
     _files["/LiveShareSandboxApi.ts"] = {
       code: LiveShareSandboxApi,
@@ -86,16 +81,9 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     };
     console.log(_files);
     return _files;
-  }, [sandpackFiles, currentPageKey]);
+  }, [codeFiles, currentPageKey]);
 
-  useEffect(() => {
-    if (currentPageKey !== previousActiveFileRef.current) {
-      previousActiveFileRef.current = currentPageKey;
-      setFiles(codePageFilesRef.current);
-    }
-  }, [currentPageKey, codePageFiles]);
-
-  if (codePageFiles.size < 2) {
+  if (codeFiles.size < 2) {
     return null;
   }
 
@@ -103,7 +91,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     <>
       <FlexItem noShrink>
         <SandpackFileExplorer
-          files={sandpackFiles}
+          codeFiles={codeFiles}
           selectedFileKey={currentPageKey}
           onChangeSelectedFile={(fileName) => {
             onChangeCurrentPageKey(fileName);
@@ -146,14 +134,12 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         >
           <SandpackThemeProvider theme={"dark"}>
             <SandpackLayout>
-              <SandpackEditor
-                pages={pages}
-                codePageFiles={codePageFiles}
-                sandpackFiles={sandpackFiles}
-                activeFileRef={activeFileRef}
-                codemirrorInstance={codemirrorInstance}
-                editableRef={editableRef}
-                setSandpackFiles={setSandpackFiles}
+              <MonacoEditor
+                language="typescript"
+                theme="vs-dark"
+                currentPageKey={currentPageKey}
+                editingEnabled={true}
+                codeFiles={codeFiles}
               />
               <SandpackPreview
                 style={{

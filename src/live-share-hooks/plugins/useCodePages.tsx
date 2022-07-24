@@ -6,23 +6,19 @@ import {
 } from "@fluid-experimental/react-inputs";
 import { useStateRef } from "../../utils/useStateRef";
 import { buildEmptyReactComponent } from "../../sandpack-templates";
+import { ICodeFile } from "../../models/ICodeFile";
 
 export function useCodePages(
   codePagesMap: SharedMap | undefined,
   container: IFluidContainer | undefined
 ): {
-  pages: Map<string, SharedStringHelper>;
-  files: Map<string, string>;
-  filesRef: MutableRefObject<Map<string, string>>;
+  codeFiles: Map<string, ICodeFile>;
+  codeFilesRef: MutableRefObject<Map<string, ICodeFile>>;
   onAddPage: (pageName: string) => void;
-  setFiles: (value: Map<string, string>) => void;
 } {
-  const [pages, pagesRef, setPages] = useStateRef<
-    Map<string, SharedStringHelper>
+  const [codeFiles, codeFilesRef, setCodeFilesRef] = useStateRef<
+    Map<string, ICodeFile>
   >(new Map());
-  const [files, filesRef, setFiles] = useStateRef<Map<string, string>>(
-    new Map()
-  );
   const listeningForRef = useRef<any>({});
 
   const onRefreshPages = useCallback(async () => {
@@ -33,19 +29,21 @@ export function useCodePages(
     codePagesMap.forEach((value, key) => {
       _handles.set(key, value);
     });
-    const _pages: Map<string, SharedStringHelper> = new Map();
+    const files: Map<string, ICodeFile> = new Map();
     const keys = [..._handles.keys()];
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
-      let pageValue: SharedStringHelper;
       const handleValue = _handles.get(key);
       const sharedString = (await handleValue.get()) as SharedString;
       console.log("setting SharedStringHelper for", key);
-      pageValue = new SharedStringHelper(sharedString);
-      _pages.set(key, pageValue);
+      const stringHelper = new SharedStringHelper(sharedString);
+      files.set(key, {
+        stringHelper,
+        text: stringHelper.getText(),
+      });
     }
-    setPages(_pages);
-  }, [codePagesMap, pagesRef, setPages, setFiles]);
+    setCodeFilesRef(files);
+  }, [codePagesMap, setCodeFilesRef]);
 
   const onAddPage = useCallback(
     (pageName: string) => {
@@ -75,69 +73,39 @@ export function useCodePages(
     };
   }, [codePagesMap, onRefreshPages]);
 
-  const onTextChange = useCallback(
-    (event: ISharedStringHelperTextChangedEventArgs | undefined) => {
-      console.log("onTextChange local", event?.isLocal, pagesRef.current.size);
-
-      let valueHasChanged = false;
-      const _files: Map<string, string> = new Map();
-      pagesRef.current.forEach((sharedStringHelper, fileName) => {
-        const newText = sharedStringHelper.getText();
-        const checkValue = filesRef.current.get(fileName);
-        if (!checkValue || checkValue !== newText) {
-          valueHasChanged = true;
-        }
-        _files.set(fileName, newText);
-      });
-
-      if (pagesRef.current.size > 0 && event?.isLocal) {
-        console.log("updating local ref");
-        filesRef.current = _files;
-        return;
-      }
-      if (valueHasChanged) {
-        console.log("onTextChange change for local is", event?.isLocal);
-        setFiles(_files);
-      }
-    },
-    [filesRef, pagesRef, setFiles]
-  );
-
   useEffect(() => {
-    function getHandleTextChangedCallback(): (
+    const onTextChange = (
       event: ISharedStringHelperTextChangedEventArgs | undefined
-    ) => void {
-      const handleTextChanged = (
-        event: ISharedStringHelperTextChangedEventArgs | undefined
-      ) => {
-        // SharedStringHelper getText() needs to yield before it returns the updated value, so we setTimeout for 0
-        setTimeout(() => {
-          onTextChange(event);
-        }, 0);
-        // onTextChange(event);
-      };
-      return handleTextChanged;
-    }
-    pages.forEach((value, key) => {
+    ) => {
+      setTimeout(() => {
+        console.log(
+          "onTextChange local",
+          event?.isLocal,
+          codeFilesRef.current.size
+        );
+        if (!event?.isLocal) {
+          onRefreshPages();
+        }
+      });
+    };
+    codeFiles.forEach((value, key) => {
       if (!listeningForRef.current[key]) {
         console.log("starting listening for", key);
         listeningForRef.current[key] = true;
-        value.on("textChanged", getHandleTextChangedCallback());
-        getHandleTextChangedCallback()(undefined);
+        value.stringHelper.on("textChanged", onTextChange);
+        onTextChange(undefined);
       }
     });
     return () => {
-      pagesRef.current.forEach((value, key) => {
-        value.off("textChanged", getHandleTextChangedCallback());
+      codeFilesRef.current.forEach((value, key) => {
+        value.stringHelper.off("textChanged", onTextChange);
       });
     };
-  }, [pages, filesRef, pagesRef, listeningForRef, setFiles, onTextChange]);
+  }, [codeFiles, codeFilesRef, listeningForRef]);
 
   return {
-    pages,
-    files,
-    filesRef,
+    codeFiles,
+    codeFilesRef,
     onAddPage,
-    setFiles,
   };
 }
