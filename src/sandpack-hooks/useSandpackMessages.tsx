@@ -20,6 +20,8 @@ export const useSandpackMessages = (
         const decoded = JSON.parse(data);
         if (!sandpackRef.current || !decoded?.messageId) {
           return;
+        } else if (inTeams()) {
+          console.log("useSandpackMessages decoded message received", decoded);
         }
         let messageResponse: any;
         if (decoded?.messageType === "getContainerId") {
