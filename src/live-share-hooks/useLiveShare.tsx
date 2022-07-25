@@ -15,8 +15,9 @@ import {
 } from "fluid-framework";
 import { SharedString } from "@fluidframework/sequence";
 import { createContext, MutableRefObject, useContext, useEffect, useRef, useState } from "react";
-import { AppTemplate, HeaderTemplate } from "../sandpack-templates";
+import { HeaderTemplate, LocalAppTemplate, TeamsAppTemplate } from "../sandpack-templates";
 import { IFollowModeStateValue } from "./plugins/useFollowModeState";
+import { inTeams } from "../utils/inTeams";
 
 export interface ILiveShareContext {
   loading: boolean;
@@ -60,11 +61,10 @@ export function useLiveShare(): ILiveShareContext {
     initalizedRef.current = true;
     console.log("useSharedObjects: starting");
     // Check if user is in Teams
-    const url = new URL(window.location.href);
-    const inTeams = !!url.searchParams.get("inTeams");
+    const isInTeams = inTeams();
 
     let connection;
-    if (!inTeams) {
+    if (!isInTeams) {
       // Configure for local testing (optional).
       connection = {
         tenantId: LOCAL_MODE_TENANT_ID,
@@ -81,21 +81,7 @@ export function useLiveShare(): ILiveShareContext {
     // - logger: A fluid logger to use.
     const clientProps = {
       connection,
-      // getFluidContainerId: (): Promise<string | undefined> => {
-      //   let containerId: string | undefined;
-      //   const searchParams = new URL(window.location.href).searchParams;
-      //   if (searchParams.has("containerId")) {
-      //     containerId = new URL(window.location.href).searchParams.get("containerId")!;
-      //   }
-      //   return Promise.resolve(containerId);
-      // },
-      // setFluidContainerId: (containerId: string): void => {
-      //   const containerId = this.getLocalTestContainerId();
-      // },
     };
-
-    // To reset the stored container-id, uncomment below:
-    // localStorage.clear();
 
     // Enable debugger
     window.localStorage.debug = "fluid:*";
@@ -112,6 +98,7 @@ export function useLiveShare(): ILiveShareContext {
             "/App.tsx",
             sharedString.handle
           );
+          const AppTemplate = isInTeams ? TeamsAppTemplate : LocalAppTemplate;
           sharedString.insertText(0, AppTemplate);
         })
         .catch((error) => setError(error));

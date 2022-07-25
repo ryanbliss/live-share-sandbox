@@ -26,6 +26,8 @@ import {
 import { EphemeralMediaSession } from "@microsoft/live-share-media";
 import { WindowMessagingApi } from "./WindowMessagingApi";
 
+export const AUTHORIZED_PARENT_ORIGINS = ["https://live-share-sandbox.vercel.app"];
+
 export class SandboxFluidContainer
   extends TypedEventEmitter<IFluidContainerEvents>
   implements IFluidContainer
