@@ -89,7 +89,7 @@ export default function App() {
               counterMapRef.current!.set("count", counterValue + 1);
             }}
           >
-            +1
+            { "+1" }
           </button>
           <h2 style={{ color: "red" }}>
             { counterValue }

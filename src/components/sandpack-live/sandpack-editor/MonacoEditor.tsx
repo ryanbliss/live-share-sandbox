@@ -1,12 +1,7 @@
-import Editor, { useMonaco } from "@monaco-editor/react";
+import { useMonaco } from "@monaco-editor/react";
 import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
 
-import {
-  SandpackFile,
-  SandpackFiles,
-  useActiveCode,
-  useSandpack,
-} from "@codesandbox/sandpack-react";
+import { SandpackFile, SandpackFiles } from "@codesandbox/sandpack-react";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { ICodeFile } from "../../../models/ICodeFile";
 import { useLiveShareContext } from "../../../live-share-hooks/useLiveShare";
@@ -108,7 +103,7 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
           const codeValue = (props.sandpackFiles[key] as SandpackFile).code;
           if (model !== null) {
             if (model.getValue() !== codeValue) {
-              console.log("setting model value");
+              console.log("MonacoEditor: setting model value for keys", key);
               model.setValue(codeValue);
             }
           } else {
@@ -131,16 +126,16 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
         editor.getModel()!.dispose();
         const model = monaco?.editor.getModel(Monaco.Uri.parse(checkUriString));
         if (model) {
-          console.log("setting model change listener");
+          console.log("MonacoEditor: setting model change listener");
           editor.setModel(model);
           model.onDidChangeContent((event) => {
-            console.log("change");
+            console.log("MonacoEditor: onDidChangeContent");
             const stringHelper = currentCodeFile?.value.stringHelper;
             if (
               stringHelper &&
               currentCodeFile?.value.stringHelper.getText() !== model.getValue()
             ) {
-              console.log("posting change");
+              console.log("MonacoEditor: posting change");
               stringHelper.replaceText(
                 model.getValue(),
                 0,
@@ -152,10 +147,6 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
       }
     }
   }, [currentCodeFile, editor, monaco]);
-
-  if (!currentCodeFile) {
-    return null;
-  }
 
   return (
     <div
@@ -170,41 +161,6 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
       }}
     >
       <div id="container" style={{ width: "100%", height: "100%" }}></div>
-      {/* <Editor
-        width="100%"
-        height="100%"
-        language={props.language}
-        theme={props.theme}
-        key={props.currentPageKey}
-        value={currentCodeFile?.value.text}
-        beforeMount={(monaco) => {
-          monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-            jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
-            allowNonTsExtensions: true,
-          });
-          monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-            noSemanticValidation: true,
-            noSyntaxValidation: true,
-            noSuggestionDiagnostics: true,
-          });
-        }}
-        onChange={(value) => {
-          console.log("onChange");
-          if (
-            props.editingEnabled &&
-            currentCodeFile &&
-            currentCodeFile.value.text !== value
-          ) {
-            updateCode(value || "");
-            // TODO: transform-level operations
-            currentCodeFile.value.stringHelper.replaceText(
-              value || "",
-              0,
-              currentCodeFile.value.stringHelper.getText().length
-            );
-          }
-        }}
-      /> */}
     </div>
   );
 };
