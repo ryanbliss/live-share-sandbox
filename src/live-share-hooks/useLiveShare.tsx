@@ -14,10 +14,9 @@ import {
   SharedMap,
 } from "fluid-framework";
 import { SharedString } from "@fluidframework/sequence";
-import { createContext, FC, MutableRefObject, ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { createContext, MutableRefObject, useContext, useEffect, useRef, useState } from "react";
 import { AppTemplate, HeaderTemplate } from "../sandpack-templates";
 import { IFollowModeStateValue } from "./plugins/useFollowModeState";
-import PageWrapper from "../components/page-wrapper/PageWrapper";
 
 export interface ILiveShareContext {
   loading: boolean;
@@ -41,7 +40,7 @@ export interface ILiveShareContext {
  *
  * @returns Shared objects managed by the apps fluid container.
  */
-function useLiveShare(): ILiveShareContext {
+export function useLiveShare(): ILiveShareContext {
   const [results, setResults] = useState<
     | {
         container: IFluidContainer;
@@ -183,22 +182,6 @@ export const LiveShareContext = createContext<ILiveShareContext>({
   presence: undefined,
   userDidCreateContainerRef: undefined,
 });
-
-export const LiveShareProvider: FC<{
-  children: ReactNode;
-}> = ({children}) => {
-  const liveShareValue = useLiveShare();
-
-  console.log("LiveShareProvider change");
-
-  return (
-    <LiveShareContext.Provider value={liveShareValue}>
-      <PageWrapper loading={liveShareValue.loading} error={liveShareValue.error}>
-        { children }
-      </PageWrapper>
-    </LiveShareContext.Provider>
-  )
-}
 
 export const useLiveShareContext = (): ILiveShareContext => {
   const liveShareContext = useContext(LiveShareContext);
