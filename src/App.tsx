@@ -33,7 +33,7 @@ function App() {
   }, [initialized]);
 
   return (
-    <PageWrapper loading={!initialized} error={undefined}>
+    <PageWrapper loading={!initialized} error={error}>
       <div className="App">
         <FluentProvider
           theme={teamsDarkTheme}
