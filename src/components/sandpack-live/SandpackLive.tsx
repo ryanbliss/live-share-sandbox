@@ -100,7 +100,9 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
             dependencies: {
               "@microsoft/live-share": "~0.3.1",
               "@microsoft/live-share-media": "~0.3.1",
+              "@microsoft/teams-js": "2.0.0-experimental.0",
               "fluid-framework": "~0.59.3000",
+              "@fluidframework/azure-client": "~0.59.3000",
               "@fluidframework/test-client-utils": "~0.59.3000",
               "@fluidframework/sequence": "~0.59.3000",
               react: "^18.0.0",
