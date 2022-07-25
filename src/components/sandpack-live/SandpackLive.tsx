@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useCallback, useMemo } from "react";
 import {
   SandpackFiles,
   SandpackLayout,
@@ -25,15 +25,18 @@ interface ISandpackLiveProps {
 }
 
 const SandpackLive: FC<ISandpackLiveProps> = (props) => {
-  console.log("SandpackLive re-render");
   const { codePagesMap, followModeState, presence, container } =
     useLiveShareContext();
 
+  // Get the latest codeFiles map and a callback to create a new page
   const { codeFiles, onAddPage } = useCodePages(codePagesMap, container);
 
+  // Get the current follow state and callbacks to start/end follow mode
   const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
     useFollowModeState(followModeState, props.teamsContext?.user?.id);
 
+  // Use presence to track local user and the page they should be looking at,
+  // as well as callback to change their current page.
   const {
     localUser,
     localUserIsEligiblePresenter,
@@ -41,6 +44,8 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     onChangeCurrentPageKey,
   } = usePresence(presence, props.teamsContext, "/App.tsx", followingUserId);
 
+  // Take the code pages stored in our map and combine with static
+  // read-only files that will be hidden from the user.
   const mappedSandpackFiles = useMemo<SandpackFiles>(() => {
     const _files: SandpackFiles = {};
     codeFiles.forEach((file, key) => {
@@ -66,6 +71,32 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     return _files;
   }, [codeFiles, currentPageKey]);
 
+  const onChangeSelectedFile = useCallback(
+    (fileName: string) => {
+      // Change the file that the user has set as their current file.
+      onChangeCurrentPageKey(fileName);
+
+      // If follow mode is active and the user is an eligible presenter
+      // but is not in control, take control so that other users are now
+      // following them.
+      if (
+        followingUserId &&
+        followingUserId !== localUser?.userId &&
+        localUserIsEligiblePresenter
+      ) {
+        onInitiateFollowMode();
+      }
+    },
+    [
+      followingUserId,
+      localUser,
+      localUserIsEligiblePresenter,
+      onChangeCurrentPageKey,
+      onInitiateFollowMode,
+    ]
+  );
+
+  // If we haven't yet loaded the code files, show nothing
   if (codeFiles.size < 2) {
     return null;
   }
@@ -73,19 +104,11 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
   return (
     <>
       <FlexItem noShrink>
+        {/* SandpackFileExplorer allows the user to select new files */}
         <SandpackFileExplorer
           codeFiles={codeFiles}
           selectedFileKey={currentPageKey}
-          onChangeSelectedFile={(fileName) => {
-            onChangeCurrentPageKey(fileName);
-            if (
-              followingUserId &&
-              followingUserId !== localUser?.userId &&
-              localUserIsEligiblePresenter
-            ) {
-              onInitiateFollowMode();
-            }
-          }}
+          onChangeSelectedFile={onChangeSelectedFile}
           followModeActive={!!followingUserId}
           onAddPage={onAddPage}
           onInitiateFollowMode={onInitiateFollowMode}
@@ -93,6 +116,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         />
       </FlexItem>
       <FlexColumn expand="fill" style={{ position: "relative" }}>
+        {/* SandpackProvider creates the sandbox and compiles the iFrame with the latest code */}
         <SandpackProvider
           template={props.template}
           files={mappedSandpackFiles}
@@ -113,6 +137,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         >
           <SandpackThemeProvider theme={"dark"}>
             <SandpackLayout>
+              {/* Custom MonacoEditor for viewing & editing the text of the code */}
               <MonacoEditor
                 language="typescript"
                 theme="vs-dark"
@@ -121,6 +146,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
                 codeFiles={codeFiles}
                 sandpackFiles={mappedSandpackFiles}
               />
+              {/* Preview viewer for the compiled application */}
               <SandpackPreview
                 style={{
                   position: "absolute",

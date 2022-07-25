@@ -6,6 +6,9 @@ export interface IFollowModeStateValue {
   userId?: string;
 }
 
+// Follow mode allows a user to force other users to move to the page that they
+// are looking at. Only meeting presenters and organizers have the privilege
+// to start and end this mode.
 export function useFollowModeState(
   followModeState: EphemeralState<IFollowModeStateValue> | undefined,
   localUserId?: string,
@@ -39,7 +42,7 @@ export function useFollowModeState(
 
   useEffect(() => {
     if (followModeState && !followModeState.isStarted) {
-      console.log("usePokerState: starting poker state");
+      console.log("useFollowModeState: listening to state changes");
       followModeState.on("stateChanged", (state, value) => {
         if (["follow", "free"].includes(state)) {
           if (value?.userId) {

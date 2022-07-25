@@ -2,7 +2,7 @@ import axios from "axios";
 
 export interface ILoadedPackageContents {
   name: string;
-  contents: string;
+  contents: string | null;
 }
 export interface ILoadablePackage {
   path: string;
@@ -34,14 +34,21 @@ export class MonacoPackageLoader {
               loadedPackages.push(loadedPackage);
               MonacoPackageLoader.packages.set(
                 loadedPackage.name,
-                loadedPackage.contents
+                loadedPackage.contents!
               );
               if (loadedPackages.length === loadablePackages.length) {
                 resolve(loadedPackages);
               }
             })
             .catch((error: Error) => {
-              reject(error);
+              console.error(error);
+              loadedPackages.push({
+                name: loadablePackage.resolvedPath,
+                contents: null,
+              });
+              if (loadedPackages.length === loadablePackages.length) {
+                resolve(loadedPackages);
+              }
             });
         }
       });
