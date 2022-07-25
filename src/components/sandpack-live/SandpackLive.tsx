@@ -32,6 +32,7 @@ interface ISandpackLiveProps {
 }
 
 const SandpackLive: FC<ISandpackLiveProps> = (props) => {
+  console.log("SandpackLive re-render");
   const { codePagesMap, followModeState, presence, container } =
     useLiveShareContext();
 
@@ -39,7 +40,6 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     codePagesMap,
     container
   );
-  const { editableRef } = useContainerEditable(container);
 
   const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
     useFollowModeState(followModeState, props.teamsContext?.user?.id);
@@ -51,11 +51,6 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     currentPageKey,
     onChangeCurrentPageKey,
   } = usePresence(presence, props.teamsContext, "/App.tsx", followingUserId);
-
-  const [sandpackFiles, setSandpackFiles] = useState<SandpackFiles>({});
-  const codemirrorInstance = useRef<any>();
-  const activeFileRef = useRef<string | undefined>();
-  const previousActiveFileRef = useRef<string | undefined>();
 
   const mappedSandpackFiles = useMemo<SandpackFiles>(() => {
     const _files: SandpackFiles = {};
@@ -79,7 +74,6 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
       active: false,
       readOnly: true,
     };
-    console.log(_files);
     return _files;
   }, [codeFiles, currentPageKey]);
 
@@ -140,6 +134,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
                 currentPageKey={currentPageKey}
                 editingEnabled={true}
                 codeFiles={codeFiles}
+                sandpackFiles={mappedSandpackFiles}
               />
               <SandpackPreview
                 style={{

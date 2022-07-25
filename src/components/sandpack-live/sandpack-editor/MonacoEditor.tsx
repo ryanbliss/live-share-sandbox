@@ -1,10 +1,18 @@
 import Editor, { useMonaco } from "@monaco-editor/react";
-import { useActiveCode, useSandpack } from "@codesandbox/sandpack-react";
-import { FC, useEffect, useMemo, useState } from "react";
+import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
+
+import {
+  SandpackFile,
+  SandpackFiles,
+  useActiveCode,
+  useSandpack,
+} from "@codesandbox/sandpack-react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { ICodeFile } from "../../../models/ICodeFile";
 import { useLiveShareContext } from "../../../live-share-hooks/useLiveShare";
 import { useSandpackMessages } from "../../../sandpack-hooks/useSandpackMessages";
 import { MonacoPackageLoader } from "../../../loaders/MonacoPackageLoader";
+import { LiveSharePackages } from "../../../constants/LiveSharePackages";
 
 interface IMonacoEditorProps {
   language: "javascript" | "typescript" | "html" | "css";
@@ -12,6 +20,7 @@ interface IMonacoEditorProps {
   currentPageKey: string | undefined;
   editingEnabled: boolean;
   codeFiles: Map<string, ICodeFile>;
+  sandpackFiles: SandpackFiles;
 }
 
 interface IKeyValueCodeFile {
@@ -21,9 +30,10 @@ interface IKeyValueCodeFile {
 type TKeyValueCodeFile = IKeyValueCodeFile | undefined;
 
 export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
-  const [loadedPackages, setLoadedPackages] = useState(false);
-  const { sandpack } = useSandpack();
-  const { updateCode } = useActiveCode();
+  const loadedPackagesRef = useRef(false);
+  const [editor, setEditor] = useState<
+    Monaco.editor.IStandaloneCodeEditor | undefined
+  >(undefined);
 
   const { userDidCreateContainerRef } = useLiveShareContext();
   useSandpackMessages(userDidCreateContainerRef);
@@ -43,66 +53,105 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
     };
   }, [props.codeFiles, props.currentPageKey]);
 
-  // useEffect(() => {
-  //   if (props.currentPageKey && monaco && loadedPackages) {
-  //     if (monaco && currentCodeFile) {
-  //       monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-  //         jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
-  //         allowNonTsExtensions: true,
-  //       });
-  //       monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-  //         noSemanticValidation: true,
-  //         noSyntaxValidation: true,
-  //         noSuggestionDiagnostics: true,
-  //       });
+  useEffect(() => {
+    if (
+      props.currentPageKey &&
+      monaco &&
+      props.sandpackFiles[props.currentPageKey]
+    ) {
+      if (!loadedPackagesRef.current) {
+        loadedPackagesRef.current = true;
+        monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+          jsx: monaco.languages.typescript.JsxEmit.ReactJSX,
+          allowNonTsExtensions: true,
+        });
+        monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+          noSemanticValidation: true,
+          noSyntaxValidation: true,
+          noSuggestionDiagnostics: true,
+        });
+        MonacoPackageLoader.loadPackages(LiveSharePackages)
+          .then((packages) => {
+            packages.forEach((loadedPackage) => {
+              monaco.languages.typescript.typescriptDefaults.addExtraLib(
+                loadedPackage.contents,
+                `file:///node_modules/${loadedPackage.name}`
+              );
+            });
+            let model;
+            Object.keys(props.sandpackFiles).forEach((key) => {
+              const createdModel = monaco.editor.createModel(
+                (props.sandpackFiles[key] as SandpackFile).code,
+                "typescript",
+                monaco.Uri.parse(`file://${key}`)
+              );
+              if (key === props.currentPageKey) {
+                model = createdModel;
+              }
+            });
 
-  //       MonacoPackageLoader.loadPackages([
-  //         {
-  //           path: "@types/react@^18.0.0/index.d.ts",
-  //           resolvedPath: "@types/react/index.d.ts",
-  //         },
-  //         {
-  //           path: "@types/react@^18.0.0/jsx-dev-runtime.d.ts",
-  //           resolvedPath: "@types/react/jsx-dev-runtime.d.ts",
-  //         },
-  //         {
-  //           path: "@types/react@^18.0.0/jsx-runtime.d.ts",
-  //           resolvedPath: "@types/react/jsx-runtime.d.ts",
-  //         },
-  //         {
-  //           path: "@microsoft/teams-js@2.0.0-experimental.0/dist/MicrosoftTeams.d.ts",
-  //           resolvedPath: "@microsoft/teams-js/index.d.ts",
-  //         },
-  //         {
-  //           path: "@microsoft/live-share@~0.3.1/bin/index.d.ts",
-  //           resolvedPath: "@microsoft/live-share/index.d.ts",
-  //         },
-  //       ])
-  //         .then((packages) => {
-  //           packages.forEach((loadedPackage) => {
-  //             monaco.languages.typescript.typescriptDefaults.addExtraLib(
-  //               loadedPackage.contents,
-  //               `file:///node_modules/${loadedPackage.name}`
-  //             );
-  //           });
-  //           const model = monaco.editor.createModel(
-  //             currentCodeFile.value.text,
-  //             "typescript",
-  //             monaco.Uri.parse(`file://${currentCodeFile.key}`)
-  //           );
-
-  //           monaco.editor.create(document.getElementById("container")!, {
-  //             model,
-  //           });
-  //         })
-  //         .catch((error) => console.error(error));
-  //     }
-  //   }
-  // }, [monaco, currentCodeFile, loadedPackages, setLoadedPackages]);
+            const editor = monaco.editor.create(
+              document.getElementById("container")!,
+              {
+                theme: props.theme,
+                automaticLayout: true,
+              }
+            );
+            setEditor(editor);
+          })
+          .catch((error) => console.error(error));
+      } else {
+        Object.keys(props.sandpackFiles).forEach((key) => {
+          const model = monaco.editor.getModel(
+            monaco.Uri.parse(`file://${key}`)
+          );
+          const codeValue = (props.sandpackFiles[key] as SandpackFile).code;
+          if (model !== null) {
+            if (model.getValue() !== codeValue) {
+              console.log("setting model value");
+              model.setValue(codeValue);
+            }
+          } else {
+            monaco.editor.createModel(
+              codeValue,
+              "typescript",
+              monaco.Uri.parse(`file://${key}`)
+            );
+          }
+        });
+      }
+    }
+  }, [monaco, props.currentPageKey, props.sandpackFiles, props.theme]);
 
   useEffect(() => {
-    console.log(sandpack.files);
-  }, [sandpack]);
+    if (currentCodeFile && editor) {
+      const checkUriString = `file://${currentCodeFile.key}`;
+      console.log(editor?.getModel()?.uri.toString(), checkUriString);
+      if (editor.getModel()?.uri.toString() !== checkUriString) {
+        editor.getModel()!.dispose();
+        const model = monaco?.editor.getModel(Monaco.Uri.parse(checkUriString));
+        if (model) {
+          console.log("setting model change listener");
+          editor.setModel(model);
+          model.onDidChangeContent((event) => {
+            console.log("change");
+            const stringHelper = currentCodeFile?.value.stringHelper;
+            if (
+              stringHelper &&
+              currentCodeFile?.value.stringHelper.getText() !== model.getValue()
+            ) {
+              console.log("posting change");
+              stringHelper.replaceText(
+                model.getValue(),
+                0,
+                stringHelper.getText().length
+              );
+            }
+          });
+        }
+      }
+    }
+  }, [currentCodeFile, editor, monaco]);
 
   if (!currentCodeFile) {
     return null;
@@ -110,7 +159,6 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
 
   return (
     <div
-      id="container"
       style={{
         position: "absolute",
         right: "50%",
@@ -121,7 +169,8 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
         width: "50%",
       }}
     >
-      <Editor
+      <div id="container" style={{ width: "100%", height: "100%" }}></div>
+      {/* <Editor
         width="100%"
         height="100%"
         language={props.language}
@@ -155,7 +204,7 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
             );
           }
         }}
-      />
+      /> */}
     </div>
   );
 };

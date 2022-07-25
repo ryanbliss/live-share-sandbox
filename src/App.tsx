@@ -5,6 +5,7 @@ import { LiveShareProvider } from "./live-share-hooks/useLiveShare";
 import { useTeamsContext } from "./teams-js-hooks/useTeamsContext";
 
 function App() {
+  console.log("App re-render");
   const teamsContext = useTeamsContext();
 
   return (
