@@ -66,6 +66,26 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
           noSyntaxValidation: true,
           noSuggestionDiagnostics: true,
         });
+        // For each file in the Sandpack project, create a corresponding
+        // model. This includes hidden uneditable files.
+        Object.keys(props.sandpackFiles).forEach((key) => {
+          monaco.editor.createModel(
+            (props.sandpackFiles[key] as SandpackFile).code,
+            "typescript",
+            monaco.Uri.parse(`file://${key}`)
+          );
+        });
+
+        // Attach the editor to the <div id="container" />
+        const createdEditor = monaco.editor.create(
+          document.getElementById("container")!,
+          {
+            theme: props.theme,
+            automaticLayout: true,
+          }
+        );
+        // Set the created editor to our local state
+        setEditor(createdEditor);
         // TODO: add rest of TS bindings, try to automate as much as possible
         // Load NPM package TypeScript bindings
         MonacoPackageLoader.loadPackages(LiveSharePackages)
@@ -73,31 +93,13 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
             // For each downloaded package, set them as an extra library within
             // the Monaco TypeScript defaults
             packages.forEach((loadedPackage) => {
-              monaco.languages.typescript.typescriptDefaults.addExtraLib(
-                loadedPackage.contents,
-                `file:///node_modules/${loadedPackage.name}`
-              );
-            });
-            // For each file in the Sandpack project, create a corresponding
-            // model. This includes hidden uneditable files.
-            Object.keys(props.sandpackFiles).forEach((key) => {
-              monaco.editor.createModel(
-                (props.sandpackFiles[key] as SandpackFile).code,
-                "typescript",
-                monaco.Uri.parse(`file://${key}`)
-              );
-            });
-
-            // Attach the editor to the <div id="container" />
-            const createdEditor = monaco.editor.create(
-              document.getElementById("container")!,
-              {
-                theme: props.theme,
-                automaticLayout: true,
+              if (loadedPackage.contents) {
+                monaco.languages.typescript.typescriptDefaults.addExtraLib(
+                  loadedPackage.contents,
+                  `file:///node_modules/${loadedPackage.name}`
+                );
               }
-            );
-            // Set the created editor to our local state
-            setEditor(createdEditor);
+            });
           })
           .catch((error) => console.error(error));
       } else {
