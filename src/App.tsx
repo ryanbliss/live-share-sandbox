@@ -16,11 +16,15 @@ function App() {
   useEffect(() => {
     if (!initialized) {
       if (inTeams()) {
-        console.log("App.js: initializing client SDK");
+        console.log("App.tsx: initializing client SDK");
         microsoftTeams.app
-          .initialize()
+          .initialize([
+            "https://1-2-2-sandpack.codesandbox.io",
+            "https://teams.microsoft.com",
+            "https://live-share-sandbox.vercel.app",
+          ])
           .then(() => {
-            console.log("App.js: initializing client SDK initialized");
+            console.log("App.tsx: initializing client SDK initialized");
             microsoftTeams.app.notifyAppLoaded();
             microsoftTeams.app.notifySuccess();
             setInitialized(true);
