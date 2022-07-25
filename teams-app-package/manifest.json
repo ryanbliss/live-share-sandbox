@@ -16,8 +16,8 @@
         "termsOfUseUrl": "https://www.example.com/TermsOfUse"
     },
     "description": {
-        "short": "Watch amazing stock videos with colleagues",
-        "full": "Have you ever loved stock videos so much that you just had to publish an app to Teams just to watch them with friends? Us to!"
+        "short": "Collaboratively build meeting extensions.",
+        "full": "Live Share sandbox is a code playground for building Teams apps collaboratively with your colleagues!"
     },
     "icons": {
         "outline": "outline.png",
@@ -38,7 +38,8 @@
         }
     ],
     "validDomains": [
-        "live-share-sandbox.vercel.app"
+        "live-share-sandbox.vercel.app",
+        "https://1-2-2-sandpack.codesandbox.io"
     ],
     "showLoadingIndicator": true,
     "authorization": {
