@@ -19,13 +19,14 @@ export const AppSettingsPage = () => {
           contentUrl: `${window.location.origin}/side-panel?inTeams=true`,
         });
         saveEvent.notifySuccess();
+        setRegistered(true);
       });
 
       microsoftTeams.pages.config.setValidityState(true);
     } else {
       setRegistered(true);
     }
-  }, [registered]);
+  }, [registered, setRegistered]);
 
   return (
     <PageWrapper loading={!registered} error={undefined}>
