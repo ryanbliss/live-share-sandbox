@@ -83,21 +83,21 @@ export default function App() {
       { started && (
         <>
           <Header />
-          <p>Click the button to iterate the counter</p>
+          <p>{ "Click the button to iterate the counter" }</p>
           <button
             onClick={() => {
               counterMapRef.current!.set("count", counterValue + 1);
             }}
           >
-            +1
+            { "+1" }
           </button>
           <h2 style={{ color: "red" }}>
-            {counterValue}
+            { counterValue }
           </h2>
         </>
       )}
       { !started && (
-        <div>Loading...</div>
+        <div>{ "Loading..." }</div>
       )}
     </div>
   );

@@ -189,6 +189,8 @@ export const LiveShareProvider: FC<{
 }> = ({children}) => {
   const liveShareValue = useLiveShare();
 
+  console.log("LiveShareProvider change");
+
   return (
     <LiveShareContext.Provider value={liveShareValue}>
       <PageWrapper loading={liveShareValue.loading} error={liveShareValue.error}>

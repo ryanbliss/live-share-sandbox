@@ -6,10 +6,10 @@ import {
   ShareScreenStart24Filled,
   ShareScreenStop24Filled,
 } from "@fluentui/react-icons";
-import { SandpackFiles } from "@codesandbox/sandpack-react";
+import { ICodeFile } from "../../../models/ICodeFile";
 
 interface ISandpackFileExplorerProps {
-  files: SandpackFiles;
+  codeFiles: Map<string, ICodeFile>;
   selectedFileKey: string;
   followModeActive: boolean;
   onChangeSelectedFile: (fileName: string) => void;
@@ -19,7 +19,7 @@ interface ISandpackFileExplorerProps {
 }
 
 export const SandpackFileExplorer: FC<ISandpackFileExplorerProps> = ({
-  files,
+  codeFiles,
   selectedFileKey,
   followModeActive,
   onChangeSelectedFile,
@@ -27,7 +27,7 @@ export const SandpackFileExplorer: FC<ISandpackFileExplorerProps> = ({
   onInitiateFollowMode,
   onEndFollowMode,
 }) => {
-  const fileNames = Object.keys(files);
+  const fileNames = [...codeFiles.keys()];
   return (
     <FlexRow
       expand="horizontal"

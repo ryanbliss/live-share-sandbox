@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useMemo } from "react";
 import {
   SandpackFiles,
   SandpackLayout,
@@ -6,24 +6,18 @@ import {
   SandpackProvider,
   SandpackThemeProvider,
 } from "@codesandbox/sandpack-react";
-import { IFluidContainer, SharedMap } from "fluid-framework";
 import * as microsoftTeams from "@microsoft/teams-js";
 import { useCodePages } from "../../live-share-hooks/plugins/useCodePages";
-import SandpackEditor from "./sandpack-editor/SandpackEditor";
-import { EphemeralPresence, EphemeralState } from "@microsoft/live-share";
-import {
-  IFollowModeStateValue,
-  useFollowModeState,
-} from "../../live-share-hooks/plugins/useFollowModeState";
+import { useFollowModeState } from "../../live-share-hooks/plugins/useFollowModeState";
 import { usePresence } from "../../live-share-hooks/plugins/usePresence";
 import { SandpackFileExplorer } from "./sandpack-files/SandpackFileExplorer";
 import {
   LiveShareSandboxApi,
   WindowMessagingApi,
 } from "../../sandpack-templates";
-import { useContainerEditable } from "../../live-share-hooks/fluid-helpers/useContainerEditable";
 import { FlexColumn, FlexItem } from "../flex";
 import { useLiveShareContext } from "../../live-share-hooks/useLiveShare";
+import { MonacoEditor } from "./sandpack-editor/MonacoEditor";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -31,17 +25,11 @@ interface ISandpackLiveProps {
 }
 
 const SandpackLive: FC<ISandpackLiveProps> = (props) => {
+  console.log("SandpackLive re-render");
   const { codePagesMap, followModeState, presence, container } =
     useLiveShareContext();
 
-  const {
-    pages,
-    files: codePageFiles,
-    filesRef: codePageFilesRef,
-    onAddPage,
-    setFiles,
-  } = useCodePages(codePagesMap, container);
-  const { editableRef } = useContainerEditable(container);
+  const { codeFiles, onAddPage } = useCodePages(codePagesMap, container);
 
   const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
     useFollowModeState(followModeState, props.teamsContext?.user?.id);
@@ -49,28 +37,19 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
   const {
     localUser,
     localUserIsEligiblePresenter,
-    users,
     currentPageKey,
     onChangeCurrentPageKey,
   } = usePresence(presence, props.teamsContext, "/App.tsx", followingUserId);
 
-  const [sandpackFiles, setSandpackFiles] = useState<SandpackFiles>({});
-  const codemirrorInstance = useRef<any>();
-  const activeFileRef = useRef<string | undefined>();
-  const previousActiveFileRef = useRef<string | undefined>();
-
   const mappedSandpackFiles = useMemo<SandpackFiles>(() => {
     const _files: SandpackFiles = {};
-    Object.keys(sandpackFiles).forEach((key) => {
-      const code = codePageFilesRef.current.get(key);
-      if (code) {
-        _files[key] = {
-          code,
-          hidden: false,
-          active: key === currentPageKey,
-          readOnly: false,
-        };
-      }
+    codeFiles.forEach((file, key) => {
+      _files[key] = {
+        code: file.text,
+        hidden: false,
+        active: key === currentPageKey,
+        readOnly: false,
+      };
     });
     _files["/LiveShareSandboxApi.ts"] = {
       code: LiveShareSandboxApi,
@@ -84,18 +63,10 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
       active: false,
       readOnly: true,
     };
-    console.log(_files);
     return _files;
-  }, [sandpackFiles, currentPageKey]);
+  }, [codeFiles, currentPageKey]);
 
-  useEffect(() => {
-    if (currentPageKey !== previousActiveFileRef.current) {
-      previousActiveFileRef.current = currentPageKey;
-      setFiles(codePageFilesRef.current);
-    }
-  }, [currentPageKey, codePageFiles]);
-
-  if (codePageFiles.size < 2) {
+  if (codeFiles.size < 2) {
     return null;
   }
 
@@ -103,7 +74,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     <>
       <FlexItem noShrink>
         <SandpackFileExplorer
-          files={sandpackFiles}
+          codeFiles={codeFiles}
           selectedFileKey={currentPageKey}
           onChangeSelectedFile={(fileName) => {
             onChangeCurrentPageKey(fileName);
@@ -125,17 +96,13 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         <SandpackProvider
           template={props.template}
           files={mappedSandpackFiles}
-          options={
-            {
-              // bundlerURL: "https://sandpack-bundler.pages.dev",
-              // skipEval: true,
-            }
-          }
           customSetup={{
             dependencies: {
               "@microsoft/live-share": "~0.3.1",
               "@microsoft/live-share-media": "~0.3.1",
+              "@microsoft/teams-js": "2.0.0-experimental.0",
               "fluid-framework": "~0.59.3000",
+              "@fluidframework/azure-client": "~0.59.3000",
               "@fluidframework/test-client-utils": "~0.59.3000",
               "@fluidframework/sequence": "~0.59.3000",
               react: "^18.0.0",
@@ -146,14 +113,13 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         >
           <SandpackThemeProvider theme={"dark"}>
             <SandpackLayout>
-              <SandpackEditor
-                pages={pages}
-                codePageFiles={codePageFiles}
-                sandpackFiles={sandpackFiles}
-                activeFileRef={activeFileRef}
-                codemirrorInstance={codemirrorInstance}
-                editableRef={editableRef}
-                setSandpackFiles={setSandpackFiles}
+              <MonacoEditor
+                language="typescript"
+                theme="vs-dark"
+                currentPageKey={currentPageKey}
+                editingEnabled={true}
+                codeFiles={codeFiles}
+                sandpackFiles={mappedSandpackFiles}
               />
               <SandpackPreview
                 style={{
