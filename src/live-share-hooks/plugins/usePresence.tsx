@@ -37,13 +37,16 @@ export const usePresence = (
     return false;
   }, [localUser]);
 
+  // The page that the local user should be looking at
   const currentPageKey = useMemo(() => {
     if (followingUserId) {
+      // Follow mode is active, so return the page the leading user is looking at
       return (
         users.find((user) => user.userId === followingUserId)?.currentPageKey ??
         initialPageKey
       );
     }
+    // Return the local user's page, or if unknown, the initial page (e.g., App.tsx)
     return localUser?.currentPageKey ?? initialPageKey;
   }, [
     followingUserId,
@@ -53,7 +56,7 @@ export const usePresence = (
     localUser,
   ]);
 
-  // Post initial user presence with name as additional data
+  // Post user presence with and the page they are currently looking at
   const updatePresence = useCallback(
     ({ name = "", currentPageKey = "" }) => {
       presence?.updatePresence(PresenceState.online, {
@@ -64,6 +67,7 @@ export const usePresence = (
     [presence, localUserRef]
   );
 
+  // Callback exposed to UI to change the current page the user is looking at
   const onChangeCurrentPageKey = useCallback(
     (currentPageKey: string) => {
       updatePresence({ currentPageKey });
@@ -75,8 +79,12 @@ export const usePresence = (
   useEffect(() => {
     if (presence && !presence.isStarted && context && initialPageKey) {
       console.info("usePresence: starting presence");
+      // Set the presenceChange event listener, which updates when any
+      // user's presence is updated.
       presence.on("presenceChanged", (userPresence, local) => {
         if (local) {
+          // We update local user separately so that we can
+          // get their Teams meeting role.
           const userData = userPresence.data as any;
           const localUser: IUser = {
             userId: userPresence.userId,
@@ -100,7 +108,7 @@ export const usePresence = (
               setLocalUser(localUser);
             });
         }
-        // Update our local state
+        // Update our local state for our list of users
         const updatedUsers: IUser[] = presence
           .toArray()
           .map((userPresence) => {
@@ -117,12 +125,15 @@ export const usePresence = (
           .filter((user) => user.state === PresenceState.online);
         setUsers(updatedUsers);
       });
+      // displayName may not be known in all M365 hubs right now
+      // so we use their email handle instead if needed.
       const userPrincipalName =
         context?.user?.displayName ??
         context?.user?.userPrincipalName ??
         `unknown@contoso.com`;
       const name = userPrincipalName.split("@")[0];
 
+      // Start listening for presence changes
       presence
         .start(context?.user?.id, {
           name,

@@ -1,10 +1,10 @@
 import { SandpackState, useSandpack } from "@codesandbox/sandpack-react";
-import { MutableRefObject, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useLiveShareContext } from "../live-share-hooks/useLiveShare";
 import { inTeams } from "../utils/inTeams";
 
-export const useSandpackMessages = (
-  userDidCreateContainerRef: MutableRefObject<boolean> | undefined
-) => {
+export const useSandpackMessages = () => {
+  const { userDidCreateContainerRef } = useLiveShareContext();
   const { sandpack } = useSandpack();
   const sandpackRef = useRef<SandpackState | undefined>();
   const registeredListenerRef = useRef<boolean>(false);
@@ -14,33 +14,36 @@ export const useSandpackMessages = (
       return;
     }
     registeredListenerRef.current = true;
-    window.addEventListener("message", function (e) {
+    window.addEventListener("message", (e) => {
       const data = e.data;
       try {
         const decoded = JSON.parse(data);
         if (!sandpackRef.current || !decoded?.messageId) {
-          if (inTeams()) {
-            console.log(
-              "useSandpackMessages decoded message received",
-              decoded
-            );
-          }
           return;
-        } else if (inTeams()) {
-          console.log("useSandpackMessages decoded message received", decoded);
         }
         let messageResponse: any;
+        let errorMessage: string | undefined;
         if (decoded?.messageType === "getContainerId") {
-          messageResponse = window.location.hash?.substring(1) ?? undefined;
-        } else if (decoded?.messageType === "getShouldCreateInitialObjects") {
-          let shouldCreateInitialObjects: boolean = true;
           if (inTeams()) {
-            // TODO: replace with isPresentingUser
+            errorMessage = "getContainerId is not supported inside of Teams";
+          } else {
+            // Return the test containerId in the hash of our URL
+            messageResponse = window.location.hash?.substring(1) ?? undefined;
+          }
+        } else if (decoded?.messageType === "getShouldCreateInitialObjects") {
+          let shouldCreateInitialObjects: boolean;
+          if (inTeams()) {
+            // TODO: replace with isPresentingUser because in meetings multiple
+            // users may think they created the container
             shouldCreateInitialObjects = !!userDidCreateContainerRef?.current;
           } else {
+            // This is important, because it means that we need to let the sandbox
+            // load once before refreshing the page when testing locally.
             shouldCreateInitialObjects = !!userDidCreateContainerRef?.current;
           }
           messageResponse = shouldCreateInitialObjects;
+        } else {
+          errorMessage = `useSandpackMessages: unhandled response type of ${decoded?.messageType}`;
         }
         let message: string;
         if (messageResponse !== undefined) {
@@ -53,10 +56,9 @@ export const useSandpackMessages = (
           message = JSON.stringify({
             messageType: decoded!.messageType,
             messageId: decoded!.messageId,
-            errorMessage: "Unable to find a response",
+            errorMessage: errorMessage || "Unable to find a response",
           });
         }
-        console.log(message);
         Object.values(sandpackRef.current.clients).forEach((client) => {
           client.iframe.contentWindow?.postMessage(message, "*");
         });
