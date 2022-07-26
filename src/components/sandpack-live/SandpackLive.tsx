@@ -44,13 +44,15 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     onChangeCurrentPageKey,
   } = usePresence(presence, props.teamsContext, "/App.tsx", followingUserId);
 
+  // Take
+
   // Take the code pages stored in our map and combine with static
   // read-only files that will be hidden from the user.
   const mappedSandpackFiles = useMemo<SandpackFiles>(() => {
     const _files: SandpackFiles = {};
     codeFiles.forEach((file, key) => {
       _files[key] = {
-        code: file.text,
+        code: file.getText(),
         hidden: false,
         active: key === currentPageKey,
         readOnly: false,
@@ -106,7 +108,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
       <FlexItem noShrink>
         {/* SandpackFileExplorer allows the user to select new files */}
         <SandpackFileExplorer
-          codeFiles={codeFiles}
+          fileNames={[...codeFiles.keys()]}
           selectedFileKey={currentPageKey}
           onChangeSelectedFile={onChangeSelectedFile}
           followModeActive={!!followingUserId}
@@ -119,7 +121,6 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
         {/* SandpackProvider creates the sandbox and compiles the iFrame with the latest code */}
         <SandpackProvider
           template={props.template}
-          files={mappedSandpackFiles}
           customSetup={{
             dependencies: {
               "@microsoft/live-share": "~0.3.1",
@@ -134,6 +135,7 @@ const SandpackLive: FC<ISandpackLiveProps> = (props) => {
               "react-scripts": "^4.0.0",
             },
           }}
+          files={mappedSandpackFiles}
         >
           <SandpackThemeProvider theme={"dark"}>
             <SandpackLayout>
