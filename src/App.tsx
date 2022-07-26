@@ -1,12 +1,10 @@
 import { FluentProvider, teamsDarkTheme } from "@fluentui/react-components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { MeetingStagePage } from "./components/pages/MeetingStagePage";
 import { useEffect, useState } from "react";
 import { inTeams } from "./utils/inTeams";
-import PageWrapper from "./components/page-wrapper/PageWrapper";
-import { SidePanelPage } from "./components/pages/SidePanelPage";
-import { AppSettingsPage } from "./components/pages/AppSettingsPage";
+import { LoadableWrapper } from "./components/view-wrappers";
+import { SidePanelPage, AppSettingsPage, MeetingStagePage } from "./pages";
 import "./App.css";
 
 function App() {
@@ -37,7 +35,7 @@ function App() {
   }, [initialized]);
 
   return (
-    <PageWrapper loading={!initialized} error={error}>
+    <LoadableWrapper loading={!initialized} error={error}>
       <div className="App">
         <FluentProvider
           theme={teamsDarkTheme}
@@ -60,7 +58,7 @@ function App() {
           </Router>
         </FluentProvider>
       </div>
-    </PageWrapper>
+    </LoadableWrapper>
   );
 }
 

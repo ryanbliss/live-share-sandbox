@@ -1,6 +1,6 @@
 import { SharedString } from "fluid-framework";
 
-export interface IKeyedFile {
+export interface ICodeFile {
   key: string;
   value: SharedString | undefined;
 }
@@ -16,7 +16,7 @@ export class CodeFilesHelper {
     this.currentKey = currentKey;
   }
 
-  get currentFile(): IKeyedFile | undefined {
+  get currentFile(): ICodeFile | undefined {
     if (this.currentKey) {
       return {
         key: this.currentKey,

@@ -1,5 +1,5 @@
-import { FlexColumn } from "./FlexColumn";
-import { FlexItem } from "./FlexItem";
-import { FlexRow } from "./FlexRow";
+import { FlexColumn } from "./column/FlexColumn";
+import { FlexItem } from "./item/FlexItem";
+import { FlexRow } from "./row/FlexRow";
 
 export { FlexColumn, FlexItem, FlexRow };
