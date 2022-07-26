@@ -1,34 +1,27 @@
 import { useCallback, useEffect, MutableRefObject, useRef } from "react";
 import { IFluidContainer, SharedMap, SharedString } from "fluid-framework";
-import { SharedStringHelper } from "@fluid-experimental/react-inputs";
 import { useStateRef } from "../../utils/useStateRef";
 import { buildEmptyReactComponent } from "../../sandpack-templates";
-import { ICodeFile } from "../../models/ICodeFile";
 
 export function useCodePages(
   codePagesMap: SharedMap | undefined,
   container: IFluidContainer | undefined
 ): {
-  codeFiles: Map<string, ICodeFile>;
-  codeFilesRef: MutableRefObject<Map<string, ICodeFile>>;
+  codeFiles: Map<string, SharedString>;
+  codeFilesRef: MutableRefObject<Map<string, SharedString>>;
   onAddPage: (pageName: string) => void;
 } {
   const [codeFiles, codeFilesRef, setCodeFiles] = useStateRef<
-    Map<string, ICodeFile>
+    Map<string, SharedString>
   >(new Map());
   // Started reference for having wired up initial event valueChanged
   // listeners for the codePageMap
   const startedRef = useRef<boolean>(false);
-  // Reference map to check if the textChanged event listener is active
-  // for the SharedString instances nested within the codePageMap
-  const listeningForRef = useRef<any>({});
 
   // Callback that updates the code files we are tracking with the
-  // latest from our codePagesMap. Also applies textChanged listeners
-  // to our SharedStringHelper if needed, and applies the latest text values
-  // to the codeFiles state.
+  // latest from our codePagesMap.
   const onRefreshPages = useCallback(() => {
-    // We use a setTimeout to yield changes so that our SharedStringHelper
+    // We use a setTimeout to yield changes so that our SharedString
     // can apply its own SharedString listener before this code runs.
     setTimeout(async () => {
       if (!codePagesMap) return;
@@ -38,58 +31,28 @@ export function useCodePages(
       codePagesMap.forEach((value, key) => {
         _handles.set(key, value);
       });
-      const files: Map<string, ICodeFile> = new Map();
+      const files: Map<string, SharedString> = new Map();
       const keys = [..._handles.keys()];
-      let valueChanged = false;
       // Build our files object by iterating through each SharedString
       // in our codeFilesMap
       for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        let stringHelper: SharedStringHelper;
+        let sharedString: SharedString;
         const existingCodeFile = codeFilesRef.current.get(key);
-        if (existingCodeFile && existingCodeFile.stringHelper) {
-          // We already have a SharedStringHelper tracked for this key
+        if (existingCodeFile) {
+          // We already have a SharedString tracked for this key
           // so we use that.
-          stringHelper = existingCodeFile.stringHelper;
+          sharedString = existingCodeFile;
         } else {
-          // We are not tracking a SharedStringHelper for this key
+          // We are not tracking a SharedString for this key
           // so we get it using the DDS handle.
           const handleValue = _handles.get(key);
-          const sharedString = (await handleValue.get()) as SharedString;
-          console.log("setting SharedStringHelper for", key);
-          // TODO: we don't want to keep using SharedStringHelper
-          // because it abstracts out our ability to see individual
-          // incoming transforms. That limits our ability to let
-          // multiple people type, so we will replace it with an adapter
-          // for Monaco editor and SharedString, using SharedStringHelper
-          // as a reference.
-          stringHelper = new SharedStringHelper(sharedString);
-        }
-        // If the text has changed since we last checked it for this file
-        // then we set our valueChanged flag to true.
-        const text = stringHelper.getText();
-        if (!existingCodeFile || existingCodeFile.text !== text) {
-          valueChanged = true;
+          sharedString = (await handleValue.get()) as SharedString;
         }
 
-        // Listen for changes to text if needed
-        if (!listeningForRef.current[key]) {
-          console.log("starting listening for", key);
-          listeningForRef.current[key] = true;
-          stringHelper.on("textChanged", onRefreshPages);
-        }
-
-        files.set(key, {
-          stringHelper,
-          text,
-        });
+        files.set(key, sharedString);
       }
-      if (valueChanged) {
-        // Since a value in our code page files has changed, we
-        // update our codeFiles map so our app can consume the
-        // latest changes to the pages and/or text.
-        setCodeFiles(files);
-      }
+      setCodeFiles(files);
     }, 0);
   }, [codePagesMap, setCodeFiles]);
 
@@ -124,18 +87,12 @@ export function useCodePages(
       codePagesMap.on("valueChanged", onRefreshPages);
       if (!startedRef.current) {
         // On initial mount, get the initial values for our pages
-        // and their corresponding text.
         onRefreshPages();
       }
     }
     // Remove event listeners when the hook unmounts
     return () => {
       codePagesMap?.off("valueChanged", onRefreshPages);
-      codeFilesRef.current.forEach((value, key) => {
-        console.log("stopping listening for", key);
-        listeningForRef.current[key] = false;
-        value.stringHelper.off("textChanged", onRefreshPages);
-      });
     };
   }, [codePagesMap, onRefreshPages]);
 
