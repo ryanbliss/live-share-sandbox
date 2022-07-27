@@ -1,16 +1,13 @@
-import { useCallback, useEffect, MutableRefObject, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { IFluidContainer, SharedMap, SharedString } from "fluid-framework";
-import { useStateRef } from "../..";
-import { buildEmptyReactComponent } from "../../../sandpack-templates";
+import { useStateRef } from "../../../../../hooks";
+import { buildEmptyReactComponent } from "../../../../../sandpack-templates";
+import { ICodePagesContext } from "../../../../../models";
 
 export function useCodePages(
   codePagesMap: SharedMap | undefined,
   container: IFluidContainer | undefined
-): {
-  codeFiles: Map<string, SharedString>;
-  codeFilesRef: MutableRefObject<Map<string, SharedString>>;
-  onAddPage: (pageName: string) => void;
-} {
+): ICodePagesContext {
   const [codeFiles, codeFilesRef, setCodeFiles] = useStateRef<
     Map<string, SharedString>
   >(new Map());

@@ -4,23 +4,16 @@ import {
   PresenceState,
   UserMeetingRole,
 } from "@microsoft/live-share";
-import { useStateRef } from "../../";
+import { useStateRef } from "../../../../../hooks";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { IUser } from "../../../models";
+import { IPresenceContext, IUser } from "../../../../../models";
 
 export const usePresence = (
   presence: EphemeralPresence | undefined,
   context: microsoftTeams.app.Context | undefined,
   initialPageKey: string,
   followingUserId: string | undefined
-): {
-  presenceStarted: boolean;
-  localUser: IUser | undefined;
-  localUserIsEligiblePresenter: boolean;
-  users: IUser[];
-  currentPageKey: string;
-  onChangeCurrentPageKey: (currentPageKey: string) => void;
-} => {
+): IPresenceContext => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [localUser, localUserRef, setLocalUser] = useStateRef<
     IUser | undefined

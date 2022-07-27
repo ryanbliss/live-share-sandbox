@@ -1,1 +1,1 @@
-export * from "./live-share-provider";
+export * from "./fluid-objects-provider";

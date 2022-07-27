@@ -1,5 +1,5 @@
-export * from "./IFollowModeState";
-export * from "./ILiveShareContext";
+export * from "./IFollowModeStateValue";
 export * from "./CodeFilesHelper";
 export * from "./IUser";
 export * from "./Cursor";
+export * from "./IFluidObjectsContext";

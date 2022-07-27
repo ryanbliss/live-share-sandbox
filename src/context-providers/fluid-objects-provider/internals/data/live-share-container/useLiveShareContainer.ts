@@ -15,9 +15,9 @@ import {
 } from "fluid-framework";
 import { SharedString } from "@fluidframework/sequence";
 import { useEffect, useRef, useState } from "react";
-import { HeaderTemplate, LocalAppTemplate, TeamsAppTemplate } from "../../../../sandpack-templates";
-import { inTeams } from "../../../../utils/inTeams";
-import { IFollowModeStateValue, ILiveShareContext } from "../../../../models";
+import { HeaderTemplate, LocalAppTemplate, TeamsAppTemplate } from "../../../../../sandpack-templates";
+import { IFollowModeStateValue, ILiveShareContext } from "../../../../../models";
+import { inTeams } from "../../../../../utils/inTeams";
 
 /**
  * @hidden
@@ -30,7 +30,7 @@ import { IFollowModeStateValue, ILiveShareContext } from "../../../../models";
  * @see useLiveShareContext for consuming ILiveShareContext using React Context.
  * @returns Shared objects managed by the apps fluid container.
  */
-export function useLiveShareData(): ILiveShareContext {
+export function useLiveShareContainer(): ILiveShareContext {
   const [results, setResults] = useState<
     | {
         container: IFluidContainer;
