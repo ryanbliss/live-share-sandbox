@@ -15,16 +15,7 @@ interface ISandpackLiveProps {
 }
 
 export const SandpackLive: FC<ISandpackLiveProps> = (props) => {
-  const {
-    codeFiles,
-    onAddPage,
-    followingUserId,
-    onInitiateFollowMode,
-    onEndFollowMode,
-    currentPageKey,
-    mappedSandpackFiles,
-    onChangeSelectedFile,
-  } = useFluidObjectsContext();
+  const { codeFiles, mappedSandpackFiles } = useFluidObjectsContext();
 
   // If we haven't yet loaded the code files, show nothing
   if (codeFiles.size < 2) {
@@ -35,15 +26,7 @@ export const SandpackLive: FC<ISandpackLiveProps> = (props) => {
     <>
       <FlexItem noShrink>
         {/* SandpackFileExplorer allows the user to select new files */}
-        <SandpackFileExplorer
-          fileNames={[...codeFiles.keys()]}
-          selectedFileKey={currentPageKey}
-          onChangeSelectedFile={onChangeSelectedFile}
-          followModeActive={!!followingUserId}
-          onAddPage={onAddPage}
-          onInitiateFollowMode={onInitiateFollowMode}
-          onEndFollowMode={onEndFollowMode}
-        />
+        <SandpackFileExplorer />
       </FlexItem>
       <FlexColumn expand="fill" style={{ position: "relative" }}>
         {/* SandpackProvider creates the sandbox and compiles the iFrame with the latest code */}
@@ -71,10 +54,7 @@ export const SandpackLive: FC<ISandpackLiveProps> = (props) => {
               <MonacoEditor
                 language="typescript"
                 theme="vs-dark"
-                currentPageKey={currentPageKey}
                 editingEnabled={true}
-                codeFiles={codeFiles}
-                sandpackFiles={mappedSandpackFiles}
               />
               {/* Preview viewer for the compiled application */}
               <SandpackPreview

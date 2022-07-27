@@ -6,26 +6,20 @@ import {
   ShareScreenStart24Filled,
   ShareScreenStop24Filled,
 } from "@fluentui/react-icons";
+import { useFluidObjectsContext } from "../../../../context-providers";
 
-interface ISandpackFileExplorerProps {
-  fileNames: string[];
-  selectedFileKey: string;
-  followModeActive: boolean;
-  onChangeSelectedFile: (fileName: string) => void;
-  onAddPage: (pageName: string) => void;
-  onInitiateFollowMode: () => void;
-  onEndFollowMode: () => void;
-}
-
-export const SandpackFileExplorer: FC<ISandpackFileExplorerProps> = ({
-  fileNames,
-  selectedFileKey,
-  followModeActive,
-  onChangeSelectedFile,
-  onAddPage,
-  onInitiateFollowMode,
-  onEndFollowMode,
-}) => {
+export const SandpackFileExplorer: FC = () => {
+  const {
+    currentPageKey,
+    followingUserId,
+    codeFiles,
+    onChangeSelectedFile,
+    onAddPage,
+    onInitiateFollowMode,
+    onEndFollowMode,
+  } = useFluidObjectsContext();
+  const fileNames = [...codeFiles.keys()];
+  const followModeActive = !!followingUserId;
   return (
     <FlexRow
       expand="horizontal"
@@ -36,7 +30,7 @@ export const SandpackFileExplorer: FC<ISandpackFileExplorerProps> = ({
     >
       <FlexColumn hAlign="start">
         <TabList
-          selectedValue={selectedFileKey}
+          selectedValue={currentPageKey}
           onTabSelect={(event, data) => {
             onChangeSelectedFile(data.value as string);
           }}

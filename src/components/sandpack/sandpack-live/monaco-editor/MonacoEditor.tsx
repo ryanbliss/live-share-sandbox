@@ -1,30 +1,27 @@
-import { SandpackFiles } from "@codesandbox/sandpack-react";
 import { FC, useMemo, useRef } from "react";
 import {
   useMonacoFluidAdapterHook,
   useSandpackMessages,
 } from "../../../../hooks";
-import { SharedString } from "fluid-framework";
 import { CodeFilesHelper } from "../../../../models";
+import { useFluidObjectsContext } from "../../../../context-providers";
 
 interface IMonacoEditorProps {
   language: "javascript" | "typescript" | "html" | "css";
   theme: "vs-dark" | "light";
-  currentPageKey: string | undefined;
   editingEnabled: boolean;
-  codeFiles: Map<string, SharedString>;
-  sandpackFiles: SandpackFiles;
 }
 
 export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
+  const { codeFiles, currentPageKey, mappedSandpackFiles } =
+    useFluidObjectsContext();
+
   const codeFilesHelperRef = useRef<CodeFilesHelper | undefined>();
   const codeFilesHelper = useMemo(() => {
-    codeFilesHelperRef.current = new CodeFilesHelper(
-      props.codeFiles,
-      props.currentPageKey
-    );
+    codeFilesHelperRef.current = new CodeFilesHelper(codeFiles, currentPageKey);
     return codeFilesHelperRef.current;
-  }, [props.codeFiles, props.currentPageKey]);
+  }, [codeFiles, currentPageKey]);
+
   // Set up iFrame window messages for Sandpack
   // This isn't directly related to MonacoEditor but
   // it needs to be in a component within SandpackProvider
@@ -36,7 +33,7 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
     codeFilesHelper,
     codeFilesHelperRef,
     "container",
-    props.sandpackFiles,
+    mappedSandpackFiles,
     props.theme
   );
 
