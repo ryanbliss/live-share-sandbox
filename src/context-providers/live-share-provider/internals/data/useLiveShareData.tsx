@@ -14,34 +14,23 @@ import {
   SharedMap,
 } from "fluid-framework";
 import { SharedString } from "@fluidframework/sequence";
-import { createContext, MutableRefObject, useContext, useEffect, useRef, useState } from "react";
-import { HeaderTemplate, LocalAppTemplate, TeamsAppTemplate } from "../../sandpack-templates";
-import { inTeams } from "../../utils/inTeams";
-import { IFollowModeStateValue } from "../../models";
-
-interface ILiveShareContext {
-  loading: boolean;
-  error: Error | undefined;
-  container: IFluidContainer | undefined;
-  codePagesMap: SharedMap | undefined;
-  sandpackObjectsMap: SharedMap | undefined;
-  followModeState:
-    | EphemeralState<IFollowModeStateValue>
-    | undefined;
-  presence: EphemeralPresence | undefined;
-  userDidCreateContainerRef: MutableRefObject<boolean> | undefined;
-}
+import { useEffect, useRef, useState } from "react";
+import { HeaderTemplate, LocalAppTemplate, TeamsAppTemplate } from "../../../../sandpack-templates";
+import { inTeams } from "../../../../utils/inTeams";
+import { IFollowModeStateValue, ILiveShareContext } from "../../../../models";
 
 /**
+ * @hidden
  * Hook that creates/loads the apps shared objects.
  *
  * @remarks
  * This is an application specific hook that defines the fluid schema of Distributed Data Structures (DDS)
  * used by the app and passes that schema to the `TeamsFluidClient` to create/load your Fluid container.
  *
+ * @see useLiveShareContext for consuming ILiveShareContext using React Context.
  * @returns Shared objects managed by the apps fluid container.
  */
-export function useLiveShare(): ILiveShareContext {
+export function useLiveShareData(): ILiveShareContext {
   const [results, setResults] = useState<
     | {
         container: IFluidContainer;
@@ -157,20 +146,4 @@ export function useLiveShare(): ILiveShareContext {
     presence: initialObjects?.presence as EphemeralPresence | undefined,
     userDidCreateContainerRef,
   };
-}
-
-export const LiveShareContext = createContext<ILiveShareContext>({
-  loading: true,
-  error: undefined,
-  container: undefined,
-  codePagesMap: undefined,
-  sandpackObjectsMap: undefined,
-  followModeState: undefined,
-  presence: undefined,
-  userDidCreateContainerRef: undefined,
-});
-
-export const useLiveShareContext = (): ILiveShareContext => {
-  const liveShareContext = useContext(LiveShareContext);
-  return liveShareContext;
 }

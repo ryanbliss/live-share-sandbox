@@ -7,12 +7,7 @@ import {
   SandpackThemeProvider,
 } from "@codesandbox/sandpack-react";
 import * as microsoftTeams from "@microsoft/teams-js";
-import {
-  useCodePages,
-  useFollowModeState,
-  useLiveShareContext,
-  usePresence,
-} from "../../../hooks";
+import { useCodePages, useFollowModeState, usePresence } from "../../../hooks";
 import { SandpackFileExplorer } from "./sandpack-files/SandpackFileExplorer";
 import {
   LiveShareSandboxApi,
@@ -20,6 +15,7 @@ import {
 } from "../../../sandpack-templates";
 import { FlexColumn, FlexItem } from "../../flex";
 import { MonacoEditor } from "./monaco-editor/MonacoEditor";
+import { useLiveShareContext } from "../../../context-providers";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";

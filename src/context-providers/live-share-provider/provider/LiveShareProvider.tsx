@@ -1,11 +1,11 @@
 import { FC, ReactNode } from "react";
-import { LiveShareContext, useLiveShare } from "../../../hooks";
-import { LoadableWrapper } from "../../view-wrappers";
+import { LiveShareContext, useLiveShareData } from "../internals";
+import { LoadableWrapper } from "../../../components/view-wrappers";
 
 export const LiveShareProvider: FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const liveShareValue = useLiveShare();
+  const liveShareValue = useLiveShareData();
 
   return (
     <LiveShareContext.Provider value={liveShareValue}>

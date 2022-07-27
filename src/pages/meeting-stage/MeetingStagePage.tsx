@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { useTeamsContext } from "../../hooks";
-import { LiveShareProvider, SandpackLive } from "../../components";
+import { SandpackLive } from "../../components";
+import { LiveShareProvider } from "../../context-providers";
 
 export const MeetingStagePage: FC = () => {
   const teamsContext = useTeamsContext();
