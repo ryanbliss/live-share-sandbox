@@ -15,10 +15,18 @@ export interface ICursor {
 export class Cursor implements ICursor {
   private _selection: ISelection;
   private _color: string;
+  private _userId: string;
   private _name: string;
-  constructor(selection: ISelection, color: string, name: string) {
+  private _decorations: string[] = [];
+  constructor(
+    selection: ISelection,
+    color: string,
+    userId: string,
+    name: string
+  ) {
     this._selection = selection;
     this._color = color;
+    this._userId = userId;
     this._name = name;
   }
 
@@ -34,8 +42,16 @@ export class Cursor implements ICursor {
     return this._color;
   }
 
+  public get userId(): string {
+    return this._userId;
+  }
+
   public get name(): string {
     return this._name;
+  }
+
+  public get decorations(): string[] {
+    return this._decorations;
   }
 
   /*
@@ -50,6 +66,10 @@ export class Cursor implements ICursor {
     this._color = value;
   }
 
+  public set decorations(value: string[]) {
+    this._decorations = value;
+  }
+
   /*
     Functions
    */
@@ -58,7 +78,12 @@ export class Cursor implements ICursor {
     if (!user.cursor) {
       return undefined;
     }
-    return new Cursor(user.cursor!.selection, user.cursor!.color, user.name);
+    return new Cursor(
+      user.cursor!.selection,
+      user.cursor!.color,
+      user.userId,
+      user.name
+    );
   }
 
   public toJson(): ICursor {

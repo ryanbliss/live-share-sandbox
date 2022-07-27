@@ -5,6 +5,7 @@ import { IFollowModeStateValue } from "./IFollowModeStateValue";
 import { IUser } from "./IUser";
 import { app } from "@microsoft/teams-js";
 import { SandpackFiles } from "@codesandbox/sandpack-react";
+import { ICursor } from "./Cursor";
 
 export interface ILiveShareContext {
   loading: boolean;
@@ -37,6 +38,7 @@ export interface IPresenceContext {
   users: IUser[];
   currentPageKey: string;
   onChangeCurrentPageKey: (currentPageKey: string) => void;
+  onChangeCursor: (cursor: ICursor) => void;
 }
 
 export interface IFluidObjectsContext

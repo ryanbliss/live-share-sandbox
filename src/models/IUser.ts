@@ -5,6 +5,7 @@ export interface IUser {
   userId: string;
   name: string;
   state: PresenceState;
+  isLocal: boolean;
   currentPageKey?: string;
   cursor?: ICursor;
   roles?: UserMeetingRole[];

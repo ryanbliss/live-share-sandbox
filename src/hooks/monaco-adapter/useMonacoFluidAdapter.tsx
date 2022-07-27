@@ -12,6 +12,7 @@ import { MonacoPackageLoader } from "./package-loader/MonacoPackageLoader";
 import { LiveSharePackages } from "./package-loader/packages/LiveSharePackages";
 import { CodeFilesHelper } from "../../models";
 import { useStateRef } from "../";
+import { useMonacoPresenceCursors } from "./presence-cursors/useMonacoPresenceCursors";
 
 export const useMonacoFluidAdapterHook = (
   codeFilesHelper: CodeFilesHelper,
@@ -31,6 +32,9 @@ export const useMonacoFluidAdapterHook = (
   const [editor, editorRef, setEditor] = useStateRef<
     Monaco.editor.IStandaloneCodeEditor | undefined
   >(undefined);
+
+  // Support highlighting cursors
+  useMonacoPresenceCursors(editor);
 
   // Callback to register a listener for changes to SharedText
   const onRegisterCodeFileTextChange = useCallback(

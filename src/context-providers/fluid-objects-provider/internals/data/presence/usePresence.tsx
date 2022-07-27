@@ -6,7 +6,7 @@ import {
 } from "@microsoft/live-share";
 import { useStateRef } from "../../../../../hooks";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { IPresenceContext, IUser } from "../../../../../models";
+import { IPresenceContext, IUser, ICursor } from "../../../../../models";
 
 export const usePresence = (
   presence: EphemeralPresence | undefined,
@@ -51,10 +51,11 @@ export const usePresence = (
 
   // Post user presence with and the page they are currently looking at
   const updatePresence = useCallback(
-    ({ name = "", currentPageKey = "" }) => {
+    (name?: string, currentPageKey?: string, cursor?: ICursor) => {
       presence?.updatePresence(PresenceState.online, {
         name: name ?? localUserRef.current?.name,
         currentPageKey: currentPageKey ?? localUserRef.current?.currentPageKey,
+        cursor: cursor ?? localUserRef.current?.cursor,
       });
     },
     [presence, localUserRef]
@@ -63,7 +64,15 @@ export const usePresence = (
   // Callback exposed to UI to change the current page the user is looking at
   const onChangeCurrentPageKey = useCallback(
     (currentPageKey: string) => {
-      updatePresence({ currentPageKey });
+      updatePresence(undefined, currentPageKey);
+    },
+    [updatePresence]
+  );
+
+  // Callback exposed to UI to change the current page the user is looking at
+  const onChangeCursor = useCallback(
+    (cursor: ICursor) => {
+      updatePresence(undefined, undefined, cursor);
     },
     [updatePresence]
   );
@@ -83,9 +92,11 @@ export const usePresence = (
             userId: userPresence.userId,
             state: userPresence.state,
             name: userData?.name ? `${userData.name}` : "Unknown",
+            isLocal: local,
             currentPageKey: userData?.currentPageKey
               ? `${userData.currentPageKey}`
               : undefined,
+            cursor: userData?.cursor,
             roles: [],
           };
           // Get the roles of the local user
@@ -113,7 +124,9 @@ export const usePresence = (
               currentPageKey: userData?.currentPageKey
                 ? `${userData.currentPageKey}`
                 : undefined,
-            } as IUser;
+              cursor: userData?.cursor,
+              isLocal: userPresence.userId === localUserRef.current?.userId,
+            };
           })
           .filter((user) => user.state === PresenceState.online);
         setUsers(updatedUsers);
@@ -146,5 +159,6 @@ export const usePresence = (
     users,
     currentPageKey,
     onChangeCurrentPageKey,
+    onChangeCursor,
   };
 };
