@@ -64,7 +64,14 @@ export const usePresence = (
   // Callback exposed to UI to change the current page the user is looking at
   const onChangeCurrentPageKey = useCallback(
     (currentPageKey: string) => {
-      updatePresence(undefined, currentPageKey);
+      // If user has a cursor, reset selection when changing page
+      const newCursor = localUserRef.current?.cursor
+        ? Object.assign({}, localUserRef.current!.cursor!)
+        : undefined;
+      if (newCursor) {
+        newCursor.selection = undefined;
+      }
+      updatePresence(undefined, currentPageKey, newCursor);
     },
     [updatePresence]
   );

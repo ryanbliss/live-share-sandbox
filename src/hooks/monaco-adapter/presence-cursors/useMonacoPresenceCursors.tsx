@@ -13,59 +13,87 @@ export const useMonacoPresenceCursors = (
   const cursorsRef = useRef<Cursor[]>([]);
 
   useEffect(() => {
-    if (!editor) return;
-    const model = editor.getModel();
-    if (!model) return;
+    // Yield so that editor model can reset when currentPageKey changes
+    setTimeout(() => {
+      if (!editor) return;
+      const model = editor.getModel();
+      if (!model) return;
+      // For each new/updated cursor, decorate the cursor in the Monaco editor
+      const newCursors = users
+        .filter(
+          (user) =>
+            user.currentPageKey === currentPageKey &&
+            !user.isLocal &&
+            user.cursor
+        )
+        .map((user) => Cursor.fromUser(user)!);
+      newCursors.forEach((cursor) => {
+        let decorations: Monaco.editor.IModelDeltaDecoration[] = [];
+        if (cursor.selection) {
+          let start = model.getPositionAt(cursor.selection.start);
+          let end = model.getPositionAt(cursor.selection.end);
 
-    const newCursors = users
-      .filter(
-        (user) =>
-          user.currentPageKey === currentPageKey && !user.isLocal && user.cursor
-      )
-      .map((user) => Cursor.fromUser(user)!);
+          /** Selection is inverted */
+          if (start > end) {
+            [start, end] = [end, start];
+          }
+          const range = new Monaco.Range(
+            start.lineNumber,
+            start.column,
+            end.lineNumber,
+            end.column
+          );
 
-    newCursors.forEach((cursor) => {
-      console.log(
-        "useMonacoPresenceCursors: updating remote cursors for pos",
-        cursor.selection.start,
-        cursor.selection.end
-      );
-      let start = model.getPositionAt(cursor.selection.start);
-      let end = model.getPositionAt(cursor.selection.end);
-
-      /** Selection is inverted */
-      if (start > end) {
-        [start, end] = [end, start];
-      }
-      const range = new Monaco.Range(
-        start.lineNumber,
-        start.column,
-        end.lineNumber,
-        end.column
-      );
-
-      const existingCursor = cursorsRef.current.find(
-        (checkCursor) => checkCursor.userId === cursor?.userId
-      );
-      cursor.decorations = editor.deltaDecorations(
-        existingCursor?.decorations ?? [],
-        [
-          {
-            range,
-            options: {
-              className: `remote-client-selection ${cursor.color}`,
-              isWholeLine: false,
-              stickiness:
-                Monaco.editor.TrackedRangeStickiness
-                  .NeverGrowsWhenTypingAtEdges,
+          decorations = [
+            {
+              range,
+              options: {
+                className: `remote-client-selection ${cursor.color}`,
+                isWholeLine: false,
+                stickiness:
+                  Monaco.editor.TrackedRangeStickiness
+                    .NeverGrowsWhenTypingAtEdges,
+              },
             },
-          },
-        ]
-      );
-    });
-    cursorsRef.current = newCursors;
+          ];
+        }
+        const existingCursor = cursorsRef.current.find(
+          (checkCursor) => checkCursor.userId === cursor?.userId
+        );
+        cursor.decorations = editor.deltaDecorations(
+          existingCursor?.decorations ?? [],
+          decorations
+        );
+      });
+
+      // Clear existing cursors for users who aren't on same page as local user
+      const cursorsOnOtherPages = users
+        .filter(
+          (user) =>
+            user.currentPageKey !== currentPageKey &&
+            !user.isLocal &&
+            user.cursor
+        )
+        .map((user) => Cursor.fromUser(user)!);
+      cursorsOnOtherPages.forEach((cursor) => {
+        console.log("cursor on another page");
+        const existingCursor = cursorsRef.current.find(
+          (checkCursor) => checkCursor.userId === cursor?.userId
+        );
+        if (existingCursor && existingCursor.decorations.length > 0) {
+          console.log("deleting");
+          cursor.decorations = editor.deltaDecorations(
+            existingCursor.decorations,
+            []
+          );
+        }
+      });
+
+      cursorsRef.current = [...newCursors, ...cursorsOnOtherPages];
+    }, 0);
   }, [editor, users, currentPageKey]);
 
+  // Listen for
   useEffect(() => {
     if (startedRef.current || !editor) return;
     startedRef.current = true;
@@ -76,27 +104,13 @@ export const useMonacoPresenceCursors = (
         return;
       }
       const model = editor!.getModel();
-      let firstPosition: Monaco.Position = ev.selection.getSelectionStart();
-      let lastPosition: Monaco.Position = ev.selection.getEndPosition();
-      // if (ev.secondaryPositions.length > 0) {
-      //   firstPosition = ev.position.isBefore(ev.secondaryPositions[0])
-      //     ? ev.position
-      //     : ev.secondaryPositions[0];
-      //   lastPosition = ev.secondaryPositions[ev.secondaryPositions.length - 1];
-      // } else {
-      //   firstPosition = ev.position;
-      //   lastPosition = ev.position;
-      // }
+      const firstPosition = ev.selection.getStartPosition();
+      const lastPosition = ev.selection.getEndPosition();
 
       const cursorSelection: ISelection = {
         start: model!.getOffsetAt(firstPosition),
         end: model!.getOffsetAt(lastPosition),
       };
-      console.log(
-        "useMonacoPresenceCursors: changing cursor for local user",
-        cursorSelection.start,
-        cursorSelection.end
-      );
       onChangeCursor({
         selection: cursorSelection,
         color: localUserRef.current?.cursor?.color ?? getRandomCursorColor(),

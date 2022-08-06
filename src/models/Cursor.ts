@@ -17,19 +17,19 @@ export enum CursorColorType {
 
 export interface ICursor {
   // selection range of cursor
-  selection: ISelection;
+  selection: ISelection | undefined;
   // color to render cursor as
   color: CursorColorType;
 }
 
 export class Cursor implements ICursor {
-  private _selection: ISelection;
+  private _selection: ISelection | undefined;
   private _color: CursorColorType;
   private _userId: string;
   private _name: string;
   private _decorations: string[] = [];
   constructor(
-    selection: ISelection,
+    selection: ISelection | undefined,
     color: CursorColorType,
     userId: string,
     name: string
@@ -44,7 +44,7 @@ export class Cursor implements ICursor {
     Getters
    */
 
-  public get selection(): ISelection {
+  public get selection(): ISelection | undefined {
     return this._selection;
   }
 
@@ -68,7 +68,7 @@ export class Cursor implements ICursor {
     Setters
    */
 
-  public set selection(value: ISelection) {
+  public set selection(value: ISelection | undefined) {
     this._selection = value;
   }
 
