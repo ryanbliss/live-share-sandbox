@@ -5,22 +5,32 @@ export interface ISelection {
   end: number;
 }
 
+export enum CursorColorType {
+  red = "red",
+  blue = "blue",
+  green = "green",
+  orange = "orange",
+  yellow = "yellow",
+  purple = "purple",
+  pink = "pink",
+}
+
 export interface ICursor {
   // selection range of cursor
   selection: ISelection;
   // color to render cursor as
-  color: string;
+  color: CursorColorType;
 }
 
 export class Cursor implements ICursor {
   private _selection: ISelection;
-  private _color: string;
+  private _color: CursorColorType;
   private _userId: string;
   private _name: string;
   private _decorations: string[] = [];
   constructor(
     selection: ISelection,
-    color: string,
+    color: CursorColorType,
     userId: string,
     name: string
   ) {
@@ -38,7 +48,7 @@ export class Cursor implements ICursor {
     return this._selection;
   }
 
-  public get color(): string {
+  public get color(): CursorColorType {
     return this._color;
   }
 
@@ -62,7 +72,7 @@ export class Cursor implements ICursor {
     this._selection = value;
   }
 
-  public set color(value: string) {
+  public set color(value: CursorColorType) {
     this._color = value;
   }
 

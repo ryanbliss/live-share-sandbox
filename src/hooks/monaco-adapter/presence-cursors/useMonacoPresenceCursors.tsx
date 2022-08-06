@@ -2,11 +2,13 @@ import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { useEffect, useRef } from "react";
 import { useFluidObjectsContext } from "../../../context-providers";
 import { Cursor, ISelection } from "../../../models";
+import { getRandomCursorColor } from "../../../utils";
 
 export const useMonacoPresenceCursors = (
   editor: Monaco.editor.IStandaloneCodeEditor | undefined
 ) => {
-  const { users, currentPageKey, onChangeCursor } = useFluidObjectsContext();
+  const { users, localUserRef, currentPageKey, onChangeCursor } =
+    useFluidObjectsContext();
   const startedRef = useRef(false);
   const cursorsRef = useRef<Cursor[]>([]);
 
@@ -25,7 +27,8 @@ export const useMonacoPresenceCursors = (
     newCursors.forEach((cursor) => {
       console.log(
         "useMonacoPresenceCursors: updating remote cursors for pos",
-        cursor.selection
+        cursor.selection.start,
+        cursor.selection.end
       );
       let start = model.getPositionAt(cursor.selection.start);
       let end = model.getPositionAt(cursor.selection.end);
@@ -50,7 +53,7 @@ export const useMonacoPresenceCursors = (
           {
             range,
             options: {
-              className: `remote-client-selection`,
+              className: `remote-client-selection ${cursor.color}`,
               isWholeLine: false,
               stickiness:
                 Monaco.editor.TrackedRangeStickiness
@@ -89,10 +92,14 @@ export const useMonacoPresenceCursors = (
         start: model!.getOffsetAt(firstPosition),
         end: model!.getOffsetAt(lastPosition),
       };
-      console.log("useMonacoPresenceCursors: changing cursor for local user");
+      console.log(
+        "useMonacoPresenceCursors: changing cursor for local user",
+        cursorSelection.start,
+        cursorSelection.end
+      );
       onChangeCursor({
         selection: cursorSelection,
-        color: "red",
+        color: localUserRef.current?.cursor?.color ?? getRandomCursorColor(),
       });
     };
     console.log("useMonacoPresenceCursors: onDidChangeCursorPosition");

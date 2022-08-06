@@ -155,6 +155,7 @@ export const usePresence = (
   return {
     presenceStarted: started,
     localUser,
+    localUserRef,
     localUserIsEligiblePresenter,
     users,
     currentPageKey,

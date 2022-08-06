@@ -34,6 +34,7 @@ export interface IFollowModeStateContext {
 export interface IPresenceContext {
   presenceStarted: boolean;
   localUser: IUser | undefined;
+  localUserRef: MutableRefObject<IUser | undefined>;
   localUserIsEligiblePresenter: boolean;
   users: IUser[];
   currentPageKey: string;
