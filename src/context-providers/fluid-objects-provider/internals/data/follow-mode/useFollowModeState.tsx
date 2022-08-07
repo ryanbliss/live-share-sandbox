@@ -1,7 +1,10 @@
 import { EphemeralState, UserMeetingRole } from "@microsoft/live-share";
 import { useCallback, useEffect, useState } from "react";
-import { IFollowModeStateValue } from "../../../models";
-import { useStateRef } from "../../";
+import {
+  IFollowModeStateContext,
+  IFollowModeStateValue,
+} from "../../../../../models";
+import { useStateRef } from "../../../../../hooks";
 
 // Follow mode allows a user to force other users to move to the page that they
 // are looking at. Only meeting presenters and organizers have the privilege
@@ -10,12 +13,7 @@ export function useFollowModeState(
   followModeState: EphemeralState<IFollowModeStateValue> | undefined,
   localUserId?: string,
   presentingUserId?: string
-): {
-  followModeStateStarted: boolean;
-  followingUserId?: string;
-  onInitiateFollowMode: () => void;
-  onEndFollowMode: () => void;
-} {
+): IFollowModeStateContext {
   const [followingUserId, followingUserIdRef, setFollowingUserId] = useStateRef<
     string | undefined
   >(presentingUserId);

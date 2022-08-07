@@ -12,6 +12,7 @@ import { MonacoPackageLoader } from "./package-loader/MonacoPackageLoader";
 import { LiveSharePackages } from "./package-loader/packages/LiveSharePackages";
 import { CodeFilesHelper } from "../../models";
 import { useStateRef } from "../";
+import { useMonacoPresenceCursors } from "./presence-cursors/useMonacoPresenceCursors";
 
 export const useMonacoFluidAdapterHook = (
   codeFilesHelper: CodeFilesHelper,
@@ -31,6 +32,12 @@ export const useMonacoFluidAdapterHook = (
   const [editor, editorRef, setEditor] = useStateRef<
     Monaco.editor.IStandaloneCodeEditor | undefined
   >(undefined);
+
+  // Support highlighting cursors
+  const { onDidInsertText, onDidRemoveText } = useMonacoPresenceCursors(
+    editor,
+    editorRef
+  );
 
   // Callback to register a listener for changes to SharedText
   const onRegisterCodeFileTextChange = useCallback(
@@ -92,7 +99,7 @@ export const useMonacoFluidAdapterHook = (
                   } else {
                     codeModel.setValue(sharedString.getText());
                   }
-
+                  onDidInsertText(range.position, segment.text.length, key);
                   break;
                 }
 
@@ -109,6 +116,11 @@ export const useMonacoFluidAdapterHook = (
                   } else {
                     codeModel.setValue(sharedString.getText());
                   }
+                  onDidRemoveText(
+                    range.position,
+                    range.position + segment.text.length,
+                    key
+                  );
                   break;
                 }
 
@@ -123,7 +135,7 @@ export const useMonacoFluidAdapterHook = (
         }
       });
     },
-    [monaco, sandpack]
+    [monaco, sandpack, onDidInsertText, onDidRemoveText]
   );
 
   const onCreateMonacoEditor = useCallback(() => {
@@ -169,16 +181,26 @@ export const useMonacoFluidAdapterHook = (
           if (change.rangeLength === 0) {
             sharedString?.insertText(change.rangeOffset, change.text);
           } else {
-            sharedString?.replaceText(
+            const endPos = change.rangeOffset + change.rangeLength;
+            sharedString?.replaceText(change.rangeOffset, endPos, change.text);
+            onDidRemoveText(
               change.rangeOffset,
-              change.rangeOffset + change.rangeLength,
-              change.text
+              endPos,
+              codeFilesHelperRef.current!.currentFile.key
             );
           }
-        } else {
-          sharedString?.removeText(
+          onDidInsertText(
             change.rangeOffset,
-            change.rangeOffset + change.rangeLength
+            change.text.length,
+            codeFilesHelperRef.current!.currentFile.key
+          );
+        } else {
+          const endPos = change.rangeOffset + change.rangeLength;
+          sharedString?.removeText(change.rangeOffset, endPos);
+          onDidRemoveText(
+            change.rangeOffset,
+            endPos,
+            codeFilesHelperRef.current!.currentFile.key
           );
         }
       }
@@ -230,6 +252,8 @@ export const useMonacoFluidAdapterHook = (
     divElementId,
     setEditor,
     onRegisterCodeFileTextChange,
+    onDidInsertText,
+    onDidRemoveText,
   ]);
 
   const onRefreshMonacoEditor = useCallback(() => {

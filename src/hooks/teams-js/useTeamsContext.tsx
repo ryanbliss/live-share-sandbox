@@ -1,9 +1,9 @@
-import * as microsoftTeams from "@microsoft/teams-js";
+import { app, HostClientType, FrameContexts } from "@microsoft/teams-js";
 import { useEffect, useState } from "react";
 import { inTeams } from "../../utils/inTeams";
 
 export const useTeamsContext = () => {
-  const [ctx, setCtx] = useState<microsoftTeams.app.Context | undefined>();
+  const [ctx, setCtx] = useState<app.Context | undefined>();
 
   useEffect(() => {
     if (!ctx?.user?.id) {
@@ -11,7 +11,7 @@ export const useTeamsContext = () => {
       if (inTeams()) {
         console.log("useTeamsContext: Attempting to get Teams context");
         // Get Context from the Microsoft Teams SDK
-        microsoftTeams.app
+        app
           .getContext()
           .then((context) => {
             console.log(
@@ -29,13 +29,13 @@ export const useTeamsContext = () => {
             sessionId: "test-session-id",
             host: {
               name: "Orange" as any,
-              clientType: microsoftTeams.HostClientType.web,
+              clientType: HostClientType.web,
               sessionId: "test-session-id",
             },
           },
           page: {
             id: "live-share-sandbox",
-            frameContext: microsoftTeams.FrameContexts.meetingStage,
+            frameContext: FrameContexts.meetingStage,
           },
           user: {
             id: `user${Math.abs(Math.random() * 999999999)}`,

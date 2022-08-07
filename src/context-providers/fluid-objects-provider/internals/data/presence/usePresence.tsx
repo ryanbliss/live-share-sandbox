@@ -4,28 +4,28 @@ import {
   PresenceState,
   UserMeetingRole,
 } from "@microsoft/live-share";
-import { useStateRef } from "../../";
+import { useStateRef } from "../../../../../hooks";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { IUser } from "../../../models";
+import { IPresenceContext, IUser, ICursor } from "../../../../../models";
 
 export const usePresence = (
   presence: EphemeralPresence | undefined,
   context: microsoftTeams.app.Context | undefined,
   initialPageKey: string,
   followingUserId: string | undefined
-): {
-  presenceStarted: boolean;
-  localUser: IUser | undefined;
-  localUserIsEligiblePresenter: boolean;
-  users: IUser[];
-  currentPageKey: string;
-  onChangeCurrentPageKey: (currentPageKey: string) => void;
-} => {
-  const [users, setUsers] = useState<IUser[]>([]);
+): IPresenceContext => {
+  const [otherUsers, setOtherUsers] = useState<IUser[]>([]);
   const [localUser, localUserRef, setLocalUser] = useStateRef<
     IUser | undefined
   >(undefined);
   const [started, setStarted] = useState(false);
+
+  const users = useMemo(() => {
+    if (localUser) {
+      return [localUser, ...otherUsers];
+    }
+    return [...otherUsers];
+  }, [localUser, otherUsers]);
 
   const localUserIsEligiblePresenter = useMemo(() => {
     if (
@@ -58,19 +58,35 @@ export const usePresence = (
 
   // Post user presence with and the page they are currently looking at
   const updatePresence = useCallback(
-    ({ name = "", currentPageKey = "" }) => {
+    (name?: string, currentPageKey?: string, cursor?: ICursor) => {
       presence?.updatePresence(PresenceState.online, {
         name: name ?? localUserRef.current?.name,
         currentPageKey: currentPageKey ?? localUserRef.current?.currentPageKey,
+        cursor: cursor ?? localUserRef.current?.cursor,
       });
     },
-    [presence, localUserRef]
+    [presence]
   );
 
   // Callback exposed to UI to change the current page the user is looking at
   const onChangeCurrentPageKey = useCallback(
     (currentPageKey: string) => {
-      updatePresence({ currentPageKey });
+      // If user has a cursor, reset selection when changing page
+      const newCursor = localUserRef.current?.cursor
+        ? Object.assign({}, localUserRef.current!.cursor!)
+        : undefined;
+      if (newCursor) {
+        newCursor.selection = undefined;
+      }
+      updatePresence(undefined, currentPageKey, newCursor);
+    },
+    [updatePresence]
+  );
+
+  // Callback exposed to UI to change the current page the user is looking at
+  const onChangeCursor = useCallback(
+    (cursor: ICursor) => {
+      updatePresence(undefined, undefined, cursor);
     },
     [updatePresence]
   );
@@ -90,9 +106,11 @@ export const usePresence = (
             userId: userPresence.userId,
             state: userPresence.state,
             name: userData?.name ? `${userData.name}` : "Unknown",
+            isLocal: local,
             currentPageKey: userData?.currentPageKey
               ? `${userData.currentPageKey}`
               : undefined,
+            cursor: userData?.cursor,
             roles: [],
           };
           // Get the roles of the local user
@@ -107,23 +125,26 @@ export const usePresence = (
               console.error(err);
               setLocalUser(localUser);
             });
+        } else {
+          // Update our local state for our list of users
+          const updatedUsers: IUser[] = presence
+            .toArray()
+            .map((userPresence) => {
+              const userData = userPresence.data as any;
+              return {
+                userId: userPresence.userId,
+                state: userPresence.state,
+                name: userData?.name ? `${userData.name}` : "Unknown",
+                currentPageKey: userData?.currentPageKey
+                  ? `${userData.currentPageKey}`
+                  : undefined,
+                cursor: userData?.cursor,
+                isLocal: userPresence.userId === localUserRef.current?.userId,
+              };
+            })
+            .filter((user) => user.state === PresenceState.online);
+          setOtherUsers(updatedUsers);
         }
-        // Update our local state for our list of users
-        const updatedUsers: IUser[] = presence
-          .toArray()
-          .map((userPresence) => {
-            const userData = userPresence.data as any;
-            return {
-              userId: userPresence.userId,
-              state: userPresence.state,
-              name: userData?.name ? `${userData.name}` : "Unknown",
-              currentPageKey: userData?.currentPageKey
-                ? `${userData.currentPageKey}`
-                : undefined,
-            } as IUser;
-          })
-          .filter((user) => user.state === PresenceState.online);
-        setUsers(updatedUsers);
       });
       // displayName may not be known in all M365 hubs right now
       // so we use their email handle instead if needed.
@@ -144,14 +165,17 @@ export const usePresence = (
         })
         .catch((error) => console.error(error));
     }
-  }, [presence, context, setStarted, setLocalUser]);
+  }, [presence, context]);
 
   return {
     presenceStarted: started,
     localUser,
+    localUserRef,
     localUserIsEligiblePresenter,
     users,
+    otherUsers,
     currentPageKey,
     onChangeCurrentPageKey,
+    onChangeCursor,
   };
 };

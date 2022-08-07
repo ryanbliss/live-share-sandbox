@@ -1,12 +1,13 @@
 import { FC } from "react";
 import { useTeamsContext } from "../../hooks";
-import { LiveShareProvider, SandpackLive } from "../../components";
+import { SandpackLive } from "../../components";
+import { FluidObjectsProvider } from "../../context-providers";
 
 export const MeetingStagePage: FC = () => {
   const teamsContext = useTeamsContext();
   return (
-    <LiveShareProvider>
-      <SandpackLive template={"react-ts"} teamsContext={teamsContext} />
-    </LiveShareProvider>
+    <FluidObjectsProvider>
+      <SandpackLive template={"react-ts"} />
+    </FluidObjectsProvider>
   );
 };
