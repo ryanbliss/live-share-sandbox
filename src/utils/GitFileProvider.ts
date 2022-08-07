@@ -24,6 +24,7 @@ export class GitFileProvider implements FileProvider {
       .then(() => this.readFile(path))
   }
 
+  // todo: multiple concurrent calls should not be allowed
   private async cloneOrUpdateIfNeeded(): Promise<void> {
     return this.fs.promises
       .readdir(this.dir, undefined)
