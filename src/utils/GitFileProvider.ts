@@ -6,16 +6,18 @@ import { Buffer } from 'buffer'
 export class GitFileProvider {
   fs: FS;
   repositoryUrl: string;
+  branch?: string;
   dir: string;
 
-  public static async create(repoUrl: string): Promise<GitFileProvider> {
-    const provider = new GitFileProvider(repoUrl);
+  public static async create(repoUrl: string, branch?: string): Promise<GitFileProvider> {
+    const provider = new GitFileProvider(repoUrl, branch);
     return provider.cloneOrUpdateIfNeeded().then(() => provider)
   }
 
-  private constructor(repositoryUrl: string) {
+  private constructor(repositoryUrl: string, branch?: string) {
     this.repositoryUrl = repositoryUrl;
     this.dir = repositoryUrl.substring(repositoryUrl.lastIndexOf('/'), repositoryUrl.length);
+    this.branch = branch;
     this.fs = new FS(this.dir);
   }
 
@@ -50,6 +52,6 @@ export class GitFileProvider {
 
   private async clone(dir: string, repositoryUrl: string, fs: FS): Promise<void> {
     // TODO: we need to replace the proxy with privately hosted version, this is a test only version
-    return git.clone({ fs, http, dir, url: repositoryUrl, corsProxy: 'https://cors.isomorphic-git.org' })
+    return git.clone({ fs, http, dir, ref: this.branch, url: repositoryUrl, corsProxy: 'https://cors.isomorphic-git.org' })
   }
 }
