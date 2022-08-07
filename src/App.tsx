@@ -6,7 +6,7 @@ import { inTeams } from "./utils/inTeams";
 import { LoadableWrapper } from "./components/view-wrappers";
 import { SidePanelPage, AppSettingsPage, MeetingStagePage } from "./pages";
 import "./App.css";
-import { GitFileProvider, FileProvider } from "./utils/GitFileProvider";
+import { GitFileProvider } from "./utils/GitFileProvider";
 
 function App() {
   const [initialized, setInitialized] = useState(false);
@@ -33,12 +33,14 @@ function App() {
         setInitialized(true);
       }
 
-      const repoUrl = 'https://github.com/ryanbliss/live-share-sandbox';
-      const fileProvider: FileProvider = new GitFileProvider(repoUrl);
-      fileProvider
-        .getFileText('README.md')
-        .then((text) => console.log(text))
-        .catch((err: any) => console.error(err));
+      GitFileProvider
+      .create('https://github.com/ryanbliss/live-share-sandbox')
+      .then((fileProvider) => {
+        fileProvider
+          .getFileText('README.md')
+          .then((text) => console.log(text))
+          .catch((err: any) => console.error(err));
+      })
     }
   }, [initialized]);
 
