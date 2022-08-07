@@ -34,13 +34,13 @@ function App() {
       }
 
       GitFileProvider
-      .create('https://github.com/ryanbliss/live-share-sandbox')
-      .then((fileProvider) => {
-        fileProvider
-          .getFileText('README.md')
-          .then((text) => console.log(text))
-          .catch((err: any) => console.error(err));
-      })
+        .create('https://github.com/ryanbliss/live-share-sandbox')
+        .then((fileProvider) => {
+          fileProvider
+            .getFileText('README.md')
+            .then((text) => console.log(text))
+            .catch((err: any) => console.error(err));
+        })
     }
   }, [initialized]);
 
