@@ -48,7 +48,6 @@ export class GitFileProvider implements FileProvider {
       })
   }
 
-
   private async clone(dir: string, repositoryUrl: string, fs: FS): Promise<void> {
     // TODO: we need to replace the proxy with privately hosted version, this is a test only version
     return git.clone({ fs, http, dir, url: repositoryUrl, corsProxy: 'https://cors.isomorphic-git.org' })

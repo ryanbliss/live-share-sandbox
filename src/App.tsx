@@ -33,11 +33,12 @@ function App() {
         setInitialized(true);
       }
 
-      const fileProvider: FileProvider = new GitFileProvider('https://github.com/ryanbliss/live-share-sandbox')
+      const repoUrl = 'https://github.com/ryanbliss/live-share-sandbox';
+      const fileProvider: FileProvider = new GitFileProvider(repoUrl);
       fileProvider
         .getFileText('README.md')
         .then((text) => console.log(text))
-        .catch((err: any) => console.error(err))
+        .catch((err: any) => console.error(err));
     }
   }, [initialized]);
 
