@@ -28,16 +28,19 @@ export class Cursor implements ICursor {
   private _userId: string;
   private _name: string;
   private _decorations: string[] = [];
+  private _pageKey: string | undefined;
   constructor(
     selection: ISelection | undefined,
     color: CursorColorType,
     userId: string,
-    name: string
+    name: string,
+    pageKey: string | undefined
   ) {
     this._selection = selection;
     this._color = color;
     this._userId = userId;
     this._name = name;
+    this._pageKey = pageKey;
   }
 
   /*
@@ -58,6 +61,10 @@ export class Cursor implements ICursor {
 
   public get name(): string {
     return this._name;
+  }
+
+  public get pageKey(): string | undefined {
+    return this._pageKey;
   }
 
   public get decorations(): string[] {
@@ -92,7 +99,8 @@ export class Cursor implements ICursor {
       user.cursor!.selection,
       user.cursor!.color,
       user.userId,
-      user.name
+      user.name,
+      user.currentPageKey
     );
   }
 

@@ -37,6 +37,7 @@ export interface IPresenceContext {
   localUserRef: MutableRefObject<IUser | undefined>;
   localUserIsEligiblePresenter: boolean;
   users: IUser[];
+  otherUsers: IUser[];
   currentPageKey: string;
   onChangeCurrentPageKey: (currentPageKey: string) => void;
   onChangeCursor: (cursor: ICursor) => void;

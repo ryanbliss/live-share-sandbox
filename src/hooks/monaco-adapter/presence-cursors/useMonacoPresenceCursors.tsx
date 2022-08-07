@@ -1,16 +1,121 @@
 import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
-import { useEffect, useRef } from "react";
+import { MutableRefObject, useCallback, useEffect, useRef } from "react";
 import { useFluidObjectsContext } from "../../../context-providers";
 import { Cursor, ISelection } from "../../../models";
 import { getRandomCursorColor } from "../../../utils";
 
 export const useMonacoPresenceCursors = (
-  editor: Monaco.editor.IStandaloneCodeEditor | undefined
-) => {
-  const { users, localUserRef, currentPageKey, onChangeCursor } =
+  editor: Monaco.editor.IStandaloneCodeEditor | undefined,
+  editorRef: MutableRefObject<Monaco.editor.IStandaloneCodeEditor | undefined>
+): {
+  onDidInsertText: (
+    pos: number,
+    characterCount: number,
+    pageKey: string
+  ) => void;
+  onDidRemoveText: (startPos: number, endPos: number, pageKey: string) => void;
+} => {
+  const { otherUsers, localUserRef, currentPageKey, onChangeCursor } =
     useFluidObjectsContext();
   const startedRef = useRef(false);
   const cursorsRef = useRef<Cursor[]>([]);
+
+  // Callback to refresh tokens. We use editorRef because this callback is
+  // used in useMonacoFluidAdapter in JS event
+  const onRefreshCursor = useCallback(
+    (cursor: Cursor, oldDecorations: string[]) => {
+      const model = editorRef.current?.getModel();
+      if (!model || !cursor.selection) return;
+      let start = model.getPositionAt(cursor.selection.start);
+      let end = model.getPositionAt(cursor.selection.end);
+
+      /** Selection is inverted */
+      if (start > end) {
+        [start, end] = [end, start];
+      }
+      const range = new Monaco.Range(
+        start.lineNumber,
+        start.column,
+        end.lineNumber,
+        end.column
+      );
+      console.log("refreshing cursor");
+      cursor.decorations = editorRef.current!.deltaDecorations(oldDecorations, [
+        {
+          range,
+          options: {
+            className: `remote-client-selection ${cursor.color}`,
+            isWholeLine: false,
+            stickiness:
+              Monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+          },
+        },
+      ]);
+    },
+    []
+  );
+
+  // Callback for when text was inserted to a code file. We pass in editorRef because this callback is
+  // used in useMonacoFluidAdapter in JS event
+  const onDidInsertText = useCallback(
+    (pos: number, characterCount: number, pageKey: string) => {
+      cursorsRef.current = cursorsRef.current.map((cursor) => {
+        if (cursor.selection) {
+          if (cursor.selection.start > pos) {
+            // offset the selection range
+            cursor.selection = {
+              start: cursor.selection.start + characterCount,
+              end: cursor.selection.end + characterCount,
+            };
+            if (cursor.pageKey === pageKey) {
+              // Side effect, but efficient...update Monaco editor
+              onRefreshCursor(cursor, cursor.decorations);
+            }
+          }
+        }
+        return cursor;
+      });
+    },
+    [onRefreshCursor]
+  );
+
+  // Callback for when code was removed from the code file. We pass in editorRef because this callback is
+  // used in useMonacoFluidAdapter in JS event
+  const onDidRemoveText = useCallback(
+    (startPos: number, endPos: number, pageKey: string) => {
+      cursorsRef.current = cursorsRef.current.map((cursor) => {
+        if (cursor.selection) {
+          const removedCharacterCount = endPos - startPos;
+          if (
+            startPos >= cursor.selection.start &&
+            startPos <= cursor.selection.end
+          ) {
+            // we are deleting within the range, adjust new range
+            cursor.selection.start =
+              startPos > cursor.selection.start
+                ? cursor.selection.start
+                : startPos;
+
+            cursor.selection.end = Math.max(
+              startPos,
+              startPos - removedCharacterCount,
+              cursor.selection.end - removedCharacterCount
+            );
+          } else if (cursor.selection.start > endPos) {
+            cursor.selection.start =
+              cursor.selection.start - removedCharacterCount;
+            cursor.selection.end = cursor.selection.end - removedCharacterCount;
+          }
+          if (cursor.pageKey === pageKey) {
+            // Side effect, but efficient...update Monaco editor
+            onRefreshCursor(cursor, cursor.decorations);
+          }
+        }
+        return cursor;
+      });
+    },
+    [onRefreshCursor]
+  );
 
   useEffect(() => {
     // Yield so that editor model can reset when currentPageKey changes
@@ -19,7 +124,7 @@ export const useMonacoPresenceCursors = (
       const model = editor.getModel();
       if (!model) return;
       // For each new/updated cursor, decorate the cursor in the Monaco editor
-      const newCursors = users
+      const newCursors = otherUsers
         .filter(
           (user) =>
             user.currentPageKey === currentPageKey &&
@@ -28,46 +133,14 @@ export const useMonacoPresenceCursors = (
         )
         .map((user) => Cursor.fromUser(user)!);
       newCursors.forEach((cursor) => {
-        let decorations: Monaco.editor.IModelDeltaDecoration[] = [];
-        if (cursor.selection) {
-          let start = model.getPositionAt(cursor.selection.start);
-          let end = model.getPositionAt(cursor.selection.end);
-
-          /** Selection is inverted */
-          if (start > end) {
-            [start, end] = [end, start];
-          }
-          const range = new Monaco.Range(
-            start.lineNumber,
-            start.column,
-            end.lineNumber,
-            end.column
-          );
-
-          decorations = [
-            {
-              range,
-              options: {
-                className: `remote-client-selection ${cursor.color}`,
-                isWholeLine: false,
-                stickiness:
-                  Monaco.editor.TrackedRangeStickiness
-                    .NeverGrowsWhenTypingAtEdges,
-              },
-            },
-          ];
-        }
         const existingCursor = cursorsRef.current.find(
           (checkCursor) => checkCursor.userId === cursor?.userId
         );
-        cursor.decorations = editor.deltaDecorations(
-          existingCursor?.decorations ?? [],
-          decorations
-        );
+        onRefreshCursor(cursor, existingCursor?.decorations ?? []);
       });
 
       // Clear existing cursors for users who aren't on same page as local user
-      const cursorsOnOtherPages = users
+      const cursorsOnOtherPages = otherUsers
         .filter(
           (user) =>
             user.currentPageKey !== currentPageKey &&
@@ -76,12 +149,10 @@ export const useMonacoPresenceCursors = (
         )
         .map((user) => Cursor.fromUser(user)!);
       cursorsOnOtherPages.forEach((cursor) => {
-        console.log("cursor on another page");
         const existingCursor = cursorsRef.current.find(
           (checkCursor) => checkCursor.userId === cursor?.userId
         );
         if (existingCursor && existingCursor.decorations.length > 0) {
-          console.log("deleting");
           cursor.decorations = editor.deltaDecorations(
             existingCursor.decorations,
             []
@@ -91,9 +162,9 @@ export const useMonacoPresenceCursors = (
 
       cursorsRef.current = [...newCursors, ...cursorsOnOtherPages];
     }, 0);
-  }, [editor, users, currentPageKey]);
+  }, [editor, otherUsers, currentPageKey, onRefreshCursor]);
 
-  // Listen for
+  // Listen for cursor position changes and post them
   useEffect(() => {
     if (startedRef.current || !editor) return;
     startedRef.current = true;
@@ -116,7 +187,12 @@ export const useMonacoPresenceCursors = (
         color: localUserRef.current?.cursor?.color ?? getRandomCursorColor(),
       });
     };
-    console.log("useMonacoPresenceCursors: onDidChangeCursorPosition");
+    console.log("useMonacoPresenceCursors: editor.onDidChangeCursorPosition");
     editor!.onDidChangeCursorSelection(handleOnDidChangeCursorPosition);
   }, [editor, onChangeCursor]);
+
+  return {
+    onDidInsertText,
+    onDidRemoveText,
+  };
 };
