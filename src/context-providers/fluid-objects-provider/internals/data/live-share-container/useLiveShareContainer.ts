@@ -15,7 +15,7 @@ import {
 } from "fluid-framework";
 import { SharedString } from "@fluidframework/sequence";
 import { useEffect, useRef, useState } from "react";
-import { HeaderTemplate, LocalAppTemplate, TeamsAppTemplate } from "../../../../../sandpack-templates";
+import { HeaderTemplate, LocalAppTemplate, TeamsAppTemplate, AFRAppTemplate } from "../../../../../sandpack-templates";
 import { IFollowModeStateValue, ILiveShareContext } from "../../../../../models";
 import { inTeams } from "../../../../../utils/inTeams";
 
@@ -87,7 +87,8 @@ export function useLiveShareContainer(): ILiveShareContext {
             "/App.tsx",
             sharedString.handle
           );
-          const AppTemplate = isInTeams ? TeamsAppTemplate : LocalAppTemplate;
+          // const AppTemplate = isInTeams ? TeamsAppTemplate : LocalAppTemplate;
+          const AppTemplate = isInTeams ? TeamsAppTemplate : AFRAppTemplate;
           sharedString.insertText(0, AppTemplate);
         })
         .catch((error) => setError(error));
