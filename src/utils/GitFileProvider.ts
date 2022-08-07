@@ -13,7 +13,6 @@ export class GitFileProvider implements FileProvider {
   dir: string;
 
   constructor(repositoryUrl: string) {
-    (globalThis as any)["Buffer"] = Buffer
     this.repositoryUrl = repositoryUrl;
     this.dir = repositoryUrl.substring(repositoryUrl.lastIndexOf('/'), repositoryUrl.length);
     this.fs = new FS(this.dir);
