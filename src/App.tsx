@@ -40,6 +40,16 @@ function App() {
             .getFileText('README.md')
             .then((text) => console.log(text))
             .catch((err: any) => console.error(err));
+
+          fileProvider
+            .getDir()
+            .then((text) => console.log(text))
+            .catch((err: any) => console.error(err));
+
+          fileProvider
+            .getDir("src/components")
+            .then((text) => console.log(text))
+            .catch((err: any) => console.error(err));
         })
     }
   }, [initialized]);

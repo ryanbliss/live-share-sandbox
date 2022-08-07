@@ -20,7 +20,7 @@ export class GitFileProvider {
   }
 
   public async getDir(path: string = "."): Promise<string[]> {
-    return this.fs.promises.readdir(path);
+    return this.fs.promises.readdir(`${this.dir}/${path}`);
   }
 
   public async getFileText(path: string): Promise<string> {
