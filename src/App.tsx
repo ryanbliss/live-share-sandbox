@@ -6,19 +6,9 @@ import { inTeams } from "./utils/inTeams";
 import { LoadableWrapper } from "./components/view-wrappers";
 import { SidePanelPage, AppSettingsPage, MeetingStagePage } from "./pages";
 import "./App.css";
-// import {clone, commit, push} from 'isomorphic-git'
-import git from 'isomorphic-git'
-import FS from "@isomorphic-git/lightning-fs";
-// import('https://unpkg.com/isomorphic-git@1.19.1/index.umd.min.js')
-import http from "isomorphic-git/http/web"
-import { Buffer } from 'buffer'
-import { GitHandler } from "./utils/GitHandler";
-
-// import { encode, decode } from "isomorphic-textencoder";
-// const textencoder = require("isomorphic-textencoder");
+import { GitFileProvider, FileProvider } from "./utils/GitFileProvider";
 
 function App() {
-  (globalThis as any)["Buffer"] = Buffer
   const [initialized, setInitialized] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
 
@@ -43,8 +33,8 @@ function App() {
         setInitialized(true);
       }
 
-      const blah = new GitHandler('https://github.com/ryanbliss/live-share-sandbox')
-      blah
+      const fileProvider: FileProvider = new GitFileProvider('https://github.com/ryanbliss/live-share-sandbox')
+      fileProvider
         .getFileText('README.md')
         .then((text) => console.log(text))
         .catch((err: any) => console.error(err))

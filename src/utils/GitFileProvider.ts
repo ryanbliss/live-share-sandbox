@@ -3,16 +3,17 @@ import FS from "@isomorphic-git/lightning-fs";
 import http from "isomorphic-git/http/web"
 import { Buffer } from 'buffer'
 
-interface FileProvider {
+export interface FileProvider {
   getFileText(path: string): Promise<string>
 }
 
-export class GitHandler implements FileProvider {
+export class GitFileProvider implements FileProvider {
   fs: FS;
   repositoryUrl: string;
   dir: string;
 
   constructor(repositoryUrl: string) {
+    (globalThis as any)["Buffer"] = Buffer
     this.repositoryUrl = repositoryUrl;
     this.dir = repositoryUrl.substring(repositoryUrl.lastIndexOf('/'), repositoryUrl.length);
     this.fs = new FS(this.dir);
@@ -50,6 +51,7 @@ export class GitHandler implements FileProvider {
 
 
   private async clone(dir: string, repositoryUrl: string, fs: FS): Promise<void> {
+    // TODO: we need to replace the proxy with privately hosted version, this is a test only version
     return git.clone({ fs, http, dir, url: repositoryUrl, corsProxy: 'https://cors.isomorphic-git.org' })
   }
 }
