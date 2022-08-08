@@ -4,41 +4,43 @@ import { Title2, Subtitle2, Button } from "@fluentui/react-components";
 import { useNavigate } from "react-router-dom";
 import { inTeams } from "../../utils/inTeams";
 import { LoadableWrapper, FlexColumn } from "../../components";
+import { CodeboxLiveProvider } from "../../context-providers";
+import { ProjectList } from "../../components/project-list/ProjectList";
+import { IProject } from "../../models";
 
 export const SidePanelPage = () => {
   const [error, setError] = useState<Error | undefined>(undefined);
   const navigate = useNavigate();
 
-  const shareAppContentToStage = useCallback(() => {
-    if (inTeams()) {
-      microsoftTeams.meeting.shareAppContentToStage((error) => {
-        if (error) {
-          setError(new Error(error.message));
-        }
-      }, `${window.location.origin}?inTeams=true`);
-    } else {
-      navigate({
-        pathname: "/",
-      });
-    }
-  }, [navigate, setError]);
+  const shareAppContentToStage = useCallback(
+    (containerId: string) => {
+      if (inTeams()) {
+        microsoftTeams.meeting.shareAppContentToStage((error) => {
+          if (error) {
+            setError(new Error(error.message));
+          }
+        }, `${window.location.origin}?inTeams=true&containerId=${containerId}`);
+      } else {
+        navigate({
+          pathname: `/?containerId=${containerId}`,
+        });
+      }
+    },
+    [navigate, setError]
+  );
 
   return (
-    <LoadableWrapper loading={false} error={error}>
-      <FlexColumn
-        expand="fill"
-        vAlign="center"
-        hAlign="center"
-        marginSpacer="small"
-      >
-        <Title2 block align="center">
-          {"Welcome to Live Share Sandbox!"}
-        </Title2>
-        <Subtitle2 block align="center">
-          {"Press the share button to continue."}
-        </Subtitle2>
-        <Button onClick={shareAppContentToStage}>{"Share"}</Button>
-      </FlexColumn>
-    </LoadableWrapper>
+    <CodeboxLiveProvider>
+      <LoadableWrapper loading={false} error={error}>
+        <FlexColumn expand="fill" vAlign="center" marginSpacer="small">
+          <ProjectList
+            selectText="Code together"
+            onSelectProject={(project: IProject) => {
+              shareAppContentToStage(project.containerId);
+            }}
+          />
+        </FlexColumn>
+      </LoadableWrapper>
+    </CodeboxLiveProvider>
   );
 };

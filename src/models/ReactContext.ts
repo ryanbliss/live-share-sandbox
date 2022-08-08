@@ -6,13 +6,13 @@ import { IUser } from "./IUser";
 import { app } from "@microsoft/teams-js";
 import { SandpackFiles } from "@codesandbox/sandpack-react";
 import { ICursor } from "./Cursor";
+import { IProject } from "./Project";
 
 export interface IFluidContainerResults {
   loading: boolean;
   error: Error | undefined;
   container: IFluidContainer | undefined;
   codePagesMap: SharedMap | undefined;
-  userDidCreateContainerRef: MutableRefObject<boolean> | undefined;
 }
 
 export interface ICodePagesContext {
@@ -73,4 +73,12 @@ export interface ILiveShareContext
 
 export interface ITeamsClientContext {
   teamsContext: app.Context | undefined;
+}
+
+// Codebox Live Context
+
+export interface ICodeboxLiveContext {
+  userProjects: IProject[];
+  createProject: (template: string) => Promise<void>;
+  editProject: (project: IProject) => Promise<void>;
 }

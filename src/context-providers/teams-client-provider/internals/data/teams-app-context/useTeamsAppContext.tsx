@@ -2,6 +2,8 @@ import { app, HostClientType, FrameContexts } from "@microsoft/teams-js";
 import { useEffect, useState } from "react";
 import { inTeams } from "../../../../../utils";
 
+const LOCAL_STORAGE_KEY = "codebox-live-user-id";
+
 /**
  * @hidden
  * @returns app.Context | undefined and error | undefined
@@ -32,6 +34,14 @@ export const useTeamsAppContext = (
           .catch((error) => setError(error));
       } else {
         // Simulate Teams userObjectId for browser testing
+        let userId: string;
+        const existingUserId = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (existingUserId) {
+          userId = existingUserId;
+        } else {
+          userId = `user${Math.abs(Math.random() * 999999999)}`;
+          localStorage.setItem(LOCAL_STORAGE_KEY, userId);
+        }
         setCtx({
           app: {
             locale: "us",
@@ -48,7 +58,7 @@ export const useTeamsAppContext = (
             frameContext: FrameContexts.meetingStage,
           },
           user: {
-            id: `user${Math.abs(Math.random() * 999999999)}`,
+            id: userId,
           },
         });
       }

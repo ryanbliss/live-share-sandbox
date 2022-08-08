@@ -1,21 +1,19 @@
 import { FC } from "react";
 import { SandpackLive } from "../../components";
 import {
+  CodeboxLiveProvider,
   FluidObjectsProvider,
   LiveShareProvider,
 } from "../../context-providers";
 
 export const MeetingStagePage: FC = () => {
-  // return (
-  //   <LiveShareProvider>
-  //     <FluidObjectsProvider>
-  //       <SandpackLive template={"react-ts"} />
-  //     </FluidObjectsProvider>
-  //   </LiveShareProvider>
-  // );
   return (
-    <FluidObjectsProvider>
-      <SandpackLive template={"react-ts"} />
-    </FluidObjectsProvider>
+    <CodeboxLiveProvider>
+      <LiveShareProvider>
+        <FluidObjectsProvider>
+          <SandpackLive template={"react-ts"} />
+        </FluidObjectsProvider>
+      </LiveShareProvider>
+    </CodeboxLiveProvider>
   );
 };
