@@ -45,7 +45,7 @@ export const SidePanelPage = () => {
                 shareAppContentToStage(project.containerId);
               } else {
                 navigate({
-                  pathname: `/?containerId=${project.containerId}`,
+                  pathname: `/project?containerId=${project.containerId}`,
                 });
               }
             }}
