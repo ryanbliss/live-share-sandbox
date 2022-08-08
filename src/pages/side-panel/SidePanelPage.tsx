@@ -1,21 +1,24 @@
-import * as microsoftTeams from "@microsoft/teams-js";
+import { meeting, FrameContexts } from "@microsoft/teams-js";
 import { useCallback, useState } from "react";
-import { Title2, Subtitle2, Button } from "@fluentui/react-components";
 import { useNavigate } from "react-router-dom";
 import { inTeams } from "../../utils/inTeams";
 import { LoadableWrapper, FlexColumn } from "../../components";
-import { CodeboxLiveProvider } from "../../context-providers";
+import {
+  CodeboxLiveProvider,
+  useTeamsClientContext,
+} from "../../context-providers";
 import { ProjectList } from "../../components/project-list/ProjectList";
 import { IProject } from "../../models";
 
 export const SidePanelPage = () => {
   const [error, setError] = useState<Error | undefined>(undefined);
   const navigate = useNavigate();
+  const { teamsContext } = useTeamsClientContext();
 
   const shareAppContentToStage = useCallback(
     (containerId: string) => {
       if (inTeams()) {
-        microsoftTeams.meeting.shareAppContentToStage((error) => {
+        meeting.shareAppContentToStage((error) => {
           if (error) {
             setError(new Error(error.message));
           }
@@ -36,7 +39,15 @@ export const SidePanelPage = () => {
           <ProjectList
             selectText="Code together"
             onSelectProject={(project: IProject) => {
-              shareAppContentToStage(project.containerId);
+              if (
+                teamsContext?.page?.frameContext === FrameContexts.sidePanel
+              ) {
+                shareAppContentToStage(project.containerId);
+              } else {
+                navigate({
+                  pathname: `/?containerId=${project.containerId}`,
+                });
+              }
             }}
           />
         </FlexColumn>
