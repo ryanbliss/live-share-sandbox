@@ -29,11 +29,16 @@
             "configurationUrl": "https://live-share-sandbox.vercel.app/app-settings?inTeams=true",
             "canUpdateConfiguration": false,
             "scopes": [
-                "groupchat"
+                "groupchat",
+                "team"
             ],
             "context": [
                 "meetingSidePanel",
-                "meetingStage"
+                "meetingStage",
+                "meetingChatTab",
+                "channelTab",
+                "personalTab",
+                "privateChatTab"
             ]
         }
     ],
@@ -44,7 +49,6 @@
     "showLoadingIndicator": true,
     "authorization": {
         "permissions": {
-            "orgWide": [],
             "resourceSpecific": [
                 {
                     "name": "MeetingStage.Write.Chat",

@@ -25,7 +25,7 @@ export const SidePanelPage = () => {
         }, `${window.location.origin}?inTeams=true&containerId=${containerId}`);
       } else {
         navigate({
-          pathname: `/?containerId=${containerId}`,
+          pathname: `/?inTeams=${inTeams()}&containerId=${containerId}`,
         });
       }
     },
