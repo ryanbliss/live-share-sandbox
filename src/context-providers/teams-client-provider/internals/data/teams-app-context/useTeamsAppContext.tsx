@@ -1,12 +1,22 @@
 import { app, HostClientType, FrameContexts } from "@microsoft/teams-js";
 import { useEffect, useState } from "react";
-import { inTeams } from "../../utils/inTeams";
+import { inTeams } from "../../../../../utils";
 
-export const useTeamsContext = () => {
+/**
+ * @hidden
+ * @returns app.Context | undefined and error | undefined
+ */
+export const useTeamsAppContext = (
+  initialized: boolean
+): {
+  teamsContext: app.Context | undefined;
+  error: Error | undefined;
+} => {
   const [ctx, setCtx] = useState<app.Context | undefined>();
+  const [error, setError] = useState<Error | undefined>();
 
   useEffect(() => {
-    if (!ctx?.user?.id) {
+    if (!ctx?.user?.id && initialized) {
       // Add inTeams=true to URL params to get real Teams context
       if (inTeams()) {
         console.log("useTeamsContext: Attempting to get Teams context");
@@ -19,7 +29,7 @@ export const useTeamsContext = () => {
             );
             setCtx(context);
           })
-          .catch((error) => console.error(error));
+          .catch((error) => setError(error));
       } else {
         // Simulate Teams userObjectId for browser testing
         setCtx({
@@ -43,7 +53,10 @@ export const useTeamsContext = () => {
         });
       }
     }
-  }, [ctx?.user?.id]);
+  }, [ctx?.user?.id, initialized]);
 
-  return ctx;
+  return {
+    teamsContext: ctx,
+    error,
+  };
 };

@@ -7,14 +7,11 @@ import { app } from "@microsoft/teams-js";
 import { SandpackFiles } from "@codesandbox/sandpack-react";
 import { ICursor } from "./Cursor";
 
-export interface ILiveShareContext {
+export interface IFluidContainerResults {
   loading: boolean;
   error: Error | undefined;
   container: IFluidContainer | undefined;
   codePagesMap: SharedMap | undefined;
-  sandpackObjectsMap: SharedMap | undefined;
-  followModeState: EphemeralState<IFollowModeStateValue> | undefined;
-  presence: EphemeralPresence | undefined;
   userDidCreateContainerRef: MutableRefObject<boolean> | undefined;
 }
 
@@ -22,6 +19,27 @@ export interface ICodePagesContext {
   codeFiles: Map<string, SharedString>;
   codeFilesRef: MutableRefObject<Map<string, SharedString>>;
   onAddPage: (pageName: string) => void;
+}
+
+export interface IFluidObjectsContext
+  extends IFluidContainerResults,
+    ICodePagesContext {
+  teamsContext: app.Context | undefined;
+  mappedSandpackFiles: SandpackFiles;
+  currentPageKey: string | undefined;
+  onChangeSelectedFile: (currentPageKey: string | undefined) => void;
+}
+
+// Live Share
+
+export interface ILiveShareContainerResults {
+  loading: boolean;
+  error: Error | undefined;
+  container: IFluidContainer | undefined;
+  sandpackObjectsMap: SharedMap | undefined;
+  followModeState: EphemeralState<IFollowModeStateValue> | undefined;
+  presence: EphemeralPresence | undefined;
+  userDidCreateContainerRef: MutableRefObject<boolean> | undefined;
 }
 
 export interface IFollowModeStateContext {
@@ -38,17 +56,21 @@ export interface IPresenceContext {
   localUserIsEligiblePresenter: boolean;
   users: IUser[];
   otherUsers: IUser[];
-  currentPageKey: string;
-  onChangeCurrentPageKey: (currentPageKey: string) => void;
+  currentPageKey: string | undefined;
+  onChangeCurrentPageKey: (currentPageKey: string | undefined) => void;
   onChangeCursor: (cursor: ICursor) => void;
 }
 
-export interface IFluidObjectsContext
-  extends ILiveShareContext,
-    ICodePagesContext,
+export interface ILiveShareContext
+  extends ILiveShareContainerResults,
     IFollowModeStateContext,
     IPresenceContext {
   teamsContext: app.Context | undefined;
-  mappedSandpackFiles: SandpackFiles;
-  onChangeSelectedFile: (fileName: string) => void;
+  onChangeSelectedFile: (fileName: string | undefined) => void;
+}
+
+// Teams Client Context
+
+export interface ITeamsClientContext {
+  teamsContext: app.Context | undefined;
 }
