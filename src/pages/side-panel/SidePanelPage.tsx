@@ -22,10 +22,10 @@ export const SidePanelPage = () => {
           if (error) {
             setError(new Error(error.message));
           }
-        }, `${window.location.origin}/projects/${containerId}?inTeams=true`);
+        }, `${window.location.origin}/meeting/projects/${containerId}?inTeams=true`);
       } else {
         navigate({
-          pathname: `/projects/${containerId}?inTeams=${inTeams()}`,
+          pathname: `/meeting/projects/${containerId}?inTeams=${inTeams()}`,
         });
       }
     },

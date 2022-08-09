@@ -4,6 +4,7 @@ import {
   AFRAppTemplate,
   HeaderTemplate,
   LocalAppTemplate,
+  ReactTSAppTemplate,
   TeamsAppTemplate,
 } from "../../../sandpack-templates";
 import { createAzureContainer, inTeams } from "../../../utils";
@@ -23,13 +24,19 @@ export const CodeboxLiveProvider: FC<{
         console.log("CodeboxLiveProvider: creating from template", template);
         const initialFiles = new Map<string, string>();
         // TODO: replace with real templates
+        let AppTemplate: string;
         if (template === "live-share-react-ts") {
-          const AppTemplate = inTeams() ? TeamsAppTemplate : LocalAppTemplate;
-          initialFiles.set("/App.tsx", AppTemplate);
+          AppTemplate = inTeams() ? TeamsAppTemplate : LocalAppTemplate;
         } else if (template === "afr-react-ts") {
-          const AppTemplate = AFRAppTemplate;
-          initialFiles.set("/App.tsx", AppTemplate);
+          AppTemplate = AFRAppTemplate;
+        } else if (template === "react-ts") {
+          AppTemplate = ReactTSAppTemplate;
+        } else {
+          return Promise.reject(
+            `CodeboxLiveProvider createProject: ${template} is not a valid template type`
+          );
         }
+        initialFiles.set("/App.tsx", AppTemplate);
         initialFiles.set("/Header.tsx", HeaderTemplate);
         const results = await createAzureContainer(
           teamsContext!.user!.id,
@@ -40,7 +47,7 @@ export const CodeboxLiveProvider: FC<{
           type: IProjectType.REACT_TS,
           title: template,
         });
-        results.container.disconnect?.();
+        results.container.dispose?.();
         return Promise.resolve();
       } catch (error: any) {
         return Promise.reject(error);

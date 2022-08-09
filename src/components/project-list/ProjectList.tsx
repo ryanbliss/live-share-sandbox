@@ -1,4 +1,4 @@
-import { Button, Title2 } from "@fluentui/react-components";
+import { Button, CompoundButton, Title2 } from "@fluentui/react-components";
 import { Card } from "@fluentui/react-components/unstable";
 import { FrameContexts } from "@microsoft/teams-js";
 import { FC } from "react";
@@ -6,6 +6,7 @@ import {
   useCodeboxLiveContext,
   useTeamsClientContext,
 } from "../../context-providers";
+import { ClipboardCode24Regular } from "@fluentui/react-icons";
 import { IProject } from "../../models";
 import { FlexColumn, FlexItem, FlexRow } from "../flex";
 import { LoadableWrapper } from "../view-wrappers";
@@ -25,26 +26,67 @@ export const ProjectList: FC<IProjectListProps> = ({
 
   return (
     <LoadableWrapper loading={loading} error={error}>
-      <FlexColumn scroll expand="fill">
-        <FlexItem noShrink>
+      <FlexColumn scroll expand="fill" marginSpacer="small">
+        <FlexItem
+          noShrink
+          style={{
+            padding:
+              teamsContext?.page.frameContext === FrameContexts.sidePanel
+                ? "0px"
+                : "24px",
+            paddingBottom: "0px",
+          }}
+        >
           <FlexRow marginSpacer="small" wrap>
-            <Button
+            <CompoundButton
+              icon={<ClipboardCode24Regular />}
+              secondaryContent={"TypeScript"}
+              onClick={() => {
+                createProject("react-ts");
+              }}
+              style={{
+                marginBottom: "12px",
+              }}
+            >
+              {"New React app"}
+            </CompoundButton>
+            <CompoundButton
+              icon={<ClipboardCode24Regular />}
+              secondaryContent={"TypeScript"}
               onClick={() => {
                 createProject("live-share-react-ts");
               }}
+              style={{
+                marginBottom: "12px",
+              }}
             >
-              {"Create Live Share App"}
-            </Button>
-            <Button
+              {"New Live Share app"}
+            </CompoundButton>
+            <CompoundButton
+              icon={<ClipboardCode24Regular />}
+              secondaryContent={"TypeScript"}
               onClick={() => {
                 createProject("afr-react-ts");
               }}
+              style={{
+                marginBottom: "12px",
+              }}
             >
-              {"Create AFR App"}
-            </Button>
+              {"New Azure Fluid Relay app"}
+            </CompoundButton>
           </FlexRow>
         </FlexItem>
-        <FlexRow wrap>
+        <FlexRow
+          wrap
+          style={{
+            padding:
+              teamsContext?.page.frameContext === FrameContexts.sidePanel
+                ? "0px"
+                : "24px",
+            paddingBottom: "0px",
+            paddingTop: "0px",
+          }}
+        >
           {userProjects.map((project) => {
             return (
               <div key={project.containerId}>

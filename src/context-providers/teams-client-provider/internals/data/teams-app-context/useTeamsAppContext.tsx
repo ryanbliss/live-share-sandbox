@@ -55,7 +55,7 @@ export const useTeamsAppContext = (
           },
           page: {
             id: "live-share-sandbox",
-            frameContext: FrameContexts.meetingStage,
+            frameContext: FrameContexts.content,
           },
           user: {
             id: userId,

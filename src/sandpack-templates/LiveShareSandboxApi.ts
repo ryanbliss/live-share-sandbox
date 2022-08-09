@@ -117,7 +117,7 @@ export class SandboxFluidContainer
   }
 
   /**
-   * {@inheritDoc IFluidContainer.connect}
+   * {@inheritDoc IFluidContainer.disconnect}
    */
   public async disconnect(): Promise<void> {
     this.container.disconnect?.();

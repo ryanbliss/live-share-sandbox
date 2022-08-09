@@ -113,7 +113,7 @@ export function useLiveShareContainer(): ILiveShareContainerResults {
 
   useEffect(() => {
     return () => {
-      results?.container.disconnect?.();
+      results?.container.dispose?.();
     };
   }, [results]);
 

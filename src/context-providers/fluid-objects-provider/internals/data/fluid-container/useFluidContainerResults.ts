@@ -62,7 +62,7 @@ export function useFluidContainerResults(): IFluidContainerResults {
 
   useEffect(() => {
     return () => {
-      results?.container.disconnect?.();
+      results?.container.dispose?.();
     };
   }, [results]);
 
