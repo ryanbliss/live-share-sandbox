@@ -37,12 +37,12 @@ export const useTeamsAppContext = (
               `useTeamsContext: received context: ${JSON.stringify(context)}`
             );
             switch (context.app.theme) {
-              case "dark": {
-                // App starts in dark theme
+              case "default": {
+                setTheme(teamsLightTheme);
                 break;
               }
-              case "light": {
-                setTheme(teamsLightTheme);
+              case "dark": {
+                // App starts in dark theme
                 break;
               }
               case "contrast": {
