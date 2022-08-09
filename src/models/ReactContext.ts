@@ -82,6 +82,8 @@ export interface ITeamsClientContext {
 
 export interface ICodeboxLiveContext {
   userProjects: IProject[];
+  loading: boolean;
+  error: Error | undefined;
   createProject: (template: string) => Promise<void>;
   editProject: (project: IProject) => Promise<void>;
 }
