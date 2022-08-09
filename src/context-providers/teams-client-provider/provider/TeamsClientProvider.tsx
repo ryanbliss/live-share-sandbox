@@ -1,17 +1,28 @@
-import { FC, ReactNode, useEffect, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { app } from "@microsoft/teams-js";
 import { LoadableWrapper } from "../../../components/view-wrappers";
 import { TeamsClientContext } from "../internals";
 import { useTeamsAppContext } from "../internals/data";
 import { inTeams } from "../../../utils";
+import { Theme } from "@fluentui/react-components";
 
 export const TeamsClientProvider: FC<{
   children: ReactNode;
-}> = ({ children }) => {
+  setTheme: Dispatch<SetStateAction<Theme>>;
+}> = ({ children, setTheme }) => {
   const [initialized, setInitialized] = useState(false);
   const [initializeError, setError] = useState<Error | undefined>(undefined);
-  const { teamsContext, error: appContextError } =
-    useTeamsAppContext(initialized);
+  const { teamsContext, error: appContextError } = useTeamsAppContext(
+    initialized,
+    setTheme
+  );
 
   useEffect(() => {
     if (!initialized) {

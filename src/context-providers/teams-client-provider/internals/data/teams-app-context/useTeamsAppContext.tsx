@@ -1,5 +1,11 @@
+import {
+  teamsDarkTheme,
+  teamsHighContrastTheme,
+  teamsLightTheme,
+  Theme,
+} from "@fluentui/react-components";
 import { app, HostClientType, FrameContexts } from "@microsoft/teams-js";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { inTeams } from "../../../../../utils";
 
 const LOCAL_STORAGE_KEY = "codebox-live-user-id";
@@ -9,7 +15,8 @@ const LOCAL_STORAGE_KEY = "codebox-live-user-id";
  * @returns app.Context | undefined and error | undefined
  */
 export const useTeamsAppContext = (
-  initialized: boolean
+  initialized: boolean,
+  setTheme: Dispatch<SetStateAction<Theme>>
 ): {
   teamsContext: app.Context | undefined;
   error: Error | undefined;
@@ -19,9 +26,9 @@ export const useTeamsAppContext = (
 
   useEffect(() => {
     if (!ctx?.user?.id && initialized) {
+      console.log("useTeamsContext: Attempting to get Teams context");
       // Add inTeams=true to URL params to get real Teams context
       if (inTeams()) {
-        console.log("useTeamsContext: Attempting to get Teams context");
         // Get Context from the Microsoft Teams SDK
         app
           .getContext()
@@ -29,6 +36,20 @@ export const useTeamsAppContext = (
             console.log(
               `useTeamsContext: received context: ${JSON.stringify(context)}`
             );
+            switch (context.app.theme) {
+              case "dark": {
+                // App starts in dark theme
+                break;
+              }
+              case "light": {
+                setTheme(teamsLightTheme);
+                break;
+              }
+              case "contrast": {
+                setTheme(teamsHighContrastTheme);
+                break;
+              }
+            }
             setCtx(context);
           })
           .catch((error) => setError(error));
@@ -42,6 +63,8 @@ export const useTeamsAppContext = (
           userId = `user${Math.abs(Math.random() * 999999999)}`;
           localStorage.setItem(LOCAL_STORAGE_KEY, userId);
         }
+        // When testing locally, change to light theme as a test case for changing themes from default
+        setTheme(teamsLightTheme);
         setCtx({
           app: {
             locale: "us",

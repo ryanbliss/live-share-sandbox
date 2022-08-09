@@ -9,11 +9,13 @@ import {
 import "./App.css";
 import { TeamsClientProvider } from "./context-providers";
 import { inTeams } from "./utils";
+import { useState } from "react";
 
 function App() {
+  const [theme, setTheme] = useState(teamsDarkTheme);
   return (
     <FluentProvider
-      theme={teamsDarkTheme}
+      theme={theme}
       style={{
         minHeight: "0px",
         position: "absolute",
@@ -25,7 +27,7 @@ function App() {
         backgroundColor: inTeams() ? "transparent" : undefined,
       }}
     >
-      <TeamsClientProvider>
+      <TeamsClientProvider setTheme={setTheme}>
         <div
           className="App"
           style={{

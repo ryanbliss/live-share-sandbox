@@ -63,19 +63,23 @@ export const SandpackFileExplorer: FC = () => {
         </FlexColumn>
       </FlexRow>
       <FlexRow vAlign="start">
-        {followModeActive && (
-          <Button
-            icon={<ShareScreenStop24Filled />}
-            appearance="subtle"
-            onClick={onEndFollowMode}
-          />
-        )}
-        {!followModeActive && (
-          <Button
-            icon={<ShareScreenStart24Filled />}
-            appearance="subtle"
-            onClick={onInitiateFollowMode}
-          />
+        {teamsContext?.page?.frameContext !== FrameContexts.meetingStage && (
+          <>
+            {followModeActive && (
+              <Button
+                icon={<ShareScreenStop24Filled />}
+                appearance="subtle"
+                onClick={onEndFollowMode}
+              />
+            )}
+            {!followModeActive && (
+              <Button
+                icon={<ShareScreenStart24Filled />}
+                appearance="subtle"
+                onClick={onInitiateFollowMode}
+              />
+            )}
+          </>
         )}
         <TextInputPopover title="File name" onDone={onAddPage} />
       </FlexRow>
