@@ -63,7 +63,7 @@ export const SandpackFileExplorer: FC = () => {
         </FlexColumn>
       </FlexRow>
       <FlexRow vAlign="start">
-        {teamsContext?.page?.frameContext !== FrameContexts.meetingStage && (
+        {teamsContext?.page?.frameContext === FrameContexts.meetingStage && (
           <>
             {followModeActive && (
               <Button
