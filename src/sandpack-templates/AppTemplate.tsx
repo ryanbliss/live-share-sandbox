@@ -321,7 +321,7 @@ export default function App() {
     }
     initRef.current = true;
     microsoftTeams.app
-      .initialize()
+      .initialize(AUTHORIZED_PARENT_ORIGINS)
       .then(() => {
         microsoftTeams.app
           .getContext()
