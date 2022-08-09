@@ -74,6 +74,18 @@ export const ProjectList: FC<IProjectListProps> = ({
             >
               {"New Azure Fluid Relay app"}
             </CompoundButton>
+            <CompoundButton
+              icon={<ClipboardCode24Regular />}
+              secondaryContent={"TypeScript"}
+              onClick={() => {
+                createProject("teams-react-ts");
+              }}
+              style={{
+                marginBottom: "12px",
+              }}
+            >
+              {"New Teams app"}
+            </CompoundButton>
           </FlexRow>
         </FlexItem>
         <FlexRow
@@ -92,7 +104,11 @@ export const ProjectList: FC<IProjectListProps> = ({
               <div key={project.containerId}>
                 <Card
                   style={{
-                    width: "280px",
+                    width:
+                      teamsContext?.page.frameContext ===
+                      FrameContexts.sidePanel
+                        ? "100vw"
+                        : "280px",
                     marginRight:
                       teamsContext?.page.frameContext ===
                       FrameContexts.sidePanel

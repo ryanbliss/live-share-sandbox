@@ -3,10 +3,10 @@
     "version": "1.0.1",
     "manifestVersion": "1.12",
     "id": "ffb8bede-d6d3-4fc1-8f2f-d7d7861c8f1a",
-    "packageName": "app.live-share-sandbox.sandbox",
+    "packageName": "app.live-share-sandbox.codebox",
     "name": {
-        "short": "Sandbox",
-        "full": "Live Share Sandbox"
+        "short": "Codebox",
+        "full": "Codebox Live"
     },
     "developer": {
         "name": "Ryan Bliss",
@@ -40,6 +40,22 @@
                 "personalTab",
                 "privateChatTab"
             ]
+        }
+    ],
+    "staticTabs": [
+        {
+            "entityId": "projects",
+            "scopes": [
+                "personal"
+            ],
+            "context": [
+                "personalTab",
+                "channelTab"
+            ],
+            "name": "Projects",
+            "contentUrl": "https://live-share-sandbox.vercel.app/?inTeams=true",
+            "websiteUrl": "https://live-share-sandbox.vercel.app/?inTeams=false",
+            "searchUrl": "https://live-share-sandbox.vercel.app/?inTeams=false"
         }
     ],
     "validDomains": [

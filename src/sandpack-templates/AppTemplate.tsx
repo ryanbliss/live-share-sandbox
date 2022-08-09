@@ -93,7 +93,7 @@ export default function App() {
 }
 `;
 
-export const TeamsAppTemplate = `
+export const LiveShareAppTemplate = `
 import { useEffect, useState, useRef } from "react";
 import { IFluidContainer } from "@fluidframework/fluid-static";
 import { SharedMap } from "@fluidframework/map";
@@ -300,6 +300,44 @@ export default function App() {
         {counter}
       </button>
     </div>
+  );
+}
+`;
+
+export const TeamsAppTemplate = `
+import { useEffect, useState, useRef } from "react";
+import * as microsoftTeams from "@microsoft/teams-js";
+import { AUTHORIZED_PARENT_ORIGINS } from "./LiveShareSandboxApi";
+// Create new components and import them like this
+import Header from "./Header";
+
+export default function App() {
+  const initRef = useRef<boolean>(false);
+  const [contextValue, setContextValue] = useState<string>("loading");
+
+  useEffect(() => {
+    if (initRef.current) {
+      return;
+    }
+    initRef.current = true;
+    microsoftTeams.app
+      .initialize()
+      .then(() => {
+        microsoftTeams.app
+          .getContext()
+          .then((context: microsoftTeams.app.Context) => {
+            setContextValue(JSON.stringify(context));
+          })
+          .catch((error) => setContextValue(error.message));
+      })
+      .catch((error) => setContextValue(error.message));
+  });
+  return (
+    <>
+      <Header />
+      <h3>{"Teams app context:"}</h3>
+      <p>{contextValue}</p>
+    </>
   );
 }
 `;

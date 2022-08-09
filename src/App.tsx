@@ -8,6 +8,7 @@ import {
 } from "./pages";
 import "./App.css";
 import { TeamsClientProvider } from "./context-providers";
+import { inTeams } from "./utils";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         top: "0",
         bottom: "0",
         overflow: "hidden",
+        backgroundColor: inTeams() ? "transparent" : undefined,
       }}
     >
       <TeamsClientProvider>

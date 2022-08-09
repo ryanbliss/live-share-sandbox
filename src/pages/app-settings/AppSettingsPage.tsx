@@ -12,15 +12,14 @@ export const AppSettingsPage = () => {
       return;
     }
     if (inTeams()) {
+      setRegistered(true);
       microsoftTeams.pages.config.registerOnSaveHandler((saveEvent) => {
         microsoftTeams.pages.config.setConfig({
           suggestedDisplayName: "Codebox",
           contentUrl: `${window.location.origin}/?inTeams=true`,
         });
         saveEvent.notifySuccess();
-        setRegistered(true);
       });
-
       microsoftTeams.pages.config.setValidityState(true);
     } else {
       setRegistered(true);
