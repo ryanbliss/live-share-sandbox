@@ -5,5 +5,5 @@ export function inTeams(): boolean {
     ? new URL(`${window.location.href.split("/#/").join("/")}`)
     : new URL(window.location.href);
   const params = url.searchParams;
-  return !!params.get("inTeams");
+  return params.get("inTeams") === "true";
 }

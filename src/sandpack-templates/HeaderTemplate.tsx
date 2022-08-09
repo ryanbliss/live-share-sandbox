@@ -1,5 +1,5 @@
 export const HeaderTemplate = `export default function Header() {
   return (
-    <h1>{ "Live Share is cool" }</h1>
+    <h1>{ "Welcome to Codebox Live!" }</h1>
   )
 }`;

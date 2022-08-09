@@ -15,8 +15,7 @@ import {
 } from "fluid-framework";
 import { SharedString } from "@fluidframework/sequence";
 import { useEffect, useRef, useState } from "react";
-import { HeaderTemplate, LocalAppTemplate, TeamsAppTemplate } from "../../../../../sandpack-templates";
-import { IFollowModeStateValue, ILiveShareContext } from "../../../../../models";
+import { IFollowModeStateValue, ILiveShareContainerResults } from "../../../../../models";
 import { inTeams } from "../../../../../utils/inTeams";
 
 /**
@@ -30,7 +29,7 @@ import { inTeams } from "../../../../../utils/inTeams";
  * @see useLiveShareContext for consuming ILiveShareContext using React Context.
  * @returns Shared objects managed by the apps fluid container.
  */
-export function useLiveShareContainer(): ILiveShareContext {
+export function useLiveShareContainer(): ILiveShareContainerResults {
   const [results, setResults] = useState<
     | {
         container: IFluidContainer;
@@ -78,36 +77,14 @@ export function useLiveShareContainer(): ILiveShareContext {
     // Define container callback (optional).
     // * This is only called once when the container is first created.
     const onFirstInitialize = (container: IFluidContainer) => {
-      console.log("useSharedObjects: onFirstInitialize called");
+      console.log("useSharedObjects: onFirstInitialize called", container.connectionState);
       userDidCreateContainerRef.current = true;
-      container
-        .create(SharedString)
-        .then((sharedString) => {
-          (container.initialObjects.codePagesMap as SharedMap).set(
-            "/App.tsx",
-            sharedString.handle
-          );
-          const AppTemplate = isInTeams ? TeamsAppTemplate : LocalAppTemplate;
-          sharedString.insertText(0, AppTemplate);
-        })
-        .catch((error) => setError(error));
-      container
-        .create(SharedString)
-        .then((sharedString) => {
-          (container.initialObjects.codePagesMap as SharedMap).set(
-            "/Header.tsx",
-            sharedString.handle
-          );
-          sharedString.insertText(0, HeaderTemplate);
-        })
-        .catch((error) => setError(error));
       // Setup any initial state here
     };
 
     // Define container schema
     const schema: ContainerSchema = {
       initialObjects: {
-        codePagesMap: SharedMap,
         sandpackObjectsMap: SharedMap,
         followModeState: EphemeralState<IFollowModeStateValue | undefined>,
         presence: EphemeralPresence,
@@ -134,13 +111,18 @@ export function useLiveShareContainer(): ILiveShareContext {
       .catch((err) => setError(err));
   });
 
+  useEffect(() => {
+    return () => {
+      results?.container.dispose?.();
+    };
+  }, [results]);
+
   const container = results?.container;
   const initialObjects = container?.initialObjects;
   return {
     loading: !container,
     error,
     container,
-    codePagesMap: initialObjects?.codePagesMap as SharedMap | undefined,
     sandpackObjectsMap: initialObjects?.sandpackObjectsMap as SharedMap | undefined,
     followModeState: initialObjects?.followModeState as EphemeralState<IFollowModeStateValue> | undefined,
     presence: initialObjects?.presence as EphemeralPresence | undefined,

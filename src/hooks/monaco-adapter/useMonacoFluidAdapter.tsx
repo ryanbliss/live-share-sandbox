@@ -1,26 +1,24 @@
 import { useMonaco } from "@monaco-editor/react";
 import { SequenceDeltaEvent, SharedString } from "fluid-framework";
 import { MergeTreeDeltaType, TextSegment } from "@fluidframework/merge-tree";
-import { MutableRefObject, useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
-import {
-  SandpackFile,
-  SandpackFiles,
-  useSandpack,
-} from "@codesandbox/sandpack-react";
+import { SandpackFile, useSandpack } from "@codesandbox/sandpack-react";
 import { MonacoPackageLoader } from "./package-loader/MonacoPackageLoader";
 import { LiveSharePackages } from "./package-loader/packages/LiveSharePackages";
-import { CodeFilesHelper } from "../../models";
 import { useStateRef } from "../";
 import { useMonacoPresenceCursors } from "./presence-cursors/useMonacoPresenceCursors";
+import { useFluidObjectsContext } from "../../context-providers";
 
 export const useMonacoFluidAdapterHook = (
-  codeFilesHelper: CodeFilesHelper,
-  codeFilesHelperRef: MutableRefObject<CodeFilesHelper | undefined>,
   divElementId: string,
-  sandpackFiles: SandpackFiles,
   theme: "vs-dark" | "light"
 ) => {
+  const {
+    codeFilesHelperRef,
+    codeFilesHelper,
+    mappedSandpackFiles: sandpackFiles,
+  } = useFluidObjectsContext();
   const monaco = useMonaco();
   const { sandpack } = useSandpack();
   const didConfigureMonacoEditorRef = useRef(false);
@@ -319,4 +317,13 @@ export const useMonacoFluidAdapterHook = (
       }
     }
   }, [codeFilesHelper, editor, monaco]);
+
+  useEffect(() => {
+    return () => {
+      monaco?.editor.getModels().forEach((model) => {
+        model.dispose();
+        didConfigureMonacoEditorRef.current = false;
+      });
+    };
+  }, [monaco]);
 };
