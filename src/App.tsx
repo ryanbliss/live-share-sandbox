@@ -38,9 +38,15 @@ function App() {
         >
           <Router window={window} basename="/">
             <Routes>
-              <Route path={"/"} element={<MeetingStagePage />} />
-              <Route path={"/project"} element={<CodeProjectPage />} />
-              <Route path={"/side-panel"} element={<SidePanelPage />} />
+              <Route path={"/"} element={<SidePanelPage />} />
+              <Route
+                path={"/projects/:containerId"}
+                element={<CodeProjectPage />}
+              />
+              <Route
+                path={"/meeting/projects/:containerId"}
+                element={<MeetingStagePage />}
+              />
               <Route path={"/app-settings"} element={<AppSettingsPage />} />
             </Routes>
           </Router>

@@ -5,7 +5,7 @@
 import { IFluidContainer, SharedMap } from "fluid-framework";
 import { useEffect, useRef, useState } from "react";
 import { IFluidContainerResults } from "../../../../../models";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { getAzureContainer } from "../../../../../utils";
 import { useTeamsClientContext } from "../../../../teams-client-provider";
 
@@ -31,7 +31,7 @@ export function useFluidContainerResults(): IFluidContainerResults {
   >();
   const [error, setError] = useState<Error | undefined>();
   const initializedRef = useRef<boolean>(false);
-  const [params] = useSearchParams();
+  const params = useParams();
   const { teamsContext } = useTeamsClientContext();
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export function useFluidContainerResults(): IFluidContainerResults {
       console.log("useSharedObjects: starting");
 
       try {
-        const containerId = params.get("containerId");
+        const containerId = params["containerId"];
         if (containerId) {
           console.log("useFluidContainerResults creating container");
           const results = await getAzureContainer(teamsUserId, containerId);

@@ -22,10 +22,10 @@ export const SidePanelPage = () => {
           if (error) {
             setError(new Error(error.message));
           }
-        }, `${window.location.origin}?inTeams=true&containerId=${containerId}`);
+        }, `${window.location.origin}/projects/${containerId}?inTeams=true`);
       } else {
         navigate({
-          pathname: `/?inTeams=${inTeams()}&containerId=${containerId}`,
+          pathname: `/projects/${containerId}?inTeams=${inTeams()}`,
         });
       }
     },
@@ -45,7 +45,7 @@ export const SidePanelPage = () => {
                 shareAppContentToStage(project.containerId);
               } else {
                 navigate({
-                  pathname: `/project?containerId=${project.containerId}`,
+                  pathname: `/projects/${project.containerId}`,
                 });
               }
             }}
