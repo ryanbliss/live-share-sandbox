@@ -2,12 +2,11 @@
  * Copyright (c) Ryan Bliss. All rights reserved.
  * Licensed under the MIT License.
  */
-import { ContainerSchema, IFluidContainer, SharedMap } from "fluid-framework";
-import { SharedString } from "@fluidframework/sequence";
+import { IFluidContainer, SharedMap } from "fluid-framework";
 import { useEffect, useRef, useState } from "react";
 import { IFluidContainerResults } from "../../../../../models";
 import { useSearchParams } from "react-router-dom";
-import { createAzureContainer, getAzureContainer } from "../../../../../utils";
+import { getAzureContainer } from "../../../../../utils";
 import { useTeamsClientContext } from "../../../../teams-client-provider";
 
 /**
@@ -61,8 +60,15 @@ export function useFluidContainerResults(): IFluidContainerResults {
     start();
   }, [teamsContext]);
 
+  useEffect(() => {
+    return () => {
+      results?.container.disconnect?.();
+    };
+  }, [results]);
+
   const container = results?.container;
   const initialObjects = container?.initialObjects;
+
   return {
     loading: !container,
     error,

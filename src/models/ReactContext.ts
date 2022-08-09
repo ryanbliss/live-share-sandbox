@@ -7,6 +7,7 @@ import { app } from "@microsoft/teams-js";
 import { SandpackFiles } from "@codesandbox/sandpack-react";
 import { ICursor } from "./Cursor";
 import { IProject } from "./Project";
+import { CodeFilesHelper } from "./CodeFilesHelper";
 
 export interface IFluidContainerResults {
   loading: boolean;
@@ -26,6 +27,8 @@ export interface IFluidObjectsContext
     ICodePagesContext {
   teamsContext: app.Context | undefined;
   mappedSandpackFiles: SandpackFiles;
+  codeFilesHelper: CodeFilesHelper;
+  codeFilesHelperRef: MutableRefObject<CodeFilesHelper | undefined>;
   currentPageKey: string | undefined;
   onChangeSelectedFile: (currentPageKey: string | undefined) => void;
 }

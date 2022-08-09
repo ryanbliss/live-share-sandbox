@@ -1,4 +1,4 @@
-import { FC, useMemo, useRef } from "react";
+import { FC, useEffect, useMemo, useRef } from "react";
 import {
   useMonacoFluidAdapterHook,
   useSandpackMessages,
@@ -13,15 +13,6 @@ interface IMonacoEditorProps {
 }
 
 export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
-  const { codeFiles, currentPageKey, mappedSandpackFiles } =
-    useFluidObjectsContext();
-
-  const codeFilesHelperRef = useRef<CodeFilesHelper | undefined>();
-  const codeFilesHelper = useMemo(() => {
-    codeFilesHelperRef.current = new CodeFilesHelper(codeFiles, currentPageKey);
-    return codeFilesHelperRef.current;
-  }, [codeFiles, currentPageKey]);
-
   // Set up iFrame window messages for Sandpack
   // This isn't directly related to MonacoEditor but
   // it needs to be in a component within SandpackProvider
@@ -29,13 +20,13 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
 
   // Set up the Monaco editor and apply/post changes
   // to/from SharedString
-  useMonacoFluidAdapterHook(
-    codeFilesHelper,
-    codeFilesHelperRef,
-    "container",
-    mappedSandpackFiles,
-    props.theme
-  );
+  useMonacoFluidAdapterHook("container", props.theme);
+
+  useEffect(() => {
+    return () => {
+      console.log("unmount MonacoEditor");
+    };
+  }, []);
 
   // Render the view
   return (

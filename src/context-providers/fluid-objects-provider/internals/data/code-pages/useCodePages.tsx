@@ -79,19 +79,27 @@ export function useCodePages(
   );
 
   useEffect(() => {
-    if (codePagesMap) {
-      // Listen for changes to the code files
-      codePagesMap.on("valueChanged", onRefreshPages);
-      if (!startedRef.current) {
-        // On initial mount, get the initial values for our pages
-        onRefreshPages();
-      }
+    if (!codePagesMap) return;
+    // Listen for changes to the code files
+    codePagesMap.on("valueChanged", onRefreshPages);
+    if (!startedRef.current) {
+      // On initial mount, get the initial values for our pages
+      onRefreshPages();
     }
     // Remove event listeners when the hook unmounts
     return () => {
       codePagesMap?.off("valueChanged", onRefreshPages);
     };
   }, [codePagesMap, onRefreshPages]);
+
+  useEffect(() => {
+    // On unmount, remove event listeners for the shared strings
+    return () => {
+      codeFilesRef.current.forEach((sharedString) => {
+        sharedString.removeAllListeners();
+      });
+    };
+  }, []);
 
   return {
     codeFiles,

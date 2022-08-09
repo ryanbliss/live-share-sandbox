@@ -111,6 +111,12 @@ export function useLiveShareContainer(): ILiveShareContainerResults {
       .catch((err) => setError(err));
   });
 
+  useEffect(() => {
+    return () => {
+      results?.container.disconnect?.();
+    };
+  }, [results]);
+
   const container = results?.container;
   const initialObjects = container?.initialObjects;
   return {

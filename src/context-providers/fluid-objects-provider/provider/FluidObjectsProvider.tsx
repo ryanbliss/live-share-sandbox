@@ -1,6 +1,7 @@
 import { SandpackFiles } from "@codesandbox/sandpack-react";
-import { FC, ReactNode, useMemo } from "react";
+import { FC, ReactNode, useMemo, useRef } from "react";
 import { LoadableWrapper } from "../../../components/view-wrappers";
+import { CodeFilesHelper } from "../../../models";
 import {
   LiveShareSandboxApi,
   WindowMessagingApi,
@@ -53,6 +54,15 @@ export const FluidObjectsProvider: FC<{
     return _files;
   }, [codeFilesData.codeFiles, currentPageKey]);
 
+  const codeFilesHelperRef = useRef<CodeFilesHelper | undefined>();
+  const codeFilesHelper = useMemo(() => {
+    codeFilesHelperRef.current = new CodeFilesHelper(
+      codeFilesData.codeFiles,
+      currentPageKey
+    );
+    return codeFilesHelperRef.current;
+  }, [codeFilesData.codeFiles, currentPageKey]);
+
   return (
     <FluidObjectsContext.Provider
       value={{
@@ -61,6 +71,8 @@ export const FluidObjectsProvider: FC<{
         teamsContext,
         mappedSandpackFiles,
         currentPageKey,
+        codeFilesHelper,
+        codeFilesHelperRef,
         onChangeSelectedFile,
       }}
     >

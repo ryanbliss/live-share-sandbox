@@ -73,7 +73,6 @@ class AzureTokenProvider implements ITokenProvider {
     const json = await response.json();
     const token = json.data.token;
     if (typeof token === "string") {
-      console.log(token, tenantId, documentId);
       return token;
     }
     throw new Error("AzureTokenProvider Invalid token response");

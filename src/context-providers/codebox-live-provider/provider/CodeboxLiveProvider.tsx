@@ -59,6 +59,7 @@ export const CodeboxLiveProvider: FC<{
     },
     [createOrEditProject]
   );
+
   return (
     <CodeboxLiveContext.Provider
       value={{

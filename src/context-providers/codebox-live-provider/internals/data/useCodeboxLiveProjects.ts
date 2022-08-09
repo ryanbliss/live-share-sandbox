@@ -44,17 +44,22 @@ export function useCodeboxLiveProjects(): {
   useEffect(() => {
     if (initializedRef.current || !teamsContext?.user?.id) return;
     initializedRef.current = true;
-    clientRef.current.authorize(teamsContext.user.id).then(() => {
-      clientRef.current
-        .getUserProjects()
-        .then((response) => {
-          setUserProjects([...response.projects]);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    });
-
+    let promise: Promise<any>;
+    promise = clientRef.current
+      .authorize(teamsContext.user.id)
+      .then(() => {
+        promise = clientRef.current
+          .getUserProjects()
+          .then((response) => {
+            if (initializedRef.current) {
+              setUserProjects([...response.projects]);
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
+      .catch((error) => console.error(error));
     return () => {
       initializedRef.current = false;
     };
