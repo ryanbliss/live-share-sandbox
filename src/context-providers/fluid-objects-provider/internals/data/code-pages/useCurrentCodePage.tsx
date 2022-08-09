@@ -12,7 +12,8 @@ export function useCurrentCodePage(): {
   } = useLiveShareContext();
 
   const currentPageKey = useMemo<string | undefined>(() => {
-    return liveShareCurrentPage || localCurrentPageKey;
+    // TODO: replace hardcoded default page
+    return liveShareCurrentPage || localCurrentPageKey || "/App.tsx";
   }, [liveShareCurrentPage, localCurrentPageKey]);
 
   const onChangeSelectedFile = useCallback(
