@@ -6,7 +6,6 @@ import { inTeams } from "./utils/inTeams";
 import { LoadableWrapper } from "./components/view-wrappers";
 import { SidePanelPage, AppSettingsPage, MeetingStagePage } from "./pages";
 import "./App.css";
-import { GitFileProvider } from "./utils/GitFileProvider";
 
 function App() {
   const [initialized, setInitialized] = useState(false);
@@ -32,25 +31,6 @@ function App() {
       } else {
         setInitialized(true);
       }
-
-      GitFileProvider
-        .create('dadfafdas' ,'https://github.com/ryanbliss/live-share-sandbox', 'git-handler')
-        .then((fileProvider) => {
-          fileProvider
-            .getFileText('README.md')
-            .then((text) => console.log(text))
-            .catch((err: any) => console.error(err));
-
-          fileProvider
-            .getDir()
-            .then((text) => console.log(text))
-            .catch((err: any) => console.error(err));
-
-          fileProvider
-            .getDir("src/components")
-            .then((text) => console.log(text))
-            .catch((err: any) => console.error(err));
-        })
     }
   }, [initialized]);
 

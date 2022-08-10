@@ -3,6 +3,27 @@ import FS from "@isomorphic-git/lightning-fs";
 import http from "isomorphic-git/http/web"
 import { Buffer } from 'buffer'
 
+/* Example usage
+  GitFileProvider
+    .create('containerId' ,'https://github.com/ryanbliss/live-share-sandbox', 'main')
+    .then((fileProvider) => {
+      fileProvider
+        .getFileText('README.md')
+        .then((text) => console.log(text))
+        .catch((err: any) => console.error(err));
+
+      fileProvider
+        .getDir()
+        .then((text) => console.log(text))
+        .catch((err: any) => console.error(err));
+
+      fileProvider
+        .getDir("src/components")
+        .then((text) => console.log(text))
+        .catch((err: any) => console.error(err));
+    })
+*/
+
 export class GitFileProvider {
   repositoryUrl: string;
   branch?: string;
