@@ -33,7 +33,7 @@ export class GitFileProvider {
   // TODO: we need to replace the proxy with privately hosted version, this is a test only version
   private proxy: string = 'https://cors.isomorphic-git.org'
 
-  public static async create(containerId: string, repositoryUrl: string, branch: string): Promise<GitFileProvider> {
+  public static async create(containerId: string, repositoryUrl: string, branch?: string): Promise<GitFileProvider> {
     const provider = new GitFileProvider(containerId, repositoryUrl, branch);
     return provider.clone().then(() => provider)
   }
