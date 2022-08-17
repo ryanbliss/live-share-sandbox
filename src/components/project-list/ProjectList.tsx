@@ -123,6 +123,7 @@ export const ProjectList: FC<IProjectListProps> = ({
                   <FlexRow>
                     <Button
                       onClick={() => {
+                        console.log("ProjectList: opening project with containerId", project.containerId);
                         onSelectProject(project);
                       }}
                     >
