@@ -5,7 +5,9 @@
 
 import { EphemeralState, TeamsFluidClient, EphemeralEvent, EphemeralPresence } from "@microsoft/live-share";
 import { EphemeralMediaSession } from "@microsoft/live-share-media";
-import { LOCAL_MODE_TENANT_ID } from "@fluidframework/azure-client";
+import {
+  AzureConnectionConfig,
+} from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
 import {
   ContainerSchema,
@@ -51,16 +53,15 @@ export function useLiveShareContainer(): ILiveShareContainerResults {
     // Check if user is in Teams
     const isInTeams = inTeams();
 
-    let connection;
+    let connection: AzureConnectionConfig | undefined;
     if (!isInTeams) {
       // Configure for local testing (optional).
       connection = {
-        tenantId: LOCAL_MODE_TENANT_ID,
+        type: "local",
         tokenProvider: new InsecureTokenProvider("", {
           id: "123",
         }),
-        orderer: "http://localhost:7070",
-        storage: "http://localhost:7070",
+        endpoint: "http://localhost:7070",
       };
     }
 

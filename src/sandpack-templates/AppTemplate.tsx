@@ -29,12 +29,11 @@ export default function App() {
       };
       // Define custom connection for local testing
       const connection = {
-        tenantId: "local",
+        type: "local",
         tokenProvider: new InsecureTokenProvider("", {
           id: "123",
         }),
-        orderer: "http://localhost:7070",
-        storage: "http://localhost:7070",
+        endpoint: "http://localhost:7070",
       };
       // Define any additional client settings (optional).
       // - connection: A custom Fluid Relay Service connection to use.
@@ -209,12 +208,12 @@ export default function App() {
       };
       // Define custom connection for local testing
       const connection = {
+        type: "remote",
         tenantId: "7515b032-fde3-47f5-a7df-af436c5a8d5f",
         tokenProvider: new CustomTokenProvider("https://codebox-live-functions.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=-6r5_0eWFpubsnUVGSOoW3hBj_SNWWBBV3MJufqCtg_kAzFuwd-c8w%3D%3D", {
           id: "123",
         }),
-        orderer: "https://alfred.westus2.fluidrelay.azure.com",
-        storage: "https://historian.westus2.fluidrelay.azure.com",
+        endpoint: "https://us.fluidrelay.azure.com",
       };
       // Define any additional client settings (optional).
       // - connection: A custom Fluid Relay Service connection to use.

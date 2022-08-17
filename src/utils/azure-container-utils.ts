@@ -1,6 +1,7 @@
 import {
   AzureClient,
   AzureConnectionConfig,
+  AzureRemoteConnectionConfig,
 } from "@fluidframework/azure-client";
 
 import {
@@ -80,7 +81,8 @@ class AzureTokenProvider implements ITokenProvider {
 }
 
 function getConnection(userId: string): AzureConnectionConfig {
-  const connection: AzureConnectionConfig = {
+  const connection: AzureRemoteConnectionConfig = {
+    type: "remote",
     tenantId: "7515b032-fde3-47f5-a7df-af436c5a8d5f",
     tokenProvider: new AzureTokenProvider(
       "https://codebox-live-functions.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=-6r5_0eWFpubsnUVGSOoW3hBj_SNWWBBV3MJufqCtg_kAzFuwd-c8w%3D%3D",
@@ -89,11 +91,11 @@ function getConnection(userId: string): AzureConnectionConfig {
         userName: "Test",
       }
     ),
-    orderer: "https://alfred.westus2.fluidrelay.azure.com",
-    storage: "https://historian.westus2.fluidrelay.azure.com",
+    endpoint: "https://us.fluidrelay.azure.com",
   };
   // West Europe
-  // const connection = {
+  // const connection: AzureRemoteConnectionConfig = {
+  //   type: "remote",
   //   tenantId: "d6459b2a-61bc-474b-a43f-9faa6c1419d2",
   //   tokenProvider: new AzureTokenProvider(
   //     "https://codebox-live-functions.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=-6r5_0eWFpubsnUVGSOoW3hBj_SNWWBBV3MJufqCtg_kAzFuwd-c8w%3D%3D",
@@ -101,8 +103,7 @@ function getConnection(userId: string): AzureConnectionConfig {
   //       id: "123",
   //     }
   //   ),
-  //   orderer: "https://alfred.westeurope.fluidrelay.azure.com",
-  //   storage: "https://historian.westeurope.fluidrelay.azure.com",
+  //   endpoint: "https://eu.fluidrelay.azure.com",
   // };
   // Local
   // const connection = {
@@ -110,8 +111,7 @@ function getConnection(userId: string): AzureConnectionConfig {
   //   tokenProvider: new InsecureTokenProvider("", {
   //     id: "123",
   //   }),
-  //   orderer: "http://localhost:7070",
-  //   storage: "http://localhost:7070",
+  //   endpoint: "http://localhost:7070",
   // };
   return connection;
 }
