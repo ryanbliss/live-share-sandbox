@@ -36,28 +36,34 @@ export function useFollowModeState(
   }, [followModeState]);
 
   useEffect(() => {
-    if (followModeState && !followModeState.isStarted) {
-      console.log("useFollowModeState: listening to state changes");
-      followModeState.on("stateChanged", (state, value) => {
-        if (["follow", "free"].includes(state)) {
-          if (value?.userId) {
-            setFollowingUserId(value.userId!);
-          } else {
-            setFollowingUserId(undefined);
-          }
+    if (!followModeState || followModeState.isStarted) return;
+    const onStateChanged = (
+      state: string,
+      value: IFollowModeStateValue | undefined
+    ) => {
+      if (["follow", "free"].includes(state)) {
+        if (value?.userId) {
+          setFollowingUserId(value.userId!);
+        } else {
+          setFollowingUserId(undefined);
         }
-      });
-      const allowedRoles: UserMeetingRole[] = [
-        UserMeetingRole.organizer,
-        UserMeetingRole.presenter,
-      ];
-      followModeState
-        .start(allowedRoles)
-        .then(() => {
-          setStarted(true);
-        })
-        .catch((error) => console.error(error));
-    }
+      }
+    };
+    console.log("useFollowModeState: listening to state changes");
+    followModeState.on("stateChanged", onStateChanged);
+    const allowedRoles: UserMeetingRole[] = [
+      UserMeetingRole.organizer,
+      UserMeetingRole.presenter,
+    ];
+    followModeState
+      .start(allowedRoles)
+      .then(() => {
+        setStarted(true);
+      })
+      .catch((error) => console.error(error));
+    return () => {
+      followModeState.off("stateChanged", onStateChanged);
+    };
   }, [followModeState, setStarted, setFollowingUserId]);
 
   return {

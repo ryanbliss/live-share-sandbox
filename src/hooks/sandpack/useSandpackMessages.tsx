@@ -1,10 +1,10 @@
 import { SandpackState, useSandpack } from "@codesandbox/sandpack-react";
 import { useEffect, useRef } from "react";
-import { useFluidObjectsContext } from "../../context-providers";
+import { useLiveShareContext } from "../../context-providers";
 import { inTeams } from "../../utils/inTeams";
 
 export const useSandpackMessages = () => {
-  const { userDidCreateContainerRef } = useFluidObjectsContext();
+  const { userDidCreateContainerRef } = useLiveShareContext();
   const { sandpack } = useSandpack();
   const sandpackRef = useRef<SandpackState | undefined>();
   const registeredListenerRef = useRef<boolean>(false);

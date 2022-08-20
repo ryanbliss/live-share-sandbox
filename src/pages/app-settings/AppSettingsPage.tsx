@@ -12,15 +12,14 @@ export const AppSettingsPage = () => {
       return;
     }
     if (inTeams()) {
+      setRegistered(true);
       microsoftTeams.pages.config.registerOnSaveHandler((saveEvent) => {
         microsoftTeams.pages.config.setConfig({
-          suggestedDisplayName: "Sandbox",
-          contentUrl: `${window.location.origin}/side-panel?inTeams=true`,
+          suggestedDisplayName: "Codebox",
+          contentUrl: `${window.location.origin}/?inTeams=true`,
         });
         saveEvent.notifySuccess();
-        setRegistered(true);
       });
-
       microsoftTeams.pages.config.setValidityState(true);
     } else {
       setRegistered(true);
@@ -36,7 +35,7 @@ export const AppSettingsPage = () => {
         marginSpacer="small"
       >
         <Title2 block align="center">
-          {"Welcome to Live Share Sandbox!"}
+          {"Welcome to Codebox Live!"}
         </Title2>
         <Subtitle2 block align="center">
           {"Press the save button to continue."}

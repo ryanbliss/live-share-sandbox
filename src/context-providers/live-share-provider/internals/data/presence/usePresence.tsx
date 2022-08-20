@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   EphemeralPresence,
+  EphemeralPresenceUser,
   PresenceState,
   UserMeetingRole,
 } from "@microsoft/live-share";
@@ -70,7 +71,7 @@ export const usePresence = (
 
   // Callback exposed to UI to change the current page the user is looking at
   const onChangeCurrentPageKey = useCallback(
-    (currentPageKey: string) => {
+    (currentPageKey: string | undefined) => {
       // If user has a cursor, reset selection when changing page
       const newCursor = localUserRef.current?.cursor
         ? Object.assign({}, localUserRef.current!.cursor!)
@@ -93,78 +94,85 @@ export const usePresence = (
 
   // Effect which registers SharedPresence event listeners before joining space
   useEffect(() => {
-    if (presence && !presence.isStarted && context && initialPageKey) {
-      console.info("usePresence: starting presence");
-      // Set the presenceChange event listener, which updates when any
-      // user's presence is updated.
-      presence.on("presenceChanged", (userPresence, local) => {
-        if (local) {
-          // We update local user separately so that we can
-          // get their Teams meeting role.
-          const userData = userPresence.data as any;
-          const localUser: IUser = {
-            userId: userPresence.userId,
-            state: userPresence.state,
-            name: userData?.name ? `${userData.name}` : "Unknown",
-            isLocal: local,
-            currentPageKey: userData?.currentPageKey
-              ? `${userData.currentPageKey}`
-              : undefined,
-            cursor: userData?.cursor,
-            roles: [],
-          };
-          // Get the roles of the local user
-          userPresence
-            .getRoles()
-            .then((roles) => {
-              localUser.roles = roles;
-              // Set local user state
-              setLocalUser(localUser);
-            })
-            .catch((err) => {
-              console.error(err);
-              setLocalUser(localUser);
-            });
-        } else {
-          // Update our local state for our list of users
-          const updatedUsers: IUser[] = presence
-            .toArray()
-            .map((userPresence) => {
-              const userData = userPresence.data as any;
-              return {
-                userId: userPresence.userId,
-                state: userPresence.state,
-                name: userData?.name ? `${userData.name}` : "Unknown",
-                currentPageKey: userData?.currentPageKey
-                  ? `${userData.currentPageKey}`
-                  : undefined,
-                cursor: userData?.cursor,
-                isLocal: userPresence.userId === localUserRef.current?.userId,
-              };
-            })
-            .filter((user) => user.state === PresenceState.online);
-          setOtherUsers(updatedUsers);
-        }
-      });
-      // displayName may not be known in all M365 hubs right now
-      // so we use their email handle instead if needed.
-      const userPrincipalName =
-        context?.user?.displayName ??
-        context?.user?.userPrincipalName ??
-        `unknown@contoso.com`;
-      const name = userPrincipalName.split("@")[0];
+    if (!presence || presence.isStarted || !context || !initialPageKey) return;
+    console.info("usePresence: starting presence");
+    const onPresenceChanged = (
+      userPresence: EphemeralPresenceUser,
+      local: boolean
+    ) => {
+      if (local) {
+        // We update local user separately so that we can
+        // get their Teams meeting role.
+        const userData = userPresence.data as any;
+        const localUser: IUser = {
+          userId: userPresence.userId,
+          state: userPresence.state,
+          name: userData?.name ? `${userData.name}` : "Unknown",
+          isLocal: local,
+          currentPageKey: userData?.currentPageKey
+            ? `${userData.currentPageKey}`
+            : undefined,
+          cursor: userData?.cursor,
+          roles: [],
+        };
+        // Get the roles of the local user
+        userPresence
+          .getRoles()
+          .then((roles) => {
+            localUser.roles = roles;
+            // Set local user state
+            setLocalUser(localUser);
+          })
+          .catch((err) => {
+            console.error(err);
+            setLocalUser(localUser);
+          });
+      } else {
+        // Update our local state for our list of users
+        const updatedUsers: IUser[] = presence
+          .toArray()
+          .map((userPresence) => {
+            const userData = userPresence.data as any;
+            return {
+              userId: userPresence.userId,
+              state: userPresence.state,
+              name: userData?.name ? `${userData.name}` : "Unknown",
+              currentPageKey: userData?.currentPageKey
+                ? `${userData.currentPageKey}`
+                : undefined,
+              cursor: userData?.cursor,
+              isLocal: userPresence.userId === localUserRef.current?.userId,
+            };
+          })
+          .filter((user) => user.state === PresenceState.online);
+        setOtherUsers(updatedUsers);
+      }
+    };
+    // Set the presenceChange event listener, which updates when any
+    // user's presence is updated.
+    presence.on("presenceChanged", onPresenceChanged);
+    // displayName may not be known in all M365 hubs right now
+    // so we use their email handle instead if needed.
+    const userPrincipalName =
+      context?.user?.displayName ??
+      context?.user?.userPrincipalName ??
+      `unknown@contoso.com`;
+    const name = userPrincipalName.split("@")[0];
 
-      // Start listening for presence changes
-      presence
-        .start(context?.user?.id, {
-          name,
-          currentPageKey: initialPageKey,
-        })
-        .then(() => {
-          setStarted(true);
-        })
-        .catch((error) => console.error(error));
-    }
+    // Start listening for presence changes
+    presence
+      .start(context?.user?.id, {
+        name,
+        currentPageKey: initialPageKey,
+      })
+      .then(() => {
+        setStarted(true);
+      })
+      .catch((error) => console.error(error));
+    return () => {
+      console.log("presence off");
+      presence.off("presenceChanged", onPresenceChanged);
+    };
   }, [presence, context]);
 
   return {

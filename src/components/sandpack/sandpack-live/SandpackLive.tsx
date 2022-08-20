@@ -34,13 +34,13 @@ export const SandpackLive: FC<ISandpackLiveProps> = (props) => {
           template={props.template}
           customSetup={{
             dependencies: {
-              "@microsoft/live-share": "~0.3.1",
-              "@microsoft/live-share-media": "~0.3.1",
-              "@microsoft/teams-js": "2.0.0-experimental.0",
-              "fluid-framework": "~0.59.3000",
-              "@fluidframework/azure-client": "~0.59.3000",
-              "@fluidframework/test-client-utils": "~0.59.3000",
-              "@fluidframework/sequence": "~0.59.3000",
+              "@microsoft/live-share": "~0.4.0",
+              "@microsoft/live-share-media": "~0.4.0",
+              "@microsoft/teams-js": "2.0.0-experimental.1",
+              "fluid-framework": "~1.2.3",
+              "@fluidframework/azure-client": "~1.0.2",
+              "@fluidframework/test-client-utils": "~1.2.3",
+              "@fluidframework/sequence": "~1.2.3",
               react: "^18.0.0",
               "react-dom": "^18.0.0",
               "react-scripts": "^4.0.0",

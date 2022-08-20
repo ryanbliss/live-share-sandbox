@@ -25,8 +25,14 @@ import {
 } from "@microsoft/live-share";
 import { EphemeralMediaSession } from "@microsoft/live-share-media";
 import { WindowMessagingApi } from "./WindowMessagingApi";
+import {
+  ITokenProvider,
+  ITokenResponse,
+} from "@fluidframework/routerlicious-driver";
 
-export const AUTHORIZED_PARENT_ORIGINS = ["https://live-share-sandbox.vercel.app"];
+export const AUTHORIZED_PARENT_ORIGINS = [
+  "https://live-share-sandbox.vercel.app",
+];
 
 export class SandboxFluidContainer
   extends TypedEventEmitter<IFluidContainerEvents>
@@ -111,7 +117,7 @@ export class SandboxFluidContainer
   }
 
   /**
-   * {@inheritDoc IFluidContainer.connect}
+   * {@inheritDoc IFluidContainer.disconnect}
    */
   public async disconnect(): Promise<void> {
     this.container.disconnect?.();
@@ -266,9 +272,10 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
 
       // TODO: need to check if user is the presenter or some other mechanism for who to create these
       if (startingLength < targetInitialObjectsLength) {
-        const shouldCreateInitialObjects = await WindowMessagingApi.sendRequest<boolean>(
-          "getShouldCreateInitialObjects"
-        );
+        const shouldCreateInitialObjects =
+          await WindowMessagingApi.sendRequest<boolean>(
+            "getShouldCreateInitialObjects"
+          );
         if (shouldCreateInitialObjects) {
           console.log("Creating initial sandpackObjectsMap values");
           // We need to set the Sandpack initial objects to the sandpackObjectsMap
@@ -314,6 +321,68 @@ export class TeamsFluidClient extends LiveShareTeamsFluidClient {
       );
       resolve(containerId);
     });
+  }
+}
+
+/**
+ * Token Provider implementation for connecting to an Azure Function endpoint for
+ * Azure Fluid Relay token resolution.
+ */
+export class CustomTokenProvider implements ITokenProvider {
+  /**
+   * Creates a new instance using configuration parameters.
+   * @param azFunctionUrl - URL to Azure Function endpoint
+   * @param user - User object
+   */
+  constructor(
+    private readonly azFunctionUrl: string,
+    private readonly user?: {
+      id?: string;
+      userName?: string;
+      additionalDetails?: string;
+    }
+  ) {}
+
+  public async fetchOrdererToken(
+    tenantId: string,
+    documentId?: string
+  ): Promise<ITokenResponse> {
+    return {
+      jwt: await this.getToken(tenantId, documentId),
+    };
+  }
+
+  public async fetchStorageToken(
+    tenantId: string,
+    documentId: string
+  ): Promise<ITokenResponse> {
+    return {
+      jwt: await this.getToken(tenantId, documentId),
+    };
+  }
+
+  private async getToken(
+    tenantId: string,
+    documentId: string | undefined
+  ): Promise<string> {
+    let url = this.azFunctionUrl + \`&tenantId=\${tenantId}\`;
+    console.log(url);
+    if (documentId) {
+      url += \`&documentId=\${documentId}\`;
+    }
+    if (this.user?.id) {
+      url += \`&userId=\${this.user.id}\`;
+    }
+    if (this.user?.userName) {
+      url += \`&userName=\${this.user.userName}\`;
+    }
+    if (this.user?.additionalDetails) {
+      url += \`&additionalDetails=\${this.user.additionalDetails}\`;
+    }
+    const response = await fetch(url);
+    const json = await response.json();
+    console.log(json);
+    return json.data.token as string;
   }
 }
 `;
