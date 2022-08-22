@@ -28,9 +28,18 @@ export const TeamsClientProvider: FC<{
     if (!initialized) {
       if (inTeams()) {
         console.log("App.tsx: initializing client SDK");
+        // Allow all Sandpack subdomains, format https://a-b-c-sandpack.codesandbox.io
+        const allSandpackUrls: string[] = [];
+        for (let a = 0; a < 10; a++) {
+          for (let b = 0; b < 10; b++) {
+            for (let c = 0; c < 10; c++) {
+              allSandpackUrls.push(`https://${a}-${b}-${c}-sandpack.codesandbox.io`)
+            }
+          }
+        }
         app
           .initialize([
-            "https://1-2-2-sandpack.codesandbox.io",
+            ...allSandpackUrls,
             "https://teams.microsoft.com",
             "https://live-share-sandbox.vercel.app",
           ])
