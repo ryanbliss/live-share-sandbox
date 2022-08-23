@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@codeboxlive/hub-interfaces": "^0.1.4",
+    "@codeboxlive/uncle": "^0.1.4",
     "@codesandbox/sandpack-react": "^1.2.4",
     "@fluentui/react-components": "^9.1.1",
     "@isomorphic-git/lightning-fs": "^4.1.0",
@@ -29,8 +31,8 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/isomorphic-git__lightning-fs": "^4.4.3",
     "@fluidframework/test-client-utils": "~1.2.3",
+    "@types/isomorphic-git__lightning-fs": "^4.4.3",
     "@types/lodash": "^4.14.182",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",

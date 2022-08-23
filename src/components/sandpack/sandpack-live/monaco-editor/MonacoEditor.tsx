@@ -1,10 +1,5 @@
-import { FC, useEffect, useMemo, useRef } from "react";
-import {
-  useMonacoFluidAdapterHook,
-  useSandpackMessages,
-} from "../../../../hooks";
-import { CodeFilesHelper } from "../../../../models";
-import { useFluidObjectsContext } from "../../../../context-providers";
+import { FC, useEffect } from "react";
+import { useMonacoFluidAdapterHook } from "../../../../hooks";
 
 interface IMonacoEditorProps {
   language: "javascript" | "typescript" | "html" | "css";
@@ -13,11 +8,6 @@ interface IMonacoEditorProps {
 }
 
 export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
-  // Set up iFrame window messages for Sandpack
-  // This isn't directly related to MonacoEditor but
-  // it needs to be in a component within SandpackProvider
-  useSandpackMessages();
-
   // Set up the Monaco editor and apply/post changes
   // to/from SharedString
   useMonacoFluidAdapterHook("container", props.theme);

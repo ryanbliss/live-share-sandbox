@@ -1,16 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useStateRef } from "../../../../hooks";
 import { IPostProject, IProject } from "../../../../models";
+import { ProjectsService } from "../../../../service";
 import { useTeamsClientContext } from "../../../teams-client-provider";
-import { CodeboxClient } from "../client/CodeboxClient";
 
 export function useCodeboxLiveProjects(): {
   userProjects: IProject[];
+  userProjectsRef: MutableRefObject<IProject[]>;
   loading: boolean;
   error: Error | undefined;
   createOrEditProject: (projectData: IPostProject) => Promise<IProject>;
 } {
-  const clientRef = useRef(new CodeboxClient());
+  const clientRef = useRef(new ProjectsService());
   const initializedRef = useRef(false);
   const { teamsContext } = useTeamsClientContext();
   const [userProjects, userProjectsRef, setUserProjects] = useStateRef<
@@ -91,6 +98,7 @@ export function useCodeboxLiveProjects(): {
 
   return {
     userProjects,
+    userProjectsRef,
     // Use ref because it will always be set along with userProjects
     loading: loadingRef.current,
     error,

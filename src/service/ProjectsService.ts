@@ -5,7 +5,7 @@ import {
   IUserProjectsResponse,
   IPostProject,
   IPostProjectResponse,
-} from "../../../../models";
+} from "../models";
 
 function isProject(value: any): value is IProject {
   return (
@@ -34,7 +34,7 @@ function isUserProjectsResponse(value: any): value is IUserProjectsResponse {
   return false;
 }
 
-export class CodeboxClient {
+export class ProjectsService {
   private userId: string | undefined;
   // TODO: real auth
   public async authorize(userId: string): Promise<void> {
@@ -44,7 +44,7 @@ export class CodeboxClient {
     if (!this.userId) {
       return Promise.reject(
         new Error(
-          "CodeboxClient: called getUserProjects before user is authorized"
+          "CodeboxService: called getUserProjects before user is authorized"
         )
       );
     }
@@ -61,7 +61,7 @@ export class CodeboxClient {
       return Promise.resolve(userProjects);
     }
     return Promise.reject(
-      new Error("CodeboxClient: getUserProjects invalid response")
+      new Error("CodeboxService: getUserProjects invalid response")
     );
   }
   public async postProject(
@@ -69,7 +69,7 @@ export class CodeboxClient {
   ): Promise<IPostProjectResponse> {
     if (!this.userId) {
       return Promise.reject(
-        new Error("CodeboxClient: called postProject before user is authorized")
+        new Error("CodeboxService: called postProject before user is authorized")
       );
     }
     const response = await axios.post(
@@ -86,7 +86,7 @@ export class CodeboxClient {
       return Promise.resolve(projectResponse);
     }
     return Promise.reject(
-      new Error("CodeboxClient: postProject invalid response")
+      new Error("CodeboxService: postProject invalid response")
     );
   }
 }

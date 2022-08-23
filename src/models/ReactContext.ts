@@ -82,6 +82,7 @@ export interface ITeamsClientContext {
 
 export interface ICodeboxLiveContext {
   userProjects: IProject[];
+  userProjectsRef: MutableRefObject<IProject[]>;
   loading: boolean;
   error: Error | undefined;
   createProject: (template: string) => Promise<void>;

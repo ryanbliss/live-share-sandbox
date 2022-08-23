@@ -15,7 +15,7 @@ import { CodeboxLiveContext, useCodeboxLiveProjects } from "../internals";
 export const CodeboxLiveProvider: FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const { userProjects, loading, error, createOrEditProject } =
+  const { userProjects, userProjectsRef, loading, error, createOrEditProject } =
     useCodeboxLiveProjects();
   const { teamsContext } = useTeamsClientContext();
 
@@ -75,6 +75,7 @@ export const CodeboxLiveProvider: FC<{
     <CodeboxLiveContext.Provider
       value={{
         userProjects,
+        userProjectsRef,
         loading,
         error,
         createProject,
