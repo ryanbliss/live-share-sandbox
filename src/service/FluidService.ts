@@ -12,9 +12,30 @@ import {
   UserRole,
 } from "@codeboxlive/hub-interfaces";
 import axios from "axios";
+import { IProject } from "../models";
+import { ProjectsService } from "./ProjectsService";
+
+function isTenantInfo(value: any): value is IFluidTenantInfo {
+  return [
+    typeof value?.tenantId === undefined || typeof value?.tenantId === "string",
+    value?.type === "remote" || value?.type === "local",
+    typeof value?.serviceEndpoint === "string",
+  ].every((isTrue) => isTrue);
+}
+
+function isNptTime(value: any): value is INtpTimeInfo {
+  return [
+    typeof value?.ntpTime === "string",
+    typeof value?.ntpTimeInUTC === "number",
+  ].every((isTrue) => isTrue);
+}
 
 export class FluidService {
-  constructor(private readonly userId: string) {}
+  constructor(
+    private readonly userId: string,
+    private readonly currentProject: IProject,
+    private readonly projectService: ProjectsService
+  ) {}
 
   toFluidRequests(): IFluidRequests {
     return {
@@ -28,13 +49,19 @@ export class FluidService {
     };
   }
 
-  getTenantInfo(): Promise<IFluidTenantInfo> {
-    const connection: IFluidTenantInfo = {
-      type: "remote",
-      tenantId: "7515b032-fde3-47f5-a7df-af436c5a8d5f",
-      serviceEndpoint: "https://us.fluidrelay.azure.com",
-    };
-    return Promise.resolve(connection);
+  async getTenantInfo(): Promise<IFluidTenantInfo> {
+    const url =
+      "https://codebox-live-functions.azurewebsites.net/api/codeboxgetfluidtenantinfo?code=uyuGyJCT3_jTZm6dISMzJSw7bb3kDLFJZ_tB7ms29eESAzFuPhPdmA%3D%3D";
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${this.userId}`,
+      },
+    });
+    const tenantInfo = response.data.data;
+    if (isTenantInfo(tenantInfo)) {
+      return tenantInfo;
+    }
+    throw Error("FluidService.getTenantInfo: invalid response");
   }
   async getFluidToken(body: IFluidTokenRequestBody): Promise<IFluidTokenInfo> {
     let url =
@@ -56,21 +83,55 @@ export class FluidService {
         token,
       };
     }
-    throw Error("FluidService: unable to get token");
+    throw Error("FluidService.getFluidToken: invalid response");
   }
-  getFluidContainerId(): Promise<IFluidContainerInfo> {
-    return Promise.reject(new Error("FluidService: not implemented exception"));
+  async getFluidContainerId(): Promise<IFluidContainerInfo> {
+    console.log(this.currentProject.sandboxContainerId);
+    if (this.currentProject.sandboxContainerId) {
+      return Promise.resolve({
+        containerId: this.currentProject.sandboxContainerId,
+        shouldCreate: false,
+      });
+    }
+    const project = await this.projectService.getProject(
+      this.currentProject._id
+    );
+    return {
+      containerId: project.sandboxContainerId,
+      shouldCreate: !project.sandboxContainerId,
+    };
   }
-  setFluidContainerId(
+  async setFluidContainerId(
     body: ISetFluidContainerIdRequestBody
   ): Promise<IFluidContainerInfo> {
-    return Promise.reject(new Error("FluidService: not implemented exception"));
-  }
-  getNtpTime(): Promise<INtpTimeInfo> {
-    return Promise.resolve({
-      ntpTime: new Date().toUTCString(),
-      ntpTimeInUTC: new Date().getUTCDate(),
+    if (this.currentProject.sandboxContainerId) {
+      return Promise.resolve({
+        containerId: this.currentProject.sandboxContainerId,
+        shouldCreate: false,
+      });
+    }
+    const project = await this.projectService.setProject({
+      _id: this.currentProject._id,
+      sandboxContainerId: body.containerId,
     });
+    return {
+      containerId: project.sandboxContainerId,
+      shouldCreate: !project.sandboxContainerId,
+    };
+  }
+  async getNtpTime(): Promise<INtpTimeInfo> {
+    const url =
+      "https://codebox-live-functions.azurewebsites.net/api/codeboxgetnpttime?code=idCRKz9a5Gk5bvsAxzTcWPVkhnEv3ZOZJFwr3ydL8CVIAzFugZl39g%3D%3D";
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${this.userId}`,
+      },
+    });
+    const info = response.data.data;
+    if (isNptTime(info)) {
+      return info;
+    }
+    throw Error("FluidService.getNtpTime: invalid response");
   }
   async registerClientId(
     body: IUserRolesMessageBody

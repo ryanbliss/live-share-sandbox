@@ -1,20 +1,40 @@
 import { UncleGatewayHub } from "@codeboxlive/uncle";
 import { useEffect, useRef } from "react";
-import { useTeamsClientContext } from "../../context-providers";
+import {
+  useCodeboxLiveContext,
+  useTeamsClientContext,
+} from "../../context-providers";
+import { ProjectsService } from "../../service";
 import { FluidService } from "../../service/FluidService";
 
 export const useSandpackMessages = () => {
   const fluidServiceRef = useRef<FluidService>();
   const { teamsContext } = useTeamsClientContext();
+  const { currentProject } = useCodeboxLiveContext();
 
   useEffect(() => {
-    if (fluidServiceRef.current || !teamsContext?.user?.id) {
-      return;
+    console.log(currentProject);
+    async function start() {
+      if (!teamsContext?.user?.id || !currentProject) {
+        return;
+      }
+      // Set up hub
+      if (!fluidServiceRef.current) {
+        const projectService = new ProjectsService();
+        await projectService.authorize(teamsContext!.user!.id);
+        fluidServiceRef.current = new FluidService(
+          teamsContext!.user!.id,
+          currentProject!,
+          projectService
+        );
+      }
+      console.log("Registering Uncle Gateway!!!");
+      await UncleGatewayHub.initialize(
+        fluidServiceRef.current!.toFluidRequests()
+      );
     }
-    // Set up hub
-    fluidServiceRef.current = new FluidService(teamsContext.user!.id);
-    UncleGatewayHub.initialize(fluidServiceRef.current!.toFluidRequests());
-  });
+    start();
+  }, [currentProject, teamsContext]);
 
   return;
 };

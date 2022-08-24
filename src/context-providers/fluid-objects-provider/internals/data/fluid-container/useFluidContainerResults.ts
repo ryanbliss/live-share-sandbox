@@ -5,9 +5,10 @@
 import { IFluidContainer, SharedMap } from "fluid-framework";
 import { useEffect, useRef, useState } from "react";
 import { IFluidContainerResults } from "../../../../../models";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getAzureContainer } from "../../../../../utils";
 import { useTeamsClientContext } from "../../../../teams-client-provider";
+import { useCodeboxLiveProjects } from "../../../../codebox-live-provider/internals";
 
 /**
  * @hidden
@@ -33,10 +34,11 @@ export function useFluidContainerResults(): IFluidContainerResults {
   const initializedRef = useRef<boolean>(false);
   const params = useParams();
   const { teamsContext } = useTeamsClientContext();
+  const { currentProject } = useCodeboxLiveProjects();
 
   useEffect(() => {
     const teamsUserId = teamsContext?.user?.id;
-    if (initializedRef.current || !teamsUserId) {
+    if (initializedRef.current || !teamsUserId || !currentProject) {
       return;
     }
     initializedRef.current = true;
@@ -44,10 +46,13 @@ export function useFluidContainerResults(): IFluidContainerResults {
       console.log("useSharedObjects: starting");
 
       try {
-        const containerId = params["containerId"];
-        if (containerId) {
+        const projectId = params["projectId"];
+        if (projectId) {
           console.log("useFluidContainerResults creating container");
-          const results = await getAzureContainer(teamsUserId, containerId);
+          const results = await getAzureContainer(
+            teamsUserId,
+            currentProject.containerId
+          );
           setResults(results);
         } else {
           initializedRef.current = true;
@@ -58,7 +63,7 @@ export function useFluidContainerResults(): IFluidContainerResults {
       }
     };
     start();
-  }, [teamsContext]);
+  }, [teamsContext, currentProject]);
 
   useEffect(() => {
     return () => {

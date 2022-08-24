@@ -57,7 +57,6 @@ class AzureTokenProvider implements ITokenProvider {
     documentId: string | undefined
   ): Promise<string> {
     let url = this.azFunctionUrl + `&tenantId=${tenantId}`;
-    console.log(url);
     if (documentId) {
       url += `&documentId=${documentId}`;
     }

@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useParams } from "react-router-dom";
 import { useStateRef } from "../../../../hooks";
 import { IPostProject, IProject } from "../../../../models";
 import { ProjectsService } from "../../../../service";
@@ -13,18 +14,24 @@ import { useTeamsClientContext } from "../../../teams-client-provider";
 export function useCodeboxLiveProjects(): {
   userProjects: IProject[];
   userProjectsRef: MutableRefObject<IProject[]>;
+  currentProject: IProject | undefined;
   loading: boolean;
   error: Error | undefined;
   createOrEditProject: (projectData: IPostProject) => Promise<IProject>;
 } {
+  const params = useParams();
   const clientRef = useRef(new ProjectsService());
   const initializedRef = useRef(false);
-  const { teamsContext } = useTeamsClientContext();
   const [userProjects, userProjectsRef, setUserProjects] = useStateRef<
     IProject[]
   >([]);
+  const [currentProject, currentProjectRef, setCurrentProject] = useStateRef<
+    IProject | undefined
+  >(undefined);
   const loadingRef = useRef(true);
   const [error, setError] = useState<Error>();
+
+  const { teamsContext } = useTeamsClientContext();
 
   const createOrEditProject = useCallback(
     async (projectData: IPostProject): Promise<IProject> => {
@@ -96,9 +103,34 @@ export function useCodeboxLiveProjects(): {
     };
   }, [teamsContext]);
 
+  useEffect(() => {
+    const projectId = params["projectId"];
+    if (projectId) {
+      const refreshCurrentProject = async () => {
+        const project = userProjectsRef.current.find(
+          (project) => project._id === projectId
+        );
+        if (project) {
+          if (project._id !== currentProjectRef.current?._id) {
+            setCurrentProject(project);
+          }
+        } else {
+          try {
+            const newProject = await clientRef.current.getProject(projectId);
+            setCurrentProject(newProject);
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      };
+      refreshCurrentProject();
+    }
+  }, [params, userProjects]);
+
   return {
     userProjects,
     userProjectsRef,
+    currentProject,
     // Use ref because it will always be set along with userProjects
     loading: loadingRef.current,
     error,

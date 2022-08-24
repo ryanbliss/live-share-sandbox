@@ -16,16 +16,16 @@ export const SidePanelPage = () => {
   const { teamsContext } = useTeamsClientContext();
 
   const shareAppContentToStage = useCallback(
-    (containerId: string) => {
+    (projectId: string) => {
       if (inTeams()) {
         meeting.shareAppContentToStage((error) => {
           if (error) {
             setError(new Error(error.message));
           }
-        }, `${window.location.origin}/meeting/projects/${containerId}?inTeams=true`);
+        }, `${window.location.origin}/meeting/projects/${projectId}?inTeams=true`);
       } else {
         navigate({
-          pathname: `/meeting/projects/${containerId}?inTeams=${inTeams()}`,
+          pathname: `/meeting/projects/${projectId}?inTeams=${inTeams()}`,
         });
       }
     },
@@ -42,10 +42,10 @@ export const SidePanelPage = () => {
               if (
                 teamsContext?.page?.frameContext === FrameContexts.sidePanel
               ) {
-                shareAppContentToStage(project.containerId);
+                shareAppContentToStage(project._id);
               } else {
                 navigate({
-                  pathname: `/projects/${project.containerId}`,
+                  pathname: `/projects/${project._id}`,
                 });
               }
             }}
