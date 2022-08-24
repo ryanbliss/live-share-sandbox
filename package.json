@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@codeboxlive/hub-interfaces": "^0.1.4",
-    "@codeboxlive/uncle": "^0.1.4",
-    "@codesandbox/sandpack-react": "^1.2.4",
+    "@codeboxlive/hub-interfaces": "^0.1.7",
+    "@codeboxlive/uncle": "^0.1.7",
+    "@codesandbox/sandpack-react": "^1.2.7",
     "@fluentui/react-components": "^9.1.1",
     "@isomorphic-git/lightning-fs": "^4.1.0",
     "@microsoft/live-share": "~0.4.0",

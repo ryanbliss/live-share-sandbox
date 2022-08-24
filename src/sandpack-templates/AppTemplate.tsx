@@ -109,25 +109,23 @@ export default function App() {
   const [started, setStarted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (initRef.current) {
-      return;
-    }
+    if (initRef.current) return;
     initRef.current = true;
     // Join container on app load
     async function start(): Promise<void> {
-      // Initialize the CodeboxLiveClient
+      // Initialize the CodeboxLiveClient so that this sandbox app can communicate
+      // with the Codebox Live application using window post messages. This is used
+      // to authenticate a Fluid container when testing this app in a sandbox.
       await CodeboxLiveClient.initialize();
+
       // Define container schema
       const schema = {
         initialObjects: {
           counterMap: SharedMap,
         },
       };
-
-      // Define container callback (optional).
-      // * This is only called once when the container is first created.
+      // Define container callback for when container is first created
       const onFirstInitialize = (container: IFluidContainer) => {
-        console.log("App.tsx: onFirstInitialize called");
         // Setup any initial state here
       };
       const client = new CodeboxLiveFluidClient();
@@ -136,6 +134,7 @@ export default function App() {
 
       counterMapRef.current = results?.container.initialObjects
         .counterMap as SharedMap;
+      // Listen for changes to the value
       counterMapRef.current!.on("valueChanged", () => {
         setCounterValue(counterMapRef.current!.get("count") ?? 0);
       });
@@ -159,7 +158,6 @@ export default function App() {
             {"+1"}
           </button>
           <h2 style={{ color: "red" }}>{counterValue}</h2>
-          <h2>{"containerId"}</h2>
         </>
       )}
       {!started && <div>{"Loading..."}</div>}
@@ -185,25 +183,23 @@ export default function App() {
   const [started, setStarted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (initRef.current) {
-      return;
-    }
+    if (initRef.current) return;
     initRef.current = true;
     // Join container on app load
     async function start(): Promise<void> {
-      // Initialize the CodeboxLiveClient
+      // Initialize the CodeboxLiveClient so that this sandbox app can communicate
+      // with the Codebox Live application using window post messages. This is used
+      // to authenticate a Fluid container when testing this app in a sandbox.
       await CodeboxLiveClient.initialize();
+
       // Define container schema
       const schema = {
         initialObjects: {
           counterMap: SharedMap,
         },
       };
-
-      // Define container callback (optional).
-      // * This is only called once when the container is first created.
+      // Define container callback for when container is first created
       const onFirstInitialize = (container: IFluidContainer) => {
-        console.log("App.tsx: onFirstInitialize called");
         // Setup any initial state here
       };
       const client = new CodeboxLiveFluidClient();
@@ -212,6 +208,7 @@ export default function App() {
 
       counterMapRef.current = results?.container.initialObjects
         .counterMap as SharedMap;
+      // Listen for changes to the value
       counterMapRef.current!.on("valueChanged", () => {
         setCounterValue(counterMapRef.current!.get("count") ?? 0);
       });
@@ -235,7 +232,6 @@ export default function App() {
             {"+1"}
           </button>
           <h2 style={{ color: "red" }}>{counterValue}</h2>
-          <h2>{"containerId"}</h2>
         </>
       )}
       {!started && <div>{"Loading..."}</div>}
