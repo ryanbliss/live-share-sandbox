@@ -9,6 +9,7 @@ import { SandpackFileExplorer } from "./sandpack-files/SandpackFileExplorer";
 import { FlexColumn, FlexItem } from "../../flex";
 import { MonacoEditor } from "./monaco-editor/MonacoEditor";
 import { useFluidObjectsContext } from "../../../context-providers";
+import { useSandpackMessages } from "../../../hooks";
 
 interface ISandpackLiveProps {
   template: "react" | "react-ts";
@@ -16,6 +17,8 @@ interface ISandpackLiveProps {
 
 export const SandpackLive: FC<ISandpackLiveProps> = (props) => {
   const { codeFiles, mappedSandpackFiles } = useFluidObjectsContext();
+  // Setup Sandpack gateway hub
+  useSandpackMessages();
 
   // If we haven't yet loaded the code files, show nothing
   if (codeFiles.size < 2) {
@@ -34,6 +37,8 @@ export const SandpackLive: FC<ISandpackLiveProps> = (props) => {
           template={props.template}
           customSetup={{
             dependencies: {
+              "@codeboxlive/extensions-core": "^0.1.4",
+              "@codeboxlive/extensions-fluid": "^0.1.5",
               "@microsoft/live-share": "~0.4.0",
               "@microsoft/live-share-media": "~0.4.0",
               "@microsoft/teams-js": "2.0.0-experimental.1",

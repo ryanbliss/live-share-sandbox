@@ -36,4 +36,4 @@ _Note:_ Do not compress the teams-app-package folder itself.
 
 ## License
 
-Licensed under the [MIT](LICENSE) License.
+Licensed under the [MIT](LICENSE) License, except for dependencies which have various licenses.

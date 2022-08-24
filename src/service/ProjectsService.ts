@@ -5,7 +5,8 @@ import {
   IUserProjectsResponse,
   IPostProject,
   IPostProjectResponse,
-} from "../../../../models";
+  ISetProject,
+} from "../models";
 
 function isProject(value: any): value is IProject {
   return (
@@ -18,7 +19,7 @@ function isProject(value: any): value is IProject {
   );
 }
 
-function isPostProjectResponse(value: any): value is IPostProjectResponse {
+function isProjectResponse(value: any): value is IPostProjectResponse {
   return value && isProject(value.project);
 }
 
@@ -34,7 +35,7 @@ function isUserProjectsResponse(value: any): value is IUserProjectsResponse {
   return false;
 }
 
-export class CodeboxClient {
+export class ProjectsService {
   private userId: string | undefined;
   // TODO: real auth
   public async authorize(userId: string): Promise<void> {
@@ -44,7 +45,7 @@ export class CodeboxClient {
     if (!this.userId) {
       return Promise.reject(
         new Error(
-          "CodeboxClient: called getUserProjects before user is authorized"
+          "CodeboxService: called getUserProjects before user is authorized"
         )
       );
     }
@@ -61,7 +62,7 @@ export class CodeboxClient {
       return Promise.resolve(userProjects);
     }
     return Promise.reject(
-      new Error("CodeboxClient: getUserProjects invalid response")
+      new Error("CodeboxService: getUserProjects invalid response")
     );
   }
   public async postProject(
@@ -69,7 +70,9 @@ export class CodeboxClient {
   ): Promise<IPostProjectResponse> {
     if (!this.userId) {
       return Promise.reject(
-        new Error("CodeboxClient: called postProject before user is authorized")
+        new Error(
+          "CodeboxService: called postProject before user is authorized"
+        )
       );
     }
     const response = await axios.post(
@@ -82,11 +85,43 @@ export class CodeboxClient {
       }
     );
     const projectResponse = response.data.data;
-    if (isPostProjectResponse(projectResponse)) {
+    if (isProjectResponse(projectResponse)) {
       return Promise.resolve(projectResponse);
     }
     return Promise.reject(
-      new Error("CodeboxClient: postProject invalid response")
+      new Error("CodeboxService: postProject invalid response")
     );
+  }
+  async getProject(id: string): Promise<IProject> {
+    const url =
+      "https://codebox-live-functions.azurewebsites.net/api/codeboxgetproject?code=KwBbsi_UBFHk6RCVSaITTSzmCeEhsYGcgVFzbPGPssWRAzFusJedOQ%3D%3D";
+    const response = await axios.post(
+      url,
+      { id },
+      {
+        headers: {
+          Authorization: `Bearer ${this.userId}`,
+        },
+      }
+    );
+    const projectResponse = response.data.data;
+
+    if (isProjectResponse(projectResponse)) {
+      return projectResponse.project;
+    }
+    throw Error("ProjectService.getProject: invalid response");
+  }
+  async setProject(project: ISetProject): Promise<IProject> {
+    const url = `https://codebox-live-functions.azurewebsites.net/api/codeboxsetproject?code=3WvILs5ikst4pKb0RI8OafSsVveTiumDey2USYZ7NL3dAzFumKnOfA%3D%3D`;
+    const response = await axios.post(url, project, {
+      headers: {
+        Authorization: `Bearer ${this.userId}`,
+      },
+    });
+    const projectResponse = response.data.data;
+    if (isProjectResponse(projectResponse)) {
+      return projectResponse.project;
+    }
+    throw Error("ProjectService.setProject: invalid response");
   }
 }

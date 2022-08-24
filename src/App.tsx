@@ -7,7 +7,7 @@ import {
   CodeProjectPage,
 } from "./pages";
 import "./App.css";
-import { TeamsClientProvider } from "./context-providers";
+import { CodeboxLiveProvider, TeamsClientProvider } from "./context-providers";
 import { inTeams } from "./utils";
 import { useState } from "react";
 
@@ -44,11 +44,11 @@ function App() {
             <Routes>
               <Route path={"/"} element={<SidePanelPage />} />
               <Route
-                path={"/projects/:containerId"}
+                path={"/projects/:projectId"}
                 element={<CodeProjectPage />}
               />
               <Route
-                path={"/meeting/projects/:containerId"}
+                path={"/meeting/projects/:projectId"}
                 element={<MeetingStagePage />}
               />
               <Route path={"/app-settings"} element={<AppSettingsPage />} />
