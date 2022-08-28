@@ -20,7 +20,7 @@ export const ProjectList: FC<IProjectListProps> = ({
   selectText,
   onSelectProject,
 }) => {
-  const { userProjects, loading, error, createProject } =
+  const { userProjects, projectTemplates, loading, error, createProject } =
     useCodeboxLiveContext();
   const { teamsContext } = useTeamsClientContext();
 
@@ -38,54 +38,27 @@ export const ProjectList: FC<IProjectListProps> = ({
           }}
         >
           <FlexRow marginSpacer="small" wrap>
-            <CompoundButton
-              icon={<ClipboardCode24Regular />}
-              secondaryContent={"TypeScript"}
-              onClick={() => {
-                createProject("react-ts");
-              }}
-              style={{
-                marginBottom: "12px",
-              }}
-            >
-              {"New React app"}
-            </CompoundButton>
-            <CompoundButton
-              icon={<ClipboardCode24Regular />}
-              secondaryContent={"TypeScript"}
-              onClick={() => {
-                createProject("live-share-react-ts");
-              }}
-              style={{
-                marginBottom: "12px",
-              }}
-            >
-              {"New Live Share app"}
-            </CompoundButton>
-            <CompoundButton
-              icon={<ClipboardCode24Regular />}
-              secondaryContent={"TypeScript"}
-              onClick={() => {
-                createProject("afr-react-ts");
-              }}
-              style={{
-                marginBottom: "12px",
-              }}
-            >
-              {"New Azure Fluid Relay app"}
-            </CompoundButton>
-            <CompoundButton
-              icon={<ClipboardCode24Regular />}
-              secondaryContent={"TypeScript"}
-              onClick={() => {
-                createProject("teams-react-ts");
-              }}
-              style={{
-                marginBottom: "12px",
-              }}
-            >
-              {"New Teams app"}
-            </CompoundButton>
+            {projectTemplates.map((template) => {
+              let secondaryContent: string = template.language;
+              if (template.framework) {
+                secondaryContent += ` | ${template.framework}`;
+              }
+              return (
+                <CompoundButton
+                  key={template.id}
+                  icon={<ClipboardCode24Regular />}
+                  secondaryContent={secondaryContent}
+                  onClick={() => {
+                    createProject(template);
+                  }}
+                  style={{
+                    marginBottom: "12px",
+                  }}
+                >
+                  {`+ ${template.name}`}
+                </CompoundButton>
+              );
+            })}
           </FlexRow>
         </FlexItem>
         <FlexRow
@@ -123,7 +96,10 @@ export const ProjectList: FC<IProjectListProps> = ({
                   <FlexRow>
                     <Button
                       onClick={() => {
-                        console.log("ProjectList: opening project with containerId", project.containerId);
+                        console.log(
+                          "ProjectList: opening project with containerId",
+                          project.containerId
+                        );
                         onSelectProject(project);
                       }}
                     >

@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
   IProject,
-  IProjectType,
+  ProjectType,
   IUserProjectsResponse,
   IPostProject,
   IPostProjectResponse,
@@ -15,7 +15,7 @@ function isProject(value: any): value is IProject {
     typeof value.title === "string" &&
     typeof value.createdAt === "string" &&
     typeof value.createdById === "string" &&
-    Object.values(IProjectType).includes(value.type)
+    Object.values(ProjectType).includes(value.type)
   );
 }
 

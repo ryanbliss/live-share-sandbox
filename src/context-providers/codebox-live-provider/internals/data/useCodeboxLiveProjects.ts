@@ -7,14 +7,68 @@ import {
 } from "react";
 import { useParams } from "react-router-dom";
 import { useStateRef } from "../../../../hooks";
-import { IPostProject, IProject } from "../../../../models";
+import {
+  IPostProject,
+  IProject,
+  IProjectTemplate,
+  ProjectFrameworkType,
+  ProjectLanguageType,
+  ProjectType,
+} from "../../../../models";
 import { ProjectsService } from "../../../../service";
 import { useTeamsClientContext } from "../../../teams-client-provider";
+
+// TODO: move to server provided value
+const PROJECT_TEMPLATES: IProjectTemplate[] = [
+  {
+    id: "react-ts",
+    name: "React Quick Start",
+    language: ProjectLanguageType.TYPESCRIPT,
+    framework: ProjectFrameworkType.REACT,
+    repository: new URL("https://github.com/codeboxlive/react-ts-template.git"),
+    branch: "main",
+    type: ProjectType.REACT_TS,
+  },
+  {
+    id: "live-share-react-ts",
+    name: "Live Share Quick Start",
+    language: ProjectLanguageType.TYPESCRIPT,
+    framework: ProjectFrameworkType.REACT,
+    repository: new URL(
+      "https://github.com/codeboxlive/live-share-react-ts-template.git"
+    ),
+    branch: "main",
+    type: ProjectType.REACT_TS,
+  },
+  {
+    id: "afr-react-ts",
+    name: "Fluid Quick Start",
+    language: ProjectLanguageType.TYPESCRIPT,
+    framework: ProjectFrameworkType.REACT,
+    repository: new URL(
+      "https://github.com/codeboxlive/fluid-react-ts-template.git"
+    ),
+    branch: "main",
+    type: ProjectType.REACT_TS,
+  },
+  {
+    id: "teams-react-ts",
+    name: "Teams Quick Start",
+    language: ProjectLanguageType.TYPESCRIPT,
+    framework: ProjectFrameworkType.REACT,
+    repository: new URL(
+      "https://github.com/codeboxlive/teams-react-ts-template.git"
+    ),
+    branch: "main",
+    type: ProjectType.REACT_TS,
+  },
+];
 
 export function useCodeboxLiveProjects(): {
   userProjects: IProject[];
   userProjectsRef: MutableRefObject<IProject[]>;
   currentProject: IProject | undefined;
+  projectTemplates: IProjectTemplate[];
   loading: boolean;
   error: Error | undefined;
   createOrEditProject: (projectData: IPostProject) => Promise<IProject>;
@@ -131,6 +185,7 @@ export function useCodeboxLiveProjects(): {
     userProjects,
     userProjectsRef,
     currentProject,
+    projectTemplates: PROJECT_TEMPLATES,
     // Use ref because it will always be set along with userProjects
     loading: loadingRef.current,
     error,

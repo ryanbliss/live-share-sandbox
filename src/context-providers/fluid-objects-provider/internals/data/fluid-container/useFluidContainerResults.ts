@@ -48,11 +48,15 @@ export function useFluidContainerResults(): IFluidContainerResults {
       try {
         const projectId = params["projectId"];
         if (projectId) {
-          console.log("useFluidContainerResults creating container");
+          console.log(
+            "useFluidContainerResults getting container id",
+            currentProject.containerId
+          );
           const results = await getAzureContainer(
             teamsUserId,
             currentProject.containerId
           );
+          console.log("useFluidContainerResults joined container");
           setResults(results);
         } else {
           initializedRef.current = true;

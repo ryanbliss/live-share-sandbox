@@ -33,26 +33,7 @@ export const SandpackLive: FC<ISandpackLiveProps> = (props) => {
       </FlexItem>
       <FlexColumn expand="fill" style={{ position: "relative" }}>
         {/* SandpackProvider creates the sandbox and compiles the iFrame with the latest code */}
-        <SandpackProvider
-          template={props.template}
-          customSetup={{
-            dependencies: {
-              "@codeboxlive/extensions-core": "^0.1.4",
-              "@codeboxlive/extensions-fluid": "^0.1.5",
-              "@microsoft/live-share": "~0.4.0",
-              "@microsoft/live-share-media": "~0.4.0",
-              "@microsoft/teams-js": "2.0.0-experimental.1",
-              "fluid-framework": "~1.2.3",
-              "@fluidframework/azure-client": "~1.0.2",
-              "@fluidframework/test-client-utils": "~1.2.3",
-              "@fluidframework/sequence": "~1.2.3",
-              react: "^18.0.0",
-              "react-dom": "^18.0.0",
-              "react-scripts": "^4.0.0",
-            },
-          }}
-          files={mappedSandpackFiles}
-        >
+        <SandpackProvider template={props.template} files={mappedSandpackFiles}>
           <SandpackThemeProvider theme={"dark"}>
             <SandpackLayout>
               {/* Custom MonacoEditor for viewing & editing the text of the code */}

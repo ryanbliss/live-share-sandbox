@@ -79,12 +79,15 @@ export function useCodePages(
   );
 
   useEffect(() => {
-    if (!codePagesMap) return;
-    // Listen for changes to the code files
-    codePagesMap.on("valueChanged", onRefreshPages);
-    if (!startedRef.current) {
-      // On initial mount, get the initial values for our pages
-      onRefreshPages();
+    if (codePagesMap) {
+      console.log("useCodePages: listening for pages");
+      // Listen for changes to the code files
+      codePagesMap.on("valueChanged", onRefreshPages);
+      if (!startedRef.current) {
+        // On initial mount, get the initial values for our pages
+        console.log("useCodePages: getting initial pages");
+        onRefreshPages();
+      }
     }
     // Remove event listeners when the hook unmounts
     return () => {

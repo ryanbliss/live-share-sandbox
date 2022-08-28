@@ -13,7 +13,6 @@ export const useSandpackMessages = () => {
   const { currentProject } = useCodeboxLiveContext();
 
   useEffect(() => {
-    console.log(currentProject);
     async function start() {
       if (!teamsContext?.user?.id || !currentProject) {
         return;
@@ -28,7 +27,7 @@ export const useSandpackMessages = () => {
           projectService
         );
       }
-      console.log("Registering Uncle Gateway!!!");
+      console.log("useSandpackMessages: registering gateway");
       await UncleGatewayHub.initialize(
         fluidServiceRef.current!.toFluidRequests()
       );

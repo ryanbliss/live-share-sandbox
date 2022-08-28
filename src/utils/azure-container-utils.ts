@@ -127,7 +127,7 @@ function getContainerSchema(): ContainerSchema {
 
 export async function createAzureContainer(
   userId: string,
-  initialFiles: Map<string, string>
+  getInitialFiles: (containerId: string) => Promise<Map<string, string>>
 ): Promise<{
   container: IFluidContainer;
   containerId: string;
@@ -138,21 +138,22 @@ export async function createAzureContainer(
   // Define container callback (optional).
   // * This is only called once when the container is first created.
   const onFirstInitialize = async (
-    container: IFluidContainer
+    container: IFluidContainer,
+    containerId: string
   ): Promise<void> => {
     console.log("azure-container-utils createNewContainer: onFirstInitialize");
     try {
+      const initialFiles = await getInitialFiles(containerId);
       const keys = [...initialFiles.keys()];
+      const codePagesMap = container.initialObjects.codePagesMap as SharedMap;
       for (let i = 0; i < initialFiles.size; i++) {
         const key = keys[i];
         const sharedString = await container.create(SharedString);
-        (container.initialObjects.codePagesMap as SharedMap).set(
-          key,
-          sharedString.handle
-        );
+        codePagesMap.set(key, sharedString.handle);
         sharedString.insertText(0, initialFiles.get(key)!);
+        console.log(key, sharedString.getText());
       }
-
+      console.log(codePagesMap.size);
       return Promise.resolve();
     } catch (err: any) {
       console.error(err);
@@ -166,13 +167,26 @@ export async function createAzureContainer(
   const schema = getContainerSchema();
   const results = await client.createContainer(schema);
   const { container } = results;
-  await onFirstInitialize(container);
+
   console.log("azure-container-utils createNewContainer: attaching");
+  const connectedPromise = new Promise<void>((resolve) => {
+    const onConnected = () => {
+      container.off("connected", onConnected);
+      resolve();
+    };
+    container.on("connected", onConnected);
+  });
+  // TODO: replace placeholder hardcoded template string with project ID
+  await onFirstInitialize(container, "template");
   const containerId = await container.attach();
   console.log(
-    "azure-container-utils createNewContainer: container created with id",
+    "azure-container-utils createNewContainer: attached with id",
     containerId
   );
+  await connectedPromise;
+  console.log("azure-container-utils createNewContainer: connected");
+
+  console.log("azure-container-utils createNewContainer: returning");
   return Promise.resolve({
     ...results,
     containerId,
