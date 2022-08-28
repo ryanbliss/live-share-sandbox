@@ -84,7 +84,7 @@ function getConnection(userId: string): AzureConnectionConfig {
     type: "remote",
     tenantId: "7515b032-fde3-47f5-a7df-af436c5a8d5f",
     tokenProvider: new AzureTokenProvider(
-      "https://codebox-live-functions.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=-6r5_0eWFpubsnUVGSOoW3hBj_SNWWBBV3MJufqCtg_kAzFuwd-c8w%3D%3D",
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=t5XKUSQTfdAOPwUyaVwhIq7JukmNU02NqPvZD0sV3D3vAzFuN26gWQ%3D%3D",
       {
         id: userId,
         userName: "Test",
@@ -127,7 +127,7 @@ function getContainerSchema(): ContainerSchema {
 
 export async function createAzureContainer(
   userId: string,
-  initialFiles: Map<string, string>
+  getInitialFiles: () => Promise<Map<string, string>>
 ): Promise<{
   container: IFluidContainer;
   containerId: string;
@@ -142,17 +142,15 @@ export async function createAzureContainer(
   ): Promise<void> => {
     console.log("azure-container-utils createNewContainer: onFirstInitialize");
     try {
+      const initialFiles = await getInitialFiles();
       const keys = [...initialFiles.keys()];
+      const codePagesMap = container.initialObjects.codePagesMap as SharedMap;
       for (let i = 0; i < initialFiles.size; i++) {
         const key = keys[i];
         const sharedString = await container.create(SharedString);
-        (container.initialObjects.codePagesMap as SharedMap).set(
-          key,
-          sharedString.handle
-        );
+        codePagesMap.set(key, sharedString.handle);
         sharedString.insertText(0, initialFiles.get(key)!);
       }
-
       return Promise.resolve();
     } catch (err: any) {
       console.error(err);
@@ -166,13 +164,25 @@ export async function createAzureContainer(
   const schema = getContainerSchema();
   const results = await client.createContainer(schema);
   const { container } = results;
-  await onFirstInitialize(container);
+
   console.log("azure-container-utils createNewContainer: attaching");
+  const connectedPromise = new Promise<void>((resolve) => {
+    const onConnected = () => {
+      container.off("connected", onConnected);
+      resolve();
+    };
+    container.on("connected", onConnected);
+  });
+  await onFirstInitialize(container);
   const containerId = await container.attach();
   console.log(
-    "azure-container-utils createNewContainer: container created with id",
+    "azure-container-utils createNewContainer: attached with id",
     containerId
   );
+  await connectedPromise;
+  console.log("azure-container-utils createNewContainer: connected");
+
+  console.log("azure-container-utils createNewContainer: returning");
   return Promise.resolve({
     ...results,
     containerId,

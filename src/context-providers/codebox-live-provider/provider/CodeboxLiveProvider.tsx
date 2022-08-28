@@ -1,14 +1,7 @@
 import { FC, ReactNode, useCallback } from "react";
-import { IProject, IProjectType } from "../../../models";
-import {
-  AFRAppTemplate,
-  HeaderTemplate,
-  LocalAppTemplate,
-  ReactTSAppTemplate,
-  LiveShareAppTemplate,
-  TeamsAppTemplate,
-} from "../../../sandpack-templates";
-import { createAzureContainer, inTeams } from "../../../utils";
+import { IProjectTemplate, ProjectType } from "../../../models";
+import { createAzureContainer } from "../../../utils";
+import { GitFileProvider } from "../../../utils/GitFileProvider";
 import { useTeamsClientContext } from "../../teams-client-provider";
 import { CodeboxLiveContext, useCodeboxLiveProjects } from "../internals";
 
@@ -19,62 +12,58 @@ export const CodeboxLiveProvider: FC<{
     userProjects,
     userProjectsRef,
     currentProject,
+    projectTemplates,
     loading,
     error,
-    createOrEditProject,
+    postProject,
+    setProject,
   } = useCodeboxLiveProjects();
   const { teamsContext } = useTeamsClientContext();
 
   const createProject = useCallback(
-    async (template: string): Promise<void> => {
+    async (template: IProjectTemplate): Promise<void> => {
       try {
         console.log("CodeboxLiveProvider: creating from template", template);
-        const initialFiles = new Map<string, string>();
-        // TODO: replace with real templates
-        let AppTemplate: string;
-        if (template === "live-share-react-ts") {
-          AppTemplate = inTeams() ? LiveShareAppTemplate : LocalAppTemplate;
-        } else if (template === "afr-react-ts") {
-          AppTemplate = AFRAppTemplate;
-        } else if (template === "react-ts") {
-          AppTemplate = ReactTSAppTemplate;
-        } else if ("teams-react-ts") {
-          AppTemplate = TeamsAppTemplate;
-        } else {
-          return Promise.reject(
-            `CodeboxLiveProvider createProject: ${template} is not a valid template type`
+        // Post initial project to get server-backed project ID
+        // TODO: since posting without containerId, need to be able to add
+        // container when opening project from list
+        const postProjectResponse = await postProject({
+          type: ProjectType.REACT_TS,
+          title: template.name,
+        });
+        // Callback function to get initial code files from Git
+        async function getInitialFiles(): Promise<Map<string, string>> {
+          const provider = await GitFileProvider.create(
+            postProjectResponse._id,
+            template.repository.toString(),
+            template.branch
           );
+          const files = await provider.getAllFiles();
+          const filesMap = new Map<string, string>();
+          files.forEach((file) => {
+            const filePath = file.path.split("./").join("/");
+            filesMap.set(filePath, file.content);
+          });
+          return filesMap;
         }
-        initialFiles.set("/App.tsx", AppTemplate);
-        initialFiles.set("/Header.tsx", HeaderTemplate);
+        // Create Fluid container
         const results = await createAzureContainer(
           teamsContext!.user!.id,
-          initialFiles
+          getInitialFiles
         );
-        createOrEditProject({
+        // Update the newly created project with containerId
+        // TODO: need to add retry logic in case this request fails
+        await setProject({
+          _id: postProjectResponse._id,
           containerId: results.containerId,
-          type: IProjectType.REACT_TS,
-          title: template,
         });
-        results.container.dispose?.();
+        results.container.dispose();
         return Promise.resolve();
       } catch (error: any) {
         return Promise.reject(error);
       }
     },
-    [teamsContext, createOrEditProject]
-  );
-
-  const editProject = useCallback(
-    async (project: IProject): Promise<void> => {
-      await createOrEditProject({
-        containerId: project.containerId,
-        title: project.title,
-        type: project.type,
-      });
-      return Promise.resolve();
-    },
-    [createOrEditProject]
+    [teamsContext, postProject, setProject]
   );
 
   return (
@@ -83,10 +72,11 @@ export const CodeboxLiveProvider: FC<{
         userProjects,
         userProjectsRef,
         currentProject,
+        projectTemplates,
         loading,
         error,
         createProject,
-        editProject,
+        setProject,
       }}
     >
       {children}

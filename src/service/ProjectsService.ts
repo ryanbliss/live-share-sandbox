@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
   IProject,
-  IProjectType,
+  ProjectType,
   IUserProjectsResponse,
   IPostProject,
   IPostProjectResponse,
@@ -11,11 +11,12 @@ import {
 function isProject(value: any): value is IProject {
   return (
     value &&
-    typeof value.containerId === "string" &&
+    (typeof value.containerId === "string" ||
+      value.containerId === undefined) &&
     typeof value.title === "string" &&
     typeof value.createdAt === "string" &&
     typeof value.createdById === "string" &&
-    Object.values(IProjectType).includes(value.type)
+    Object.values(ProjectType).includes(value.type)
   );
 }
 
@@ -50,7 +51,7 @@ export class ProjectsService {
       );
     }
     const response = await axios.get(
-      "https://codebox-live-functions.azurewebsites.net/api/codeboxgetuserprojects?code=-S7slILyBCJK2uvUKJx_NSmOOVADEAStD5RtxHPgMWHwAzFuloV26g%3D%3D",
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxgetuserprojects?code=slwrGp0Ch8dtV_35spI8YzeCKQKkm9HwZf3ANFdCii74AzFuFBn1Ew%3D%3D",
       {
         headers: {
           Authorization: `Bearer ${this.userId}`,
@@ -76,7 +77,7 @@ export class ProjectsService {
       );
     }
     const response = await axios.post(
-      "https://codebox-live-functions.azurewebsites.net/api/codeboxpostproject?code=UrTLR-MWHouamPU3PDh-Vck6aQOKonBAL3EbHib3WAUMAzFuhiBIsA%3D%3D",
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxpostproject?code=QOFLsyQ07dtUzKViROs9zFUSKvS9tLqSpDu3JPk_J8SYAzFue2iPLw%3D%3D",
       projectData,
       {
         headers: {
@@ -94,7 +95,7 @@ export class ProjectsService {
   }
   async getProject(id: string): Promise<IProject> {
     const url =
-      "https://codebox-live-functions.azurewebsites.net/api/codeboxgetproject?code=KwBbsi_UBFHk6RCVSaITTSzmCeEhsYGcgVFzbPGPssWRAzFusJedOQ%3D%3D";
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxgetproject?code=p9I4HISDY4jDoszWFcuWUwBqJ7gkrrKWdC5KJ3O16JFEAzFuC5nS6g%3D%3D";
     const response = await axios.post(
       url,
       { id },
@@ -112,7 +113,7 @@ export class ProjectsService {
     throw Error("ProjectService.getProject: invalid response");
   }
   async setProject(project: ISetProject): Promise<IProject> {
-    const url = `https://codebox-live-functions.azurewebsites.net/api/codeboxsetproject?code=3WvILs5ikst4pKb0RI8OafSsVveTiumDey2USYZ7NL3dAzFumKnOfA%3D%3D`;
+    const url = `https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxsetproject?code=yDDATx8PXrOFySQswTCxKRv2VssZhVuKERq7vCdqw3DHAzFu_M__tg%3D%3D`;
     const response = await axios.post(url, project, {
       headers: {
         Authorization: `Bearer ${this.userId}`,

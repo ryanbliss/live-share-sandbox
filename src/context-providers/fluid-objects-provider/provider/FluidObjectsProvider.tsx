@@ -2,10 +2,6 @@ import { SandpackFiles } from "@codesandbox/sandpack-react";
 import { FC, ReactNode, useMemo, useRef } from "react";
 import { LoadableWrapper } from "../../../components/view-wrappers";
 import { CodeFilesHelper } from "../../../models";
-import {
-  LiveShareSandboxApi,
-  WindowMessagingApi,
-} from "../../../sandpack-templates";
 import { useTeamsClientContext } from "../../teams-client-provider";
 import {
   FluidObjectsContext,
@@ -39,18 +35,6 @@ export const FluidObjectsProvider: FC<{
         readOnly: false,
       };
     });
-    _files["/LiveShareSandboxApi.ts"] = {
-      code: LiveShareSandboxApi,
-      hidden: true,
-      active: false,
-      readOnly: true,
-    };
-    _files["/WindowMessagingApi.ts"] = {
-      code: WindowMessagingApi,
-      hidden: true,
-      active: false,
-      readOnly: true,
-    };
     return _files;
   }, [codeFilesData.codeFiles, currentPageKey]);
 

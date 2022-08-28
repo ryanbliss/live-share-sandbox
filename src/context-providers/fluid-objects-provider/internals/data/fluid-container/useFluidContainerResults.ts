@@ -38,7 +38,11 @@ export function useFluidContainerResults(): IFluidContainerResults {
 
   useEffect(() => {
     const teamsUserId = teamsContext?.user?.id;
-    if (initializedRef.current || !teamsUserId || !currentProject) {
+    if (
+      initializedRef.current ||
+      !teamsUserId ||
+      !currentProject?.containerId
+    ) {
       return;
     }
     initializedRef.current = true;
@@ -48,11 +52,15 @@ export function useFluidContainerResults(): IFluidContainerResults {
       try {
         const projectId = params["projectId"];
         if (projectId) {
-          console.log("useFluidContainerResults creating container");
-          const results = await getAzureContainer(
-            teamsUserId,
+          console.log(
+            "useFluidContainerResults getting container id",
             currentProject.containerId
           );
+          const results = await getAzureContainer(
+            teamsUserId,
+            currentProject.containerId!
+          );
+          console.log("useFluidContainerResults joined container");
           setResults(results);
         } else {
           initializedRef.current = true;
