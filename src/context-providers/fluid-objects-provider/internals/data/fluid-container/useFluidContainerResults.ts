@@ -38,7 +38,11 @@ export function useFluidContainerResults(): IFluidContainerResults {
 
   useEffect(() => {
     const teamsUserId = teamsContext?.user?.id;
-    if (initializedRef.current || !teamsUserId || !currentProject) {
+    if (
+      initializedRef.current ||
+      !teamsUserId ||
+      !currentProject?.containerId
+    ) {
       return;
     }
     initializedRef.current = true;
@@ -54,7 +58,7 @@ export function useFluidContainerResults(): IFluidContainerResults {
           );
           const results = await getAzureContainer(
             teamsUserId,
-            currentProject.containerId
+            currentProject.containerId!
           );
           console.log("useFluidContainerResults joined container");
           setResults(results);

@@ -84,7 +84,7 @@ function getConnection(userId: string): AzureConnectionConfig {
     type: "remote",
     tenantId: "7515b032-fde3-47f5-a7df-af436c5a8d5f",
     tokenProvider: new AzureTokenProvider(
-      "https://codebox-live-functions.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=-6r5_0eWFpubsnUVGSOoW3hBj_SNWWBBV3MJufqCtg_kAzFuwd-c8w%3D%3D",
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=t5XKUSQTfdAOPwUyaVwhIq7JukmNU02NqPvZD0sV3D3vAzFuN26gWQ%3D%3D",
       {
         id: userId,
         userName: "Test",
@@ -127,7 +127,7 @@ function getContainerSchema(): ContainerSchema {
 
 export async function createAzureContainer(
   userId: string,
-  getInitialFiles: (containerId: string) => Promise<Map<string, string>>
+  getInitialFiles: () => Promise<Map<string, string>>
 ): Promise<{
   container: IFluidContainer;
   containerId: string;
@@ -138,12 +138,11 @@ export async function createAzureContainer(
   // Define container callback (optional).
   // * This is only called once when the container is first created.
   const onFirstInitialize = async (
-    container: IFluidContainer,
-    containerId: string
+    container: IFluidContainer
   ): Promise<void> => {
     console.log("azure-container-utils createNewContainer: onFirstInitialize");
     try {
-      const initialFiles = await getInitialFiles(containerId);
+      const initialFiles = await getInitialFiles();
       const keys = [...initialFiles.keys()];
       const codePagesMap = container.initialObjects.codePagesMap as SharedMap;
       for (let i = 0; i < initialFiles.size; i++) {
@@ -151,9 +150,7 @@ export async function createAzureContainer(
         const sharedString = await container.create(SharedString);
         codePagesMap.set(key, sharedString.handle);
         sharedString.insertText(0, initialFiles.get(key)!);
-        console.log(key, sharedString.getText());
       }
-      console.log(codePagesMap.size);
       return Promise.resolve();
     } catch (err: any) {
       console.error(err);
@@ -176,8 +173,7 @@ export async function createAzureContainer(
     };
     container.on("connected", onConnected);
   });
-  // TODO: replace placeholder hardcoded template string with project ID
-  await onFirstInitialize(container, "template");
+  await onFirstInitialize(container);
   const containerId = await container.attach();
   console.log(
     "azure-container-utils createNewContainer: attached with id",

@@ -1,6 +1,6 @@
 import { FC, ReactNode, useCallback } from "react";
-import { IProject, IProjectTemplate, ProjectType } from "../../../models";
-import { createAzureContainer, inTeams } from "../../../utils";
+import { IProjectTemplate, ProjectType } from "../../../models";
+import { createAzureContainer } from "../../../utils";
 import { GitFileProvider } from "../../../utils/GitFileProvider";
 import { useTeamsClientContext } from "../../teams-client-provider";
 import { CodeboxLiveContext, useCodeboxLiveProjects } from "../internals";
@@ -15,7 +15,8 @@ export const CodeboxLiveProvider: FC<{
     projectTemplates,
     loading,
     error,
-    createOrEditProject,
+    postProject,
+    setProject,
   } = useCodeboxLiveProjects();
   const { teamsContext } = useTeamsClientContext();
 
@@ -23,11 +24,17 @@ export const CodeboxLiveProvider: FC<{
     async (template: IProjectTemplate): Promise<void> => {
       try {
         console.log("CodeboxLiveProvider: creating from template", template);
-        async function getInitialFiles(
-          containerId: string
-        ): Promise<Map<string, string>> {
+        // Post initial project to get server-backed project ID
+        // TODO: since posting without containerId, need to be able to add
+        // container when opening project from list
+        const postProjectResponse = await postProject({
+          type: ProjectType.REACT_TS,
+          title: template.name,
+        });
+        // Callback function to get initial code files from Git
+        async function getInitialFiles(): Promise<Map<string, string>> {
           const provider = await GitFileProvider.create(
-            containerId,
+            postProjectResponse._id,
             template.repository.toString(),
             template.branch
           );
@@ -39,14 +46,16 @@ export const CodeboxLiveProvider: FC<{
           });
           return filesMap;
         }
+        // Create Fluid container
         const results = await createAzureContainer(
           teamsContext!.user!.id,
           getInitialFiles
         );
-        await createOrEditProject({
+        // Update the newly created project with containerId
+        // TODO: need to add retry logic in case this request fails
+        await setProject({
+          _id: postProjectResponse._id,
           containerId: results.containerId,
-          type: ProjectType.REACT_TS,
-          title: template.name,
         });
         results.container.dispose();
         return Promise.resolve();
@@ -54,19 +63,7 @@ export const CodeboxLiveProvider: FC<{
         return Promise.reject(error);
       }
     },
-    [teamsContext, createOrEditProject]
-  );
-
-  const editProject = useCallback(
-    async (project: IProject): Promise<void> => {
-      await createOrEditProject({
-        containerId: project.containerId,
-        title: project.title,
-        type: project.type,
-      });
-      return Promise.resolve();
-    },
-    [createOrEditProject]
+    [teamsContext, postProject, setProject]
   );
 
   return (
@@ -79,7 +76,7 @@ export const CodeboxLiveProvider: FC<{
         loading,
         error,
         createProject,
-        editProject,
+        setProject,
       }}
     >
       {children}

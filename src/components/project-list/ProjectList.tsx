@@ -74,7 +74,7 @@ export const ProjectList: FC<IProjectListProps> = ({
         >
           {userProjects.map((project) => {
             return (
-              <div key={project.containerId}>
+              <div key={project._id}>
                 <Card
                   style={{
                     width:

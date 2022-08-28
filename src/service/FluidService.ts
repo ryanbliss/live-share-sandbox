@@ -51,7 +51,7 @@ export class FluidService {
 
   async getTenantInfo(): Promise<IFluidTenantInfo> {
     const url =
-      "https://codebox-live-functions.azurewebsites.net/api/codeboxgetfluidtenantinfo?code=uyuGyJCT3_jTZm6dISMzJSw7bb3kDLFJZ_tB7ms29eESAzFuPhPdmA%3D%3D";
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxgetfluidtenantinfo?code=-2r7wfX8PTJnTANzrX_uL_xOmCH8slUduqehEF_XWgDoAzFuYY3pOQ%3D%3D";
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${this.userId}`,
@@ -65,7 +65,7 @@ export class FluidService {
   }
   async getFluidToken(body: IFluidTokenRequestBody): Promise<IFluidTokenInfo> {
     let url =
-      "https://codebox-live-functions.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=-6r5_0eWFpubsnUVGSOoW3hBj_SNWWBBV3MJufqCtg_kAzFuwd-c8w%3D%3D";
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=t5XKUSQTfdAOPwUyaVwhIq7JukmNU02NqPvZD0sV3D3vAzFuN26gWQ%3D%3D";
     if (body.containerId) {
       url += `&documentId=${body.containerId}`;
     }
@@ -121,7 +121,7 @@ export class FluidService {
   }
   async getNtpTime(): Promise<INtpTimeInfo> {
     const url =
-      "https://codebox-live-functions.azurewebsites.net/api/codeboxgetnpttime?code=idCRKz9a5Gk5bvsAxzTcWPVkhnEv3ZOZJFwr3ydL8CVIAzFugZl39g%3D%3D";
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxgetnpttime?code=sOuwBFOeDqiH5O19Yo7h4ril_tTz1LtoxgJK5yfGrUw_AzFuD0kpQw%3D%3D";
     const response = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${this.userId}`,

@@ -18,7 +18,7 @@ export enum ProjectFrameworkType {
 
 export interface IProject {
   _id: string;
-  containerId: string;
+  containerId?: string;
   title: string;
   type: ProjectType;
   createdAt: string;
@@ -27,7 +27,6 @@ export interface IProject {
 }
 
 export interface IPostProject {
-  containerId: string;
   title: string;
   type: ProjectType;
 }
