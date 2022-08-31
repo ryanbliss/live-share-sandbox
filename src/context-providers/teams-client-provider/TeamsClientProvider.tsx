@@ -1,18 +1,32 @@
 import {
+  createContext,
   Dispatch,
   FC,
   ReactNode,
   SetStateAction,
+  useContext,
   useEffect,
   useState,
 } from "react";
 import { app } from "@microsoft/teams-js";
-import { LoadableWrapper } from "../../../components/view-wrappers";
-import { TeamsClientContext } from "../internals";
-import { useTeamsAppContext } from "../internals/data";
-import { inTeams } from "../../../utils";
+import { LoadableWrapper } from "../../components/view-wrappers";
+import { inTeams } from "../../utils";
 import { Theme } from "@fluentui/react-components";
+import { ITeamsClientContext } from "../../models";
+import { useTeamsAppContext } from "./internals";
 
+// Teams Context
+export const TeamsClientContext = createContext<ITeamsClientContext>(
+  {} as ITeamsClientContext
+);
+
+// React useContext
+export const useTeamsClientContext = (): ITeamsClientContext => {
+  const context = useContext(TeamsClientContext);
+  return context;
+};
+
+// React Context Provider
 export const TeamsClientProvider: FC<{
   children: ReactNode;
   setTheme: Dispatch<SetStateAction<Theme>>;
@@ -33,7 +47,9 @@ export const TeamsClientProvider: FC<{
         for (let a = 0; a < 10; a++) {
           for (let b = 0; b < 10; b++) {
             for (let c = 0; c < 10; c++) {
-              allSandpackUrls.push(`https://${a}-${b}-${c}-sandpack.codesandbox.io`)
+              allSandpackUrls.push(
+                `https://${a}-${b}-${c}-sandpack.codesandbox.io`
+              );
             }
           }
         }

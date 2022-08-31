@@ -1,13 +1,25 @@
-import { FC, ReactNode, useCallback } from "react";
-import { LoadableWrapper } from "../../../components/view-wrappers";
-import { useTeamsClientContext } from "../../teams-client-provider";
+import { createContext, FC, ReactNode, useCallback, useContext } from "react";
+import { LoadableWrapper } from "../../components/view-wrappers";
+import { ILiveShareContext } from "../../models";
+import { useTeamsClientContext } from "../teams-client-provider";
 import {
-  LiveShareContext,
   useFollowModeState,
   useLiveShareContainer,
   usePresence,
-} from "../internals";
+} from "./internals";
 
+// React Context
+const LiveShareContext = createContext<Partial<ILiveShareContext>>(
+  {} as Partial<ILiveShareContext>
+);
+
+// React useContext
+export const useLiveShareContext = (): Partial<ILiveShareContext> => {
+  const context = useContext(LiveShareContext);
+  return context;
+};
+
+// React Context Provider
 export const LiveShareProvider: FC<{
   children: ReactNode;
 }> = ({ children }) => {

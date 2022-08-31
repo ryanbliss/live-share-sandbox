@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { useLiveShareContext } from "../../../../live-share-provider";
+import { useLiveShareContext } from "../../../live-share-provider";
 
 export function useCurrentCodePage(): {
   currentPageKey: string | undefined;

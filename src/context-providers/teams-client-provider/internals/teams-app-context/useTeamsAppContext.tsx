@@ -6,7 +6,7 @@ import {
 } from "@fluentui/react-components";
 import { app, HostClientType, FrameContexts } from "@microsoft/teams-js";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { inTeams } from "../../../../../utils";
+import { inTeams } from "../../../../utils";
 
 const LOCAL_STORAGE_KEY = "codebox-live-user-id";
 

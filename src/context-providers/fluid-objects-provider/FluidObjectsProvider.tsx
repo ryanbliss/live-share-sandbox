@@ -1,15 +1,33 @@
 import { SandpackFiles } from "@codesandbox/sandpack-react";
-import { FC, ReactNode, useMemo, useRef } from "react";
-import { LoadableWrapper } from "../../../components/view-wrappers";
-import { CodeFilesHelper } from "../../../models";
-import { useTeamsClientContext } from "../../teams-client-provider";
 import {
-  FluidObjectsContext,
+  createContext,
+  FC,
+  ReactNode,
+  useContext,
+  useMemo,
+  useRef,
+} from "react";
+import { LoadableWrapper } from "../../components/view-wrappers";
+import { CodeFilesHelper, IFluidObjectsContext } from "../../models";
+import { useTeamsClientContext } from "../teams-client-provider";
+import {
   useCodePages,
   useCurrentCodePage,
   useFluidContainerResults,
-} from "../internals";
+} from "./internals";
 
+// React Context
+const FluidObjectsContext = createContext<IFluidObjectsContext>(
+  {} as IFluidObjectsContext
+);
+
+// React useContext
+export const useFluidObjectsContext = (): IFluidObjectsContext => {
+  const context = useContext(FluidObjectsContext);
+  return context;
+};
+
+// React Context Provider
 export const FluidObjectsProvider: FC<{
   children: ReactNode;
 }> = ({ children }) => {

@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   IFollowModeStateContext,
   IFollowModeStateValue,
-} from "../../../../../models";
-import { useStateRef } from "../../../../../hooks";
+} from "../../../../models";
+import { useStateRef } from "../../../../hooks";
 
 // Follow mode allows a user to force other users to move to the page that they
 // are looking at. Only meeting presenters and organizers have the privilege

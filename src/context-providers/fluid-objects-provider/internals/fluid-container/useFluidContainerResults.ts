@@ -4,11 +4,11 @@
  */
 import { IFluidContainer, SharedMap } from "fluid-framework";
 import { useEffect, useRef, useState } from "react";
-import { IFluidContainerResults } from "../../../../../models";
+import { IFluidContainerResults } from "../../../../models";
 import { useParams } from "react-router-dom";
-import { getAzureContainer } from "../../../../../utils";
-import { useTeamsClientContext } from "../../../../teams-client-provider";
-import { useCodeboxLiveProjects } from "../../../../codebox-live-provider/internals";
+import { getAzureContainer } from "../../../../utils";
+import { useTeamsClientContext } from "../../../teams-client-provider";
+import { useCodeboxLiveProjects } from "../../../codebox-live-provider/internals";
 
 /**
  * @hidden

@@ -1,2 +1,1 @@
-export * from "./provider/LiveShareProvider";
-export * from "./use-context/useLiveShareContext";
+export * from "./LiveShareProvider";

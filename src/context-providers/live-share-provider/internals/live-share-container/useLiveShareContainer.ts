@@ -3,11 +3,14 @@
  * Licensed under the MIT License.
  */
 
-import { EphemeralState, TeamsFluidClient, EphemeralEvent, EphemeralPresence } from "@microsoft/live-share";
-import { EphemeralMediaSession } from "@microsoft/live-share-media";
 import {
-  AzureConnectionConfig,
-} from "@fluidframework/azure-client";
+  EphemeralState,
+  TeamsFluidClient,
+  EphemeralEvent,
+  EphemeralPresence,
+} from "@microsoft/live-share";
+import { EphemeralMediaSession } from "@microsoft/live-share-media";
+import { AzureConnectionConfig } from "@fluidframework/azure-client";
 import { InsecureTokenProvider } from "@fluidframework/test-client-utils";
 import {
   ContainerSchema,
@@ -17,8 +20,11 @@ import {
 } from "fluid-framework";
 import { SharedString } from "@fluidframework/sequence";
 import { useEffect, useRef, useState } from "react";
-import { IFollowModeStateValue, ILiveShareContainerResults } from "../../../../../models";
-import { inTeams } from "../../../../../utils/inTeams";
+import {
+  IFollowModeStateValue,
+  ILiveShareContainerResults,
+} from "../../../../models";
+import { inTeams } from "../../../../utils/inTeams";
 
 /**
  * @hidden
@@ -78,7 +84,10 @@ export function useLiveShareContainer(): ILiveShareContainerResults {
     // Define container callback (optional).
     // * This is only called once when the container is first created.
     const onFirstInitialize = (container: IFluidContainer) => {
-      console.log("useSharedObjects: onFirstInitialize called", container.connectionState);
+      console.log(
+        "useSharedObjects: onFirstInitialize called",
+        container.connectionState
+      );
       userDidCreateContainerRef.current = true;
       // Setup any initial state here
     };
@@ -124,8 +133,12 @@ export function useLiveShareContainer(): ILiveShareContainerResults {
     loading: !container,
     error,
     container,
-    sandpackObjectsMap: initialObjects?.sandpackObjectsMap as SharedMap | undefined,
-    followModeState: initialObjects?.followModeState as EphemeralState<IFollowModeStateValue> | undefined,
+    sandpackObjectsMap: initialObjects?.sandpackObjectsMap as
+      | SharedMap
+      | undefined,
+    followModeState: initialObjects?.followModeState as
+      | EphemeralState<IFollowModeStateValue>
+      | undefined,
     presence: initialObjects?.presence as EphemeralPresence | undefined,
     userDidCreateContainerRef,
   };

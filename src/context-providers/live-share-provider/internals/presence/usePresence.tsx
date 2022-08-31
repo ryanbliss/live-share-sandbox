@@ -5,9 +5,9 @@ import {
   PresenceState,
   UserMeetingRole,
 } from "@microsoft/live-share";
-import { useStateRef } from "../../../../../hooks";
+import { useStateRef } from "../../../../hooks";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { IPresenceContext, IUser, ICursor } from "../../../../../models";
+import { IPresenceContext, IUser, ICursor } from "../../../../models";
 
 export const usePresence = (
   presence: EphemeralPresence | undefined,

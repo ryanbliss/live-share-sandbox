@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
 import { IFluidContainer, SharedMap, SharedString } from "fluid-framework";
-import { useStateRef } from "../../../../../hooks";
-import { buildEmptyReactComponent } from "../../../../../sandpack-templates";
-import { ICodePagesContext } from "../../../../../models";
+import { useStateRef } from "../../../../hooks";
+import { buildEmptyReactComponent } from "../../../../sandpack-templates";
+import { ICodePagesContext } from "../../../../models";
 
 export function useCodePages(
   codePagesMap: SharedMap | undefined,

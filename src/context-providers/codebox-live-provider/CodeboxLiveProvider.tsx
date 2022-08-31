@@ -1,10 +1,26 @@
-import { FC, ReactNode, useCallback } from "react";
-import { IProjectTemplate, ProjectType } from "../../../models";
-import { createAzureContainer } from "../../../utils";
-import { GitFileProvider } from "../../../utils/GitFileProvider";
-import { useTeamsClientContext } from "../../teams-client-provider";
-import { CodeboxLiveContext, useCodeboxLiveProjects } from "../internals";
+import { createContext, FC, ReactNode, useCallback, useContext } from "react";
+import {
+  ICodeboxLiveContext,
+  IProjectTemplate,
+  ProjectType,
+} from "../../models";
+import { createAzureContainer } from "../../utils";
+import { GitFileProvider } from "../../utils/GitFileProvider";
+import { useTeamsClientContext } from "../teams-client-provider";
+import { useCodeboxLiveProjects } from "./internals";
 
+// React Context
+const CodeboxLiveContext = createContext<ICodeboxLiveContext>(
+  {} as ICodeboxLiveContext
+);
+
+// React useContext
+export const useCodeboxLiveContext = (): ICodeboxLiveContext => {
+  const context = useContext(CodeboxLiveContext);
+  return context;
+};
+
+// React Context Provider
 export const CodeboxLiveProvider: FC<{
   children: ReactNode;
 }> = ({ children }) => {

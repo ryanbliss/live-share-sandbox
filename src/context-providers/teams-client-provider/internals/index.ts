@@ -1,1 +1,1 @@
-export * from "./context/TeamsClientContext";
+export * from "./teams-app-context/useTeamsAppContext";
