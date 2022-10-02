@@ -6,11 +6,11 @@ import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { SandpackFile, useSandpack } from "@codesandbox/sandpack-react";
 import { MonacoPackageLoader } from "./package-loader/MonacoPackageLoader";
 import { LiveSharePackages } from "./package-loader/packages/LiveSharePackages";
-import { useStateRef } from "../";
+import { useStateRef } from "../../../../../hooks";
 import { useMonacoPresenceCursors } from "./presence-cursors/useMonacoPresenceCursors";
-import { useFluidObjectsContext } from "../../context-providers";
+import { useFluidObjectsContext } from "../../../../../context-providers";
 
-export const useMonacoFluidAdapterHook = (
+export const useMonacoFluidAdapter = (
   divElementId: string,
   theme: "vs-dark" | "light"
 ) => {

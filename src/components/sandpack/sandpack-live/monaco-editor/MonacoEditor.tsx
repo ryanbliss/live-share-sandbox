@@ -1,5 +1,5 @@
 import { FC, useEffect } from "react";
-import { useMonacoFluidAdapterHook } from "../../../../hooks";
+import { useMonacoFluidAdapter } from "./adapter";
 
 interface IMonacoEditorProps {
   language: "javascript" | "typescript" | "html" | "css";
@@ -10,7 +10,7 @@ interface IMonacoEditorProps {
 export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
   // Set up the Monaco editor and apply/post changes
   // to/from SharedString
-  useMonacoFluidAdapterHook("container", props.theme);
+  useMonacoFluidAdapter("container", props.theme);
 
   useEffect(() => {
     return () => {

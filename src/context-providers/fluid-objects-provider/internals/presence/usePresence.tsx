@@ -94,7 +94,8 @@ export const usePresence = (
 
   // Effect which registers SharedPresence event listeners before joining space
   useEffect(() => {
-    if (!presence || presence.isStarted || !context || !initialPageKey) return;
+    if (!presence || presence.isInitialized || !context || !initialPageKey)
+      return;
     console.info("usePresence: starting presence");
     const onPresenceChanged = (
       userPresence: EphemeralPresenceUser,
@@ -161,7 +162,7 @@ export const usePresence = (
 
     // Start listening for presence changes
     presence
-      .start(context?.user?.id, {
+      .initialize(context?.user?.id, {
         name,
         currentPageKey: initialPageKey,
       })

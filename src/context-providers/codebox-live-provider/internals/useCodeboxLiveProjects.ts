@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import { useParams } from "react-router-dom";
-import { useStateRef } from "../../../../hooks";
+import { useStateRef } from "../../../hooks";
 import {
   IPostProject,
   IProject,
@@ -15,9 +15,9 @@ import {
   ProjectFrameworkType,
   ProjectLanguageType,
   ProjectType,
-} from "../../../../models";
-import { ProjectsService } from "../../../../service";
-import { useTeamsClientContext } from "../../../teams-client-provider";
+} from "../../../models";
+import { ProjectsService } from "../../../service";
+import { useTeamsClientContext } from "../../teams-client-provider";
 
 // TODO: move to server provided value
 const PROJECT_TEMPLATES: IProjectTemplate[] = [

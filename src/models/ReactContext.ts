@@ -14,6 +14,9 @@ export interface IFluidContainerResults {
   error: Error | undefined;
   container: IFluidContainer | undefined;
   codePagesMap: SharedMap | undefined;
+  sandpackObjectsMap: SharedMap | undefined;
+  followModeState: EphemeralState<IFollowModeStateValue> | undefined;
+  presence: EphemeralPresence | undefined;
 }
 
 export interface ICodePagesContext {
@@ -24,7 +27,9 @@ export interface ICodePagesContext {
 
 export interface IFluidObjectsContext
   extends IFluidContainerResults,
-    ICodePagesContext {
+    ICodePagesContext,
+    IFollowModeStateContext,
+    IPresenceContext {
   teamsContext: app.Context | undefined;
   mappedSandpackFiles: SandpackFiles;
   codeFilesHelper: CodeFilesHelper;
@@ -34,16 +39,6 @@ export interface IFluidObjectsContext
 }
 
 // Live Share
-
-export interface ILiveShareContainerResults {
-  loading: boolean;
-  error: Error | undefined;
-  container: IFluidContainer | undefined;
-  sandpackObjectsMap: SharedMap | undefined;
-  followModeState: EphemeralState<IFollowModeStateValue> | undefined;
-  presence: EphemeralPresence | undefined;
-  userDidCreateContainerRef: MutableRefObject<boolean> | undefined;
-}
 
 export interface IFollowModeStateContext {
   followModeStateStarted: boolean;
@@ -62,14 +57,6 @@ export interface IPresenceContext {
   currentPageKey: string | undefined;
   onChangeCurrentPageKey: (currentPageKey: string | undefined) => void;
   onChangeCursor: (cursor: ICursor) => void;
-}
-
-export interface ILiveShareContext
-  extends ILiveShareContainerResults,
-    IFollowModeStateContext,
-    IPresenceContext {
-  teamsContext: app.Context | undefined;
-  onChangeSelectedFile: (fileName: string | undefined) => void;
 }
 
 // Teams Client Context

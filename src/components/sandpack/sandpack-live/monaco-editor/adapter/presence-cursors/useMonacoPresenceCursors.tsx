@@ -1,11 +1,8 @@
 import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { MutableRefObject, useCallback, useEffect, useRef } from "react";
-import {
-  useFluidObjectsContext,
-  useLiveShareContext,
-} from "../../../context-providers";
-import { Cursor, ISelection } from "../../../models";
-import { getRandomCursorColor } from "../../../utils";
+import { useFluidObjectsContext } from "../../../../../../context-providers";
+import { Cursor, ISelection } from "../../../../../../models";
+import { getRandomCursorColor } from "./internals";
 
 export const useMonacoPresenceCursors = (
   editor: Monaco.editor.IStandaloneCodeEditor | undefined,
@@ -18,8 +15,8 @@ export const useMonacoPresenceCursors = (
   ) => void;
   onDidRemoveText: (startPos: number, endPos: number, pageKey: string) => void;
 } => {
-  const { currentPageKey } = useFluidObjectsContext();
-  const { otherUsers, localUserRef, onChangeCursor } = useLiveShareContext();
+  const { currentPageKey, otherUsers, localUserRef, onChangeCursor } =
+    useFluidObjectsContext();
   const startedRef = useRef(false);
   const cursorsRef = useRef<Cursor[]>([]);
 
@@ -185,7 +182,7 @@ export const useMonacoPresenceCursors = (
         start: model!.getOffsetAt(firstPosition),
         end: model!.getOffsetAt(lastPosition),
       };
-      onChangeCursor?.({
+      onChangeCursor({
         selection: cursorSelection,
         color: localUserRef?.current?.cursor?.color ?? getRandomCursorColor(),
       });
