@@ -36,7 +36,7 @@ export function useFollowModeState(
   }, [followModeState]);
 
   useEffect(() => {
-    if (!followModeState || followModeState.isStarted) return;
+    if (!followModeState || followModeState.isInitialized) return;
     const onStateChanged = (
       state: string,
       value: IFollowModeStateValue | undefined
@@ -56,7 +56,7 @@ export function useFollowModeState(
       UserMeetingRole.presenter,
     ];
     followModeState
-      .start(allowedRoles)
+      .initialize(allowedRoles)
       .then(() => {
         setStarted(true);
       })

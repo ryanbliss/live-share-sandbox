@@ -4,11 +4,15 @@
  */
 import { IFluidContainer, SharedMap } from "fluid-framework";
 import { useEffect, useRef, useState } from "react";
-import { IFluidContainerResults } from "../../../../models";
+import {
+  IFluidContainerResults,
+  IFollowModeStateValue,
+} from "../../../../models";
 import { useParams } from "react-router-dom";
 import { getAzureContainer } from "../../../../utils";
 import { useTeamsClientContext } from "../../../teams-client-provider";
 import { useCodeboxLiveProjects } from "../../../codebox-live-provider/internals";
+import { EphemeralPresence, EphemeralState } from "@microsoft/live-share";
 
 /**
  * @hidden
@@ -56,10 +60,7 @@ export function useFluidContainerResults(): IFluidContainerResults {
             "useFluidContainerResults getting container id",
             currentProject.containerId
           );
-          const results = await getAzureContainer(
-            teamsUserId,
-            currentProject.containerId!
-          );
+          const results = await getAzureContainer(teamsUserId, currentProject);
           console.log("useFluidContainerResults joined container");
           setResults(results);
         } else {
@@ -87,5 +88,12 @@ export function useFluidContainerResults(): IFluidContainerResults {
     error,
     container,
     codePagesMap: initialObjects?.codePagesMap as SharedMap | undefined,
+    sandpackObjectsMap: initialObjects?.sandpackObjectsMap as
+      | SharedMap
+      | undefined,
+    followModeState: initialObjects?.followModeState as
+      | EphemeralState<IFollowModeStateValue>
+      | undefined,
+    presence: initialObjects?.presence as EphemeralPresence | undefined,
   };
 }

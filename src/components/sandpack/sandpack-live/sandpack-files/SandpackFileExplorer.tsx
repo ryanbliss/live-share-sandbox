@@ -9,7 +9,6 @@ import {
 } from "@fluentui/react-icons";
 import {
   useFluidObjectsContext,
-  useLiveShareContext,
   useTeamsClientContext,
 } from "../../../../context-providers";
 import { useNavigate } from "react-router-dom";
@@ -17,10 +16,15 @@ import { inTeams } from "../../../../utils";
 import { FrameContexts } from "@microsoft/teams-js";
 
 export const SandpackFileExplorer: FC = () => {
-  const { currentPageKey, codeFiles, onAddPage, onChangeSelectedFile } =
-    useFluidObjectsContext();
-  const { followingUserId, onInitiateFollowMode, onEndFollowMode } =
-    useLiveShareContext();
+  const {
+    currentPageKey,
+    codeFiles,
+    onAddPage,
+    onChangeSelectedFile,
+    followingUserId,
+    onInitiateFollowMode,
+    onEndFollowMode,
+  } = useFluidObjectsContext();
   const { teamsContext } = useTeamsClientContext();
   const navigate = useNavigate();
   const fileNames = [...codeFiles.keys()];
@@ -51,7 +55,7 @@ export const SandpackFileExplorer: FC = () => {
           <TabList
             selectedValue={currentPageKey || "App.tsx"}
             onTabSelect={(event, data) => {
-              onChangeSelectedFile?.(data.value as string);
+              onChangeSelectedFile(data.value as string);
             }}
           >
             {fileNames.map((fileName) => (
@@ -63,23 +67,19 @@ export const SandpackFileExplorer: FC = () => {
         </FlexColumn>
       </FlexRow>
       <FlexRow vAlign="start">
-        {teamsContext?.page?.frameContext === FrameContexts.meetingStage && (
-          <>
-            {followModeActive && (
-              <Button
-                icon={<ShareScreenStop24Filled />}
-                appearance="subtle"
-                onClick={onEndFollowMode}
-              />
-            )}
-            {!followModeActive && (
-              <Button
-                icon={<ShareScreenStart24Filled />}
-                appearance="subtle"
-                onClick={onInitiateFollowMode}
-              />
-            )}
-          </>
+        {followModeActive && (
+          <Button
+            icon={<ShareScreenStop24Filled />}
+            appearance="subtle"
+            onClick={onEndFollowMode}
+          />
+        )}
+        {!followModeActive && (
+          <Button
+            icon={<ShareScreenStart24Filled />}
+            appearance="subtle"
+            onClick={onInitiateFollowMode}
+          />
         )}
         <TextInputPopover title="File name" onDone={onAddPage} />
       </FlexRow>

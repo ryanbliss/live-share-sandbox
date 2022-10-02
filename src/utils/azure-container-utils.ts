@@ -9,11 +9,20 @@ import {
   ITokenResponse,
 } from "@fluidframework/routerlicious-driver";
 import {
+  EphemeralEvent,
+  EphemeralPresence,
+  EphemeralState,
+  ITimestampProvider,
+} from "@microsoft/live-share";
+import {
   ContainerSchema,
   IFluidContainer,
   SharedMap,
   SharedString,
 } from "fluid-framework";
+import { IFollowModeStateValue, IProject } from "../models";
+import { FluidService, ProjectsService } from "../service";
+import { SharedClock } from "./internals";
 
 /**
  * Token Provider implementation for connecting to an Azure Function endpoint for
@@ -119,6 +128,9 @@ function getContainerSchema(): ContainerSchema {
   const schema: ContainerSchema = {
     initialObjects: {
       codePagesMap: SharedMap,
+      sandpackObjectsMap: SharedMap,
+      followModeState: EphemeralState<IFollowModeStateValue | undefined>,
+      presence: EphemeralPresence,
     },
     dynamicObjectTypes: [SharedMap, SharedString],
   };
@@ -190,9 +202,10 @@ export async function createAzureContainer(
   });
 }
 
+let startedSharedClock = false;
 export async function getAzureContainer(
   userId: string,
-  containerId: string
+  currentProject: IProject
 ): Promise<
   | {
       container: IFluidContainer;
@@ -201,15 +214,39 @@ export async function getAzureContainer(
     }
   | undefined
 > {
-  const connection = getConnection(userId);
+  if (!currentProject.containerId) {
+    return Promise.reject(
+      new Error(
+        "getAzureContainer: cannot call this method with project with undefined containerId"
+      )
+    );
+  }
 
+  if (!startedSharedClock) {
+    // Prepare the Fluid container to use Live Share APIs
+    startedSharedClock = true;
+    const projectService = new ProjectsService();
+    await projectService.authorize(userId);
+    const fluidService = new FluidService(
+      userId,
+      currentProject!,
+      projectService
+    );
+    // Set the SharedClock
+    const sharedClock = new SharedClock(fluidService.getNtpTime);
+    EphemeralEvent.setTimestampProvider(sharedClock);
+    await sharedClock.start();
+  }
+  // Setup AzureClient
+  const connection = getConnection(userId);
   const client = new AzureClient({
     connection,
   });
+  // Get the container
   const schema = getContainerSchema();
-  const results = await client.getContainer(containerId, schema);
+  const results = await client.getContainer(currentProject.containerId, schema);
   return Promise.resolve({
     ...results,
-    created: true,
+    created: false,
   });
 }
