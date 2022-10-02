@@ -5,9 +5,8 @@ import {
   ProjectType,
 } from "../../models";
 import { createAzureContainer } from "../../utils";
-import { GitFileProvider } from "../../utils/GitFileProvider";
 import { useTeamsClientContext } from "../teams-client-provider";
-import { useCodeboxLiveProjects } from "./internals";
+import { useCodeboxLiveProjects, GitFileProvider } from "./internals";
 
 // React Context
 const CodeboxLiveContext = createContext<ICodeboxLiveContext>(

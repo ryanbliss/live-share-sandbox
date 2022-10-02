@@ -5,7 +5,7 @@ import {
   useLiveShareContext,
 } from "../../../context-providers";
 import { Cursor, ISelection } from "../../../models";
-import { getRandomCursorColor } from "../../../utils";
+import { getRandomCursorColor } from "./internals";
 
 export const useMonacoPresenceCursors = (
   editor: Monaco.editor.IStandaloneCodeEditor | undefined,

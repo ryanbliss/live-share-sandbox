@@ -1,4 +1,4 @@
-import { CursorColorType } from "../models";
+import { CursorColorType } from "../../../../models";
 
 export function getRandomCursorColor(): CursorColorType {
   const colors = Object.keys(CursorColorType).filter((item) => {
