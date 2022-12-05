@@ -1,9 +1,10 @@
+import { IFluidTenantInfo } from "@codeboxlive/hub-interfaces";
 import {
   AzureClient,
   AzureConnectionConfig,
   AzureRemoteConnectionConfig,
 } from "@fluidframework/azure-client";
-
+import axios from "axios";
 import {
   ITokenProvider,
   ITokenResponse,
@@ -88,10 +89,39 @@ class AzureTokenProvider implements ITokenProvider {
   }
 }
 
-function getConnection(userId: string): AzureConnectionConfig {
+function isTenantInfo(value: any): value is IFluidTenantInfo {
+  return [
+    typeof value?.tenantId === undefined || typeof value?.tenantId === "string",
+    value?.type === "remote" || value?.type === "local",
+    typeof value?.serviceEndpoint === "string",
+  ].every((isTrue) => isTrue);
+}
+
+async function getTenantInfo(userId: string): Promise<IFluidTenantInfo> {
+  const url =
+    "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxgetfluidtenantinfo?code=-2r7wfX8PTJnTANzrX_uL_xOmCH8slUduqehEF_XWgDoAzFuYY3pOQ%3D%3D";
+  const response = await axios.get(url, {
+    headers: {
+      Authorization: `Bearer ${userId}`,
+    },
+  });
+  const tenantInfo = response.data.data;
+  if (isTenantInfo(tenantInfo)) {
+    return tenantInfo;
+  }
+  throw Error("azure-container-utils.getTenantInfo: invalid response");
+}
+
+async function getConnection(userId: string): Promise<AzureConnectionConfig> {
+  const tenantInfo = await getTenantInfo(userId);
+  if (!tenantInfo?.tenantId) {
+    throw Error(
+      "azure-container-utils.getConnection: no tenantId found in response"
+    );
+  }
   const connection: AzureRemoteConnectionConfig = {
     type: "remote",
-    tenantId: "7515b032-fde3-47f5-a7df-af436c5a8d5f",
+    tenantId: tenantInfo.tenantId,
     tokenProvider: new AzureTokenProvider(
       "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=t5XKUSQTfdAOPwUyaVwhIq7JukmNU02NqPvZD0sV3D3vAzFuN26gWQ%3D%3D",
       {
@@ -99,28 +129,8 @@ function getConnection(userId: string): AzureConnectionConfig {
         userName: "Test",
       }
     ),
-    endpoint: "https://us.fluidrelay.azure.com",
+    endpoint: tenantInfo.serviceEndpoint,
   };
-  // West Europe
-  // const connection: AzureRemoteConnectionConfig = {
-  //   type: "remote",
-  //   tenantId: "d6459b2a-61bc-474b-a43f-9faa6c1419d2",
-  //   tokenProvider: new AzureTokenProvider(
-  //     "https://codebox-live-functions.azurewebsites.net/api/codeboxfluidrelaytokenprovider?code=-6r5_0eWFpubsnUVGSOoW3hBj_SNWWBBV3MJufqCtg_kAzFuwd-c8w%3D%3D",
-  //     {
-  //       id: "123",
-  //     }
-  //   ),
-  //   endpoint: "https://eu.fluidrelay.azure.com",
-  // };
-  // Local
-  // const connection = {
-  //   tenantId: "local",
-  //   tokenProvider: new InsecureTokenProvider("", {
-  //     id: "123",
-  //   }),
-  //   endpoint: "http://localhost:7070",
-  // };
   return connection;
 }
 
@@ -146,7 +156,7 @@ export async function createAzureContainer(
   services: any;
   created: boolean;
 }> {
-  const connection = getConnection(userId);
+  const connection = await getConnection(userId);
   // Define container callback (optional).
   // * This is only called once when the container is first created.
   const onFirstInitialize = async (
@@ -238,7 +248,7 @@ export async function getAzureContainer(
     await sharedClock.start();
   }
   // Setup AzureClient
-  const connection = getConnection(userId);
+  const connection = await getConnection(userId);
   const client = new AzureClient({
     connection,
   });
