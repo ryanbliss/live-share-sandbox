@@ -76,4 +76,5 @@ export interface ICodeboxLiveContext {
   error: Error | undefined;
   createProject: (template: IProjectTemplate) => Promise<void>;
   setProject: (projectData: ISetProject) => Promise<IProject>;
+  deleteProject: (project: IProject) => Promise<void>;
 }

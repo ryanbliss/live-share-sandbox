@@ -6,7 +6,7 @@ import {
   useCodeboxLiveContext,
   useTeamsClientContext,
 } from "../../context-providers";
-import { ClipboardCode24Regular } from "@fluentui/react-icons";
+import { ClipboardCode24Regular, Delete24Regular } from "@fluentui/react-icons";
 import { IProject } from "../../models";
 import { FlexColumn, FlexItem, FlexRow } from "../flex";
 import { LoadableWrapper } from "../view-wrappers";
@@ -20,8 +20,14 @@ export const ProjectList: FC<IProjectListProps> = ({
   selectText,
   onSelectProject,
 }) => {
-  const { userProjects, projectTemplates, loading, error, createProject } =
-    useCodeboxLiveContext();
+  const {
+    userProjects,
+    projectTemplates,
+    loading,
+    error,
+    createProject,
+    deleteProject,
+  } = useCodeboxLiveContext();
   const { teamsContext } = useTeamsClientContext();
 
   return (
@@ -93,7 +99,7 @@ export const ProjectList: FC<IProjectListProps> = ({
                   <FlexRow>
                     <Title2 align="start">{project.title}</Title2>
                   </FlexRow>
-                  <FlexRow>
+                  <FlexRow spaceBetween>
                     <Button
                       onClick={() => {
                         console.log(
@@ -105,6 +111,13 @@ export const ProjectList: FC<IProjectListProps> = ({
                     >
                       {selectText}
                     </Button>
+                    <Button
+                      appearance="subtle"
+                      icon={<Delete24Regular />}
+                      onClick={() => {
+                        deleteProject(project);
+                      }}
+                    />
                   </FlexRow>
                 </Card>
               </div>

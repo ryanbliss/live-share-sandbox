@@ -125,4 +125,19 @@ export class ProjectsService {
     }
     throw Error("ProjectService.setProject: invalid response");
   }
+  async deleteProject(project: IProject): Promise<void> {
+    const url = `https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxdeleteproject?code=UgZo4fr2zzoXdUBjXgBTkeFcAAdPwue7FNP6FU9hVZh7AzFuIkwU3Q%3D%3D`;
+    await axios.post(
+      url,
+      {
+        projectId: project._id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.userId}`,
+        },
+      }
+    );
+    return Promise.resolve();
+  }
 }

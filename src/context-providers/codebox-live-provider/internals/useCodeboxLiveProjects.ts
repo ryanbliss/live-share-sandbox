@@ -74,6 +74,7 @@ export function useCodeboxLiveProjects(): {
   error: Error | undefined;
   postProject: (projectData: IPostProject) => Promise<IProject>;
   setProject: (projectData: ISetProject) => Promise<IProject>;
+  deleteProject: (project: IProject) => Promise<void>;
 } {
   const params = useParams();
   const clientRef = useRef(new ProjectsService());
@@ -136,6 +137,18 @@ export function useCodeboxLiveProjects(): {
           new Error("useCodeboxLiveClient: unable to process request")
         );
       }
+    },
+    []
+  );
+
+  const deleteProject = useCallback(
+    async (project: IProject): Promise<void> => {
+      await clientRef.current.deleteProject(project);
+      setUserProjects([
+        ...userProjectsRef.current.filter(
+          (checkProject) => checkProject._id !== project._id
+        ),
+      ]);
     },
     []
   );
@@ -218,5 +231,6 @@ export function useCodeboxLiveProjects(): {
     error,
     postProject,
     setProject,
+    deleteProject,
   };
 }

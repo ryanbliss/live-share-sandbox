@@ -32,6 +32,7 @@ export const CodeboxLiveProvider: FC<{
     error,
     postProject,
     setProject,
+    deleteProject,
   } = useCodeboxLiveProjects();
   const { teamsContext } = useTeamsClientContext();
 
@@ -92,6 +93,7 @@ export const CodeboxLiveProvider: FC<{
         error,
         createProject,
         setProject,
+        deleteProject,
       }}
     >
       {children}
