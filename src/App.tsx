@@ -1,6 +1,6 @@
 import { FluentProvider, teamsDarkTheme } from "@fluentui/react-components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { SidePanelPage, AppSettingsPage, CodeProjectPage } from "./pages";
+import { ProjectsPage, AppSettingsPage, CodeProjectPage } from "./pages";
 import "./App.css";
 import { TeamsClientProvider } from "./context-providers";
 import { inTeams } from "./utils";
@@ -37,7 +37,7 @@ function App() {
         >
           <Router window={window} basename="/">
             <Routes>
-              <Route path={"/"} element={<SidePanelPage />} />
+              <Route path={"/"} element={<ProjectsPage />} />
               <Route
                 path={"/projects/:projectId"}
                 element={<CodeProjectPage />}

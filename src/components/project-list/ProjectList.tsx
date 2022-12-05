@@ -12,14 +12,10 @@ import { FlexColumn, FlexItem, FlexRow } from "../flex";
 import { LoadableWrapper } from "../view-wrappers";
 
 interface IProjectListProps {
-  selectText: string;
   onSelectProject: (project: IProject) => void;
 }
 
-export const ProjectList: FC<IProjectListProps> = ({
-  selectText,
-  onSelectProject,
-}) => {
+export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
   const {
     userProjects,
     projectTemplates,
@@ -29,6 +25,10 @@ export const ProjectList: FC<IProjectListProps> = ({
     deleteProject,
   } = useCodeboxLiveContext();
   const { teamsContext } = useTeamsClientContext();
+  const selectText =
+    teamsContext?.page?.frameContext === FrameContexts.sidePanel
+      ? "Code together"
+      : "Open";
 
   return (
     <LoadableWrapper loading={loading} error={error}>

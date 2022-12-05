@@ -10,7 +10,7 @@ import {
 import { ProjectList } from "../../components/project-list/ProjectList";
 import { IProject } from "../../models";
 
-export const SidePanelPage = () => {
+export const ProjectsPage = () => {
   const [error, setError] = useState<Error | undefined>(undefined);
   const navigate = useNavigate();
   const { teamsContext } = useTeamsClientContext();
@@ -37,7 +37,6 @@ export const SidePanelPage = () => {
       <LoadableWrapper loading={false} error={error}>
         <FlexColumn expand="fill" vAlign="center" marginSpacer="small">
           <ProjectList
-            selectText="Code together"
             onSelectProject={(project: IProject) => {
               if (
                 teamsContext?.page?.frameContext === FrameContexts.sidePanel

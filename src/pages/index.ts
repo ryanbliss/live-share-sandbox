@@ -1,3 +1,3 @@
 export * from "./app-settings/AppSettingsPage";
-export * from "./side-panel/SidePanelPage";
+export * from "./projects-page/ProjectsPage";
 export * from "./code-project/CodeProjectPage";
