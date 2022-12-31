@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import { useParams } from "react-router-dom";
+import moment from "moment";
 import { useStateRef } from "../../../hooks";
 import {
   IPostProject,
@@ -76,10 +77,10 @@ export function useCodeboxLiveProjects(): {
       try {
         const project = await clientRef.current.setProject(projectData);
         setUserProjects([
+          project,
           ...userProjectsRef.current.filter(
             (checkProject) => checkProject._id !== project._id
           ),
-          project,
         ]);
         return Promise.resolve(project);
       } catch (err: any) {
@@ -117,7 +118,19 @@ export function useCodeboxLiveProjects(): {
           .then((response) => {
             if (initializedRef.current) {
               loadingRef.current = false;
-              setUserProjects([...response.projects]);
+              const projects = [...response.projects];
+              projects.sort((a, b) => {
+                const isAfter = moment(a.createdAt).isBefore(b.createdAt);
+                if (isAfter) {
+                  return 1;
+                }
+                const isEqual = moment(a.createdAt).isSame(b.createdAt);
+                if (isEqual) {
+                  return 0;
+                }
+                return -1;
+              });
+              setUserProjects(projects);
             }
           })
           .catch((err: any) => {

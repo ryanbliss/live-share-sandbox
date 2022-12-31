@@ -8,7 +8,10 @@ import {
 import { IProject } from "../../models";
 import { FlexColumn, FlexRow } from "../flex";
 import { LoadableWrapper } from "../view-wrappers";
-import { CreateProjectDialog } from "../create-project";
+import {
+  CreateProjectViaGitDialog,
+  CreateProjectViaTemplateDialog,
+} from "../create-project";
 import { ProjectCard } from "./ProjectCard";
 import { ScrollWrapper } from "../scroll-wrapper/ScrollWrapper";
 
@@ -39,7 +42,10 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
             <TabList selectedValue={"created"}>
               <Tab value="created">{"Created"}</Tab>
             </TabList>
-            <CreateProjectDialog />
+            <FlexRow marginSpacer="small">
+              <CreateProjectViaGitDialog />
+              <CreateProjectViaTemplateDialog />
+            </FlexRow>
           </FlexRow>
           <FlexColumn scroll expand="fill" marginSpacer="small">
             {userProjects.map((project) => {

@@ -30,6 +30,7 @@ export const ProjectCard: FC<IProjectCardProps> = ({
       : "Open";
   return (
     <Card
+      appearance="filled"
       style={{
         width: "100%",
         marginBottom: "12px",

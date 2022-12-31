@@ -1,4 +1,8 @@
-import { FluentProvider, teamsDarkTheme } from "@fluentui/react-components";
+import {
+  FluentProvider,
+  teamsDarkTheme,
+  tokens,
+} from "@fluentui/react-components";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ProjectsPage, AppSettingsPage, CodeProjectPage } from "./pages";
 import "./App.css";
@@ -19,7 +23,9 @@ function App() {
         top: "0",
         bottom: "0",
         overflow: "hidden",
-        backgroundColor: inTeams() ? "transparent" : undefined,
+        backgroundColor: inTeams()
+          ? "transparent"
+          : tokens.colorNeutralBackground3,
       }}
     >
       <TeamsClientProvider setTheme={setTheme}>

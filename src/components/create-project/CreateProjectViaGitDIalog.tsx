@@ -14,16 +14,17 @@ import {
 import { useCodeboxLiveContext } from "../../context-providers";
 import {
   FrameworkType,
+  IProjectTemplate,
   IRadioItem,
-  isFrameworkType,
   isLanguageType,
   LanguageType,
 } from "../../models";
-import { FormRadioGroup } from "../form/FormRadioGroup";
+import { FormRadioGroup, FormTextField } from "../form";
 import { FlexColumn } from "../flex";
 import { Alert } from "@fluentui/react-components/unstable";
+import { isUrlValid } from "../../utils";
 
-interface ICreateProjectDialogProps {}
+interface ICreateProjectViaGitDialogProps {}
 
 const LANGUAGE_TYPE_RADIO_ITEMS: IRadioItem[] = [
   {
@@ -59,28 +60,35 @@ const FRAMEWORK_TYPE_RADIO_ITEMS: IRadioItem[] = [
   },
 ];
 
-export const CreateProjectDialog: FC<ICreateProjectDialogProps> = ({}) => {
-  const { createProject, projectTemplates } = useCodeboxLiveContext();
+export const CreateProjectViaGitDialog: FC<
+  ICreateProjectViaGitDialogProps
+> = ({}) => {
+  const { createProject } = useCodeboxLiveContext();
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
+  const [title, setTitle] = useState<string>("");
+  const [gitRemoteUrl, setGitRemoteUrl] = useState<string>("");
+  const [branch, setBranch] = useState<string>("");
   const [language, setLanguage] = useState<LanguageType>(
     LanguageType.typescript
   );
-  const [framework, setFramework] = useState<FrameworkType>(
-    FrameworkType.react
-  );
-  const [preset, setPreset] = useState<string>();
 
   const onCreate = useCallback(async () => {
-    const template = projectTemplates?.find(
-      (checkTemplate) => checkTemplate.gitRemoteUrl === preset
-    );
+    const template: IProjectTemplate = {
+      language,
+      framework: FrameworkType.vanilla,
+      title,
+      description: "",
+      gitRemoteUrl,
+      branch: branch ? branch : undefined,
+    };
     if (template) {
       setLoading(true);
       try {
         console.log(template);
         await createProject(template);
-        // TODO: hide modal
+        setOpen(false);
       } catch (error: any) {
         if (error instanceof Error) {
           setError(error);
@@ -93,7 +101,7 @@ export const CreateProjectDialog: FC<ICreateProjectDialogProps> = ({}) => {
         setLoading(false);
       }
     }
-  }, [createProject, preset]);
+  }, [createProject, title, gitRemoteUrl, language, branch]);
 
   const onChangeLanguage = useCallback((value: string) => {
     if (isLanguageType(value)) {
@@ -101,46 +109,57 @@ export const CreateProjectDialog: FC<ICreateProjectDialogProps> = ({}) => {
     }
   }, []);
 
-  const onChangeFramework = useCallback((value: string) => {
-    if (isFrameworkType(value)) {
-      setFramework(value);
-    }
+  const onChangeTitle = useCallback((value: string) => {
+    setTitle(value);
+  }, []);
+  const onChangeGitRemoteUrl = useCallback((value: string) => {
+    setGitRemoteUrl(value);
+  }, []);
+  const onChangeBranch = useCallback((value: string) => {
+    setBranch(value);
   }, []);
 
-  const onChangePreset = useCallback(
-    (value: string) => {
-      const template = projectTemplates?.find(
-        (checkTemplate) => checkTemplate.gitRemoteUrl === value
-      );
-      if (template) {
-        setPreset(value);
-      }
-    },
-    [projectTemplates]
-  );
-
-  const presetRadioItems: IRadioItem[] | undefined = projectTemplates
-    ?.filter(
-      (template) =>
-        template.language === language && template.framework === framework
-    )
-    .map((template) => ({
-      value: template.gitRemoteUrl,
-      label: template.title,
-    }));
+  const gitUrlValid = gitRemoteUrl && isUrlValid(gitRemoteUrl);
 
   return (
-    <Dialog modalType={loading ? "alert" : "modal"}>
+    <Dialog
+      modalType={loading ? "alert" : "modal"}
+      open={open}
+      onOpenChange={(event, data) => setOpen(data.open)}
+    >
       <DialogTrigger>
-        <Button appearance="primary" size="medium">
-          {"New project"}
+        <Button appearance="subtle" size="medium">
+          {"Git clone"}
         </Button>
       </DialogTrigger>
       <DialogSurface>
         <DialogBody>
-          <DialogTitle>{"New project"}</DialogTitle>
+          <DialogTitle>{"Git clone"}</DialogTitle>
           <DialogContent>
             <FlexColumn marginSpacer="medium">
+              <FormTextField
+                id="title"
+                value={title}
+                label="Title"
+                required
+                placeholder="Enter title text..."
+                onChange={onChangeTitle}
+              />
+              <FormTextField
+                id="git-url"
+                value={gitRemoteUrl}
+                label="Git remote URL"
+                required
+                placeholder="Enter git remote URL..."
+                onChange={onChangeGitRemoteUrl}
+              />
+              <FormTextField
+                id="branch"
+                value={branch}
+                label="Default branch"
+                placeholder="Enter default branch..."
+                onChange={onChangeBranch}
+              />
               <FormRadioGroup
                 id={"language"}
                 title={"Language"}
@@ -150,28 +169,13 @@ export const CreateProjectDialog: FC<ICreateProjectDialogProps> = ({}) => {
                 radioItems={LANGUAGE_TYPE_RADIO_ITEMS}
                 onChange={onChangeLanguage}
               />
-              <FormRadioGroup
-                id={"framework"}
-                title={"Framework"}
-                required
-                disabled={loading}
-                selectedValue={framework}
-                radioItems={FRAMEWORK_TYPE_RADIO_ITEMS}
-                onChange={onChangeFramework}
-              />
-              {presetRadioItems && (
-                <FormRadioGroup
-                  id={"preset"}
-                  title={"Preset"}
-                  required
-                  disabled={loading}
-                  selectedValue={preset}
-                  radioItems={presetRadioItems}
-                  onChange={onChangePreset}
-                />
-              )}
               {loading && (
-                <FlexColumn vAlign="center" hAlign="center">
+                <FlexColumn
+                  vAlign="center"
+                  hAlign="center"
+                  marginSpacer="small"
+                  style={{ minHeight: "5.4rem" }}
+                >
                   <Text>{"Creating project..."}</Text>
                   <Spinner />
                 </FlexColumn>
@@ -191,13 +195,7 @@ export const CreateProjectDialog: FC<ICreateProjectDialogProps> = ({}) => {
             </DialogTrigger>
             <Button
               appearance="primary"
-              disabled={
-                !language ||
-                !framework ||
-                !preset ||
-                !presetRadioItems ||
-                loading
-              }
+              disabled={!language || !title || !gitUrlValid || loading}
               onClick={onCreate}
             >
               {"Create"}

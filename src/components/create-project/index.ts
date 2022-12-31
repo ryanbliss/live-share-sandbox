@@ -1,1 +1,2 @@
-export * from "./CreateProjectDialog";
+export * from "./CreateProjectViaTemplateDialog";
+export * from "./CreateProjectViaGitDIalog";
