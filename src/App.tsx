@@ -3,12 +3,23 @@ import {
   teamsDarkTheme,
   tokens,
 } from "@fluentui/react-components";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ProjectsPage, AppSettingsPage, CodeProjectPage } from "./pages";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import {
+  ProjectsPage,
+  AppSettingsPage,
+  CodeProjectPage,
+  HomePage,
+} from "./pages";
 import "./App.css";
 import { TeamsClientProvider } from "./context-providers";
 import { inTeams } from "./utils";
 import { useState } from "react";
+import { RouteRedirect } from "./components/router";
 
 function App() {
   const [theme, setTheme] = useState(teamsDarkTheme);
@@ -43,11 +54,19 @@ function App() {
         >
           <Router window={window} basename="/">
             <Routes>
-              <Route path={"/"} element={<ProjectsPage />} />
-              <Route
-                path={"/projects/:projectId"}
-                element={<CodeProjectPage />}
-              />
+              <Route path="/" element={<HomePage />}>
+                <Route
+                  path={"/"}
+                  element={
+                    <RouteRedirect pathName="/projects" preserveSearch />
+                  }
+                />
+                <Route path={"/projects"} element={<ProjectsPage />} />
+                <Route
+                  path={"/projects/:projectId"}
+                  element={<CodeProjectPage />}
+                />
+              </Route>
               <Route path={"/app-settings"} element={<AppSettingsPage />} />
             </Routes>
           </Router>

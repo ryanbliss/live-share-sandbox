@@ -1,1 +1,1 @@
-export * from "./sandpack-live/SandpackLive";
+export * from "./CodeProject";

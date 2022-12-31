@@ -1,7 +1,7 @@
 import { Button, Tab, TabList } from "@fluentui/react-components";
 import { FC } from "react";
-import { FlexColumn, FlexRow } from "../../../flex";
-import { TextInputPopover } from "../../../popovers";
+import { FlexColumn, FlexRow } from "../../flex";
+import { TextInputPopover } from "../../popovers";
 import {
   ShareScreenStart24Filled,
   ShareScreenStop24Filled,
@@ -10,12 +10,12 @@ import {
 import {
   useFluidObjectsContext,
   useTeamsClientContext,
-} from "../../../../context-providers";
+} from "../../../context-providers";
 import { useNavigate } from "react-router-dom";
-import { inTeams } from "../../../../utils";
+import { inTeams } from "../../../utils";
 import { FrameContexts } from "@microsoft/teams-js";
 
-export const SandpackFileExplorer: FC = () => {
+export const FileExplorer: FC = () => {
   const {
     currentPageKey,
     codeFiles,

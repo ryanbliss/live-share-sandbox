@@ -1,10 +1,11 @@
-import { FC, useEffect } from "react";
+import { CSSProperties, FC, useEffect } from "react";
 import { useMonacoFluidAdapter } from "./adapter";
 
 interface IMonacoEditorProps {
   language: "javascript" | "typescript" | "html" | "css";
   theme: "vs-dark" | "light";
   editingEnabled: boolean;
+  style?: CSSProperties;
 }
 
 export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
@@ -20,17 +21,7 @@ export const MonacoEditor: FC<IMonacoEditorProps> = (props) => {
 
   // Render the view
   return (
-    <div
-      style={{
-        position: "absolute",
-        right: "50%",
-        top: 0,
-        left: 0,
-        bottom: 0,
-        height: "100%",
-        width: "50%",
-      }}
-    >
+    <div style={props.style}>
       <div id="container" style={{ width: "100%", height: "100%" }} />
     </div>
   );

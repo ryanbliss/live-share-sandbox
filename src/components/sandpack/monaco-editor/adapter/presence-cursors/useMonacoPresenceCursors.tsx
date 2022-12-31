@@ -1,7 +1,7 @@
 import * as Monaco from "monaco-editor/esm/vs/editor/editor.api";
 import { MutableRefObject, useCallback, useEffect, useRef } from "react";
-import { useFluidObjectsContext } from "../../../../../../context-providers";
-import { Cursor, ISelection } from "../../../../../../models";
+import { useFluidObjectsContext } from "../../../../../context-providers";
+import { Cursor, ISelection } from "../../../../../models";
 import { getRandomCursorColor } from "./internals";
 
 export const useMonacoPresenceCursors = (
