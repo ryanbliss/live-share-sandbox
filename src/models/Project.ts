@@ -1,34 +1,33 @@
-export enum ProjectType {
-  REACT = "react",
-  REACT_TS = "react-ts",
-}
-
-export enum ProjectLanguageType {
-  TYPESCRIPT = "TypeScript",
-  JAVASCRIPT = "JavaScript",
-}
-
-export enum ProjectFrameworkType {
-  REACT = "React",
-  VUE = "Vue",
-  ANGULAR = "Angular",
-  SVELTE = "Svelte",
-  VANILLA = "Vanilla",
-}
+import { FrameworkType, LanguageType } from "./Templates";
 
 export interface IProject {
   _id: string;
   containerId?: string;
   title: string;
-  type: ProjectType;
+  language: LanguageType;
+  framework: FrameworkType;
   createdAt: string;
   createdById: string;
   sandboxContainerId?: string;
 }
 
+export function isProject(value: any): value is IProject {
+  return (
+    value &&
+    (typeof value.containerId === "string" ||
+      value.containerId === undefined) &&
+    typeof value.title === "string" &&
+    typeof value.createdAt === "string" &&
+    typeof value.createdById === "string" &&
+    Object.values(FrameworkType).includes(value.framework) &&
+    Object.values(LanguageType).includes(value.language)
+  );
+}
+
 export interface IPostProject {
   title: string;
-  type: ProjectType;
+  language: LanguageType;
+  framework: FrameworkType;
 }
 
 export interface ISetProject extends Partial<IProject> {
@@ -41,14 +40,4 @@ export interface IUserProjectsResponse {
 
 export interface IPostProjectResponse {
   project: IProject;
-}
-
-export interface IProjectTemplate {
-  id: string;
-  name: string;
-  language: ProjectLanguageType;
-  framework?: ProjectFrameworkType;
-  repository: URL;
-  branch?: string;
-  type: ProjectType;
 }

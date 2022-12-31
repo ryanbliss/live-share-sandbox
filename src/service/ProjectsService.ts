@@ -1,24 +1,13 @@
 import axios from "axios";
 import {
   IProject,
-  ProjectType,
   IUserProjectsResponse,
   IPostProject,
   IPostProjectResponse,
   ISetProject,
+  isProject,
 } from "../models";
-
-function isProject(value: any): value is IProject {
-  return (
-    value &&
-    (typeof value.containerId === "string" ||
-      value.containerId === undefined) &&
-    typeof value.title === "string" &&
-    typeof value.createdAt === "string" &&
-    typeof value.createdById === "string" &&
-    Object.values(ProjectType).includes(value.type)
-  );
-}
+import { IProjectTemplate, isProjectTemplateList } from "../models/Templates";
 
 function isProjectResponse(value: any): value is IPostProjectResponse {
   return value && isProject(value.project);
@@ -139,5 +128,19 @@ export class ProjectsService {
       }
     );
     return Promise.resolve();
+  }
+  async getTemplates(): Promise<IProjectTemplate[]> {
+    const url = `https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxgettemplates?code=39ahg98I5MVqUZrs6CCXhf8IQTnxECbYI8A3LRQRMXRYAzFupFVItw%3D%3D`;
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${this.userId}`,
+      },
+    });
+    const templateList = response.data.data;
+    console.log(templateList);
+    if (isProjectTemplateList(templateList)) {
+      return templateList;
+    }
+    throw Error("ProjectsService.getTemplates: invalid response");
   }
 }

@@ -4,3 +4,4 @@ export * from "./IUser";
 export * from "./Cursor";
 export * from "./ReactContext";
 export * from "./Project";
+export * from "./Templates";

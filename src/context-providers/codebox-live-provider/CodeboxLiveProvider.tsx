@@ -1,9 +1,5 @@
 import { createContext, FC, ReactNode, useCallback, useContext } from "react";
-import {
-  ICodeboxLiveContext,
-  IProjectTemplate,
-  ProjectType,
-} from "../../models";
+import { ICodeboxLiveContext, IProjectTemplate } from "../../models";
 import { createAzureContainer } from "../../utils";
 import { useTeamsClientContext } from "../teams-client-provider";
 import { useCodeboxLiveProjects, GitFileProvider } from "./internals";
@@ -44,14 +40,15 @@ export const CodeboxLiveProvider: FC<{
         // TODO: since posting without containerId, need to be able to add
         // container when opening project from list
         const postProjectResponse = await postProject({
-          type: ProjectType.REACT_TS,
-          title: template.name,
+          language: template.language,
+          framework: template.framework,
+          title: template.title,
         });
         // Callback function to get initial code files from Git
         async function getInitialFiles(): Promise<Map<string, string>> {
           const provider = await GitFileProvider.create(
             postProjectResponse._id,
-            template.repository.toString(),
+            template.gitRemoteUrl,
             template.branch
           );
           const files = await provider.getAllFiles();

@@ -12,64 +12,15 @@ import {
   IProject,
   IProjectTemplate,
   ISetProject,
-  ProjectFrameworkType,
-  ProjectLanguageType,
-  ProjectType,
 } from "../../../models";
 import { ProjectsService } from "../../../service";
 import { useTeamsClientContext } from "../../teams-client-provider";
-
-// TODO: move to server provided value
-const PROJECT_TEMPLATES: IProjectTemplate[] = [
-  {
-    id: "react-ts",
-    name: "React Quick Start",
-    language: ProjectLanguageType.TYPESCRIPT,
-    framework: ProjectFrameworkType.REACT,
-    repository: new URL("https://github.com/codeboxlive/react-ts-template.git"),
-    branch: "main",
-    type: ProjectType.REACT_TS,
-  },
-  {
-    id: "live-share-react-ts",
-    name: "Live Share Quick Start",
-    language: ProjectLanguageType.TYPESCRIPT,
-    framework: ProjectFrameworkType.REACT,
-    repository: new URL(
-      "https://github.com/codeboxlive/live-share-react-ts-template.git"
-    ),
-    branch: "main",
-    type: ProjectType.REACT_TS,
-  },
-  {
-    id: "afr-react-ts",
-    name: "Fluid Quick Start",
-    language: ProjectLanguageType.TYPESCRIPT,
-    framework: ProjectFrameworkType.REACT,
-    repository: new URL(
-      "https://github.com/codeboxlive/fluid-react-ts-template.git"
-    ),
-    branch: "main",
-    type: ProjectType.REACT_TS,
-  },
-  {
-    id: "teams-react-ts",
-    name: "Teams Quick Start",
-    language: ProjectLanguageType.TYPESCRIPT,
-    framework: ProjectFrameworkType.REACT,
-    repository: new URL(
-      "https://github.com/codeboxlive/teams-react-ts-template.git"
-    ),
-    branch: "main",
-    type: ProjectType.REACT_TS,
-  },
-];
 
 export function useCodeboxLiveProjects(): {
   userProjects: IProject[];
   userProjectsRef: MutableRefObject<IProject[]>;
   currentProject: IProject | undefined;
-  projectTemplates: IProjectTemplate[];
+  projectTemplates: IProjectTemplate[] | undefined;
   loading: boolean;
   error: Error | undefined;
   postProject: (projectData: IPostProject) => Promise<IProject>;
@@ -85,6 +36,8 @@ export function useCodeboxLiveProjects(): {
   const [currentProject, currentProjectRef, setCurrentProject] = useStateRef<
     IProject | undefined
   >(undefined);
+  const [projectTemplates, projectTemplatesRef, setProjectTemplates] =
+    useStateRef<IProjectTemplate[] | undefined>(undefined);
   const loadingRef = useRef(true);
   const [error, setError] = useState<Error>();
 
@@ -179,6 +132,26 @@ export function useCodeboxLiveProjects(): {
               );
             }
           });
+        clientRef.current
+          .getTemplates()
+          .then((templates) => {
+            if (initializedRef.current) {
+              loadingRef.current = false;
+              setProjectTemplates([...templates]);
+            }
+          })
+          .catch((err: any) => {
+            console.error(err);
+            if (err instanceof Error) {
+              setError(err);
+            } else {
+              setError(
+                new Error(
+                  "useCodeboxLiveProject: an unknown error occurred when getting project templates"
+                )
+              );
+            }
+          });
       })
       .catch((err: any) => {
         console.error(err);
@@ -225,7 +198,7 @@ export function useCodeboxLiveProjects(): {
     userProjects,
     userProjectsRef,
     currentProject,
-    projectTemplates: PROJECT_TEMPLATES,
+    projectTemplates,
     // Use ref because it will always be set along with userProjects
     loading: loadingRef.current,
     error,

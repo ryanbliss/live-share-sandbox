@@ -44,14 +44,14 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
           }}
         >
           <FlexRow marginSpacer="small" wrap>
-            {projectTemplates.map((template) => {
+            {projectTemplates?.map((template) => {
               let secondaryContent: string = template.language;
               if (template.framework) {
                 secondaryContent += ` | ${template.framework}`;
               }
               return (
                 <CompoundButton
-                  key={template.id}
+                  key={template.gitRemoteUrl}
                   icon={<ClipboardCode24Regular />}
                   secondaryContent={secondaryContent}
                   onClick={() => {
@@ -61,7 +61,7 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
                     marginBottom: "12px",
                   }}
                 >
-                  {`+ ${template.name}`}
+                  {`+ ${template.title}`}
                 </CompoundButton>
               );
             })}

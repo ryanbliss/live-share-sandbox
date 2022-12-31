@@ -6,8 +6,9 @@ import { IUser } from "./IUser";
 import { app } from "@microsoft/teams-js";
 import { SandpackFiles } from "@codesandbox/sandpack-react";
 import { ICursor } from "./Cursor";
-import { IProject, IProjectTemplate, ISetProject } from "./Project";
+import { IProject, ISetProject } from "./Project";
 import { CodeFilesHelper } from "./CodeFilesHelper";
+import { IProjectTemplate } from "./Templates";
 
 export interface IFluidContainerResults {
   loading: boolean;
@@ -71,7 +72,7 @@ export interface ICodeboxLiveContext {
   userProjects: IProject[];
   userProjectsRef: MutableRefObject<IProject[]>;
   currentProject: IProject | undefined;
-  projectTemplates: IProjectTemplate[];
+  projectTemplates: IProjectTemplate[] | undefined;
   loading: boolean;
   error: Error | undefined;
   createProject: (template: IProjectTemplate) => Promise<void>;
