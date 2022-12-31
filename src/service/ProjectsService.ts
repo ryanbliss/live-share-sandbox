@@ -137,7 +137,6 @@ export class ProjectsService {
       },
     });
     const templateList = response.data.data;
-    console.log(templateList);
     if (isProjectTemplateList(templateList)) {
       return templateList;
     }
