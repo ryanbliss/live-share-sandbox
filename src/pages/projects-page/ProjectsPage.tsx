@@ -30,12 +30,17 @@ export const ProjectsPage = () => {
     [navigate, setError]
   );
 
+  const isSidePanel =
+    teamsContext?.page.frameContext === FrameContexts.sidePanel;
+
   return (
     <LoadableWrapper loading={false} error={error}>
       <FlexColumn expand="fill" vAlign="center" marginSpacer="small">
-        <FlexItem noShrink>
-          <HomeNavigationBar />
-        </FlexItem>
+        {isSidePanel && (
+          <FlexItem noShrink>
+            <HomeNavigationBar />
+          </FlexItem>
+        )}
         <ProjectList
           onSelectProject={(project: IProject) => {
             if (teamsContext?.page?.frameContext === FrameContexts.sidePanel) {
