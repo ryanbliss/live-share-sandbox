@@ -7,16 +7,24 @@ import {
   useFluidObjectsContext,
 } from "../../../context-providers";
 import { ScrollWrapper } from "../../scroll-wrapper";
+import { getTextClampStyles } from "../../../styles/getTextStyles";
 
 export const FileExplorer: FC = () => {
   const { currentPageKey, codeFiles, onAddPage, onChangeSelectedFile } =
     useFluidObjectsContext();
   const { currentProject } = useCodeboxLiveContext();
   const fileNames = [...codeFiles.keys()];
+  const { root: textClampStyle } = getTextClampStyles();
   return (
     <ScrollWrapper>
       <FlexRow spaceBetween vAlign="center" style={{ padding: "4px 8px" }}>
-        <Text weight="semibold">{currentProject?.title.toUpperCase()}</Text>
+        <Text
+          weight="semibold"
+          className={textClampStyle}
+          title={currentProject?.title.toUpperCase()}
+        >
+          {currentProject?.title.toUpperCase()}
+        </Text>
         <TextInputPopover title="File name" onDone={onAddPage} />
       </FlexRow>
       <TabList
