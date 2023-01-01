@@ -20,19 +20,24 @@ export const getFlexRowStyles = makeStyles({
     width: "100%",
     height: "100%",
   },
+  marginSpacerSmaller: {
+    "> :not(:last-child)": {
+      marginRight: "4px",
+    },
+  },
   marginSpacerSmall: {
     "> :not(:last-child)": {
-      marginRight: "0.8rem",
+      marginRight: "8px",
     },
   },
   marginSpacerMedium: {
     "> :not(:last-child)": {
-      marginRight: "1.6rem",
+      marginRight: "16px",
     },
   },
   marginSpacerLarge: {
     "> :not(:last-child)": {
-      marginRight: "2.4rem",
+      marginRight: "24px",
     },
   },
   spaceBetween: {

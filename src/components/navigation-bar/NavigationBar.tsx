@@ -65,7 +65,13 @@ export const NavigationBar: FC<INavigationBarProps> = ({
           )}
         {leftActions || null}
       </FlexRow>
-      <FlexRow vAlign="start">{rightActions}</FlexRow>
+      <FlexRow
+        vAlign="center"
+        style={{ paddingRight: "8px" }}
+        marginSpacer="smaller"
+      >
+        {rightActions}
+      </FlexRow>
     </FlexRow>
   );
 };

@@ -7,7 +7,7 @@ interface IFlexRowProps {
   expand?: "horizontal" | "vertical" | "fill";
   hAlign?: "start" | "center" | "end";
   vAlign?: "start" | "center" | "end";
-  marginSpacer?: "small" | "medium" | "large";
+  marginSpacer?: "smaller" | "small" | "medium" | "large";
   spaceBetween?: boolean;
   wrap?: boolean;
   style?: CSSProperties;
@@ -35,6 +35,7 @@ export const FlexRow: FC<IFlexRowProps> = ({
     vAlign === "center" ? flexRowStyles.vAlignCenter : "",
     vAlign === "end" ? flexRowStyles.vAlignEnd : "",
     vAlign === "start" ? flexRowStyles.vAlignStart : "",
+    marginSpacer === "smaller" ? flexRowStyles.marginSpacerSmaller : "",
     marginSpacer === "small" ? flexRowStyles.marginSpacerSmall : "",
     marginSpacer === "medium" ? flexRowStyles.marginSpacerMedium : "",
     marginSpacer === "large" ? flexRowStyles.marginSpacerLarge : "",
