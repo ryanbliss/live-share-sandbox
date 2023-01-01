@@ -7,7 +7,7 @@ import {
   MenuTrigger,
 } from "@fluentui/react-components";
 import {
-  Share24Filled,
+  Share20Regular,
   ShareScreenStart20Regular,
   Clipboard20Regular,
   Chat20Regular,
@@ -76,7 +76,7 @@ export const ShareMenu: FC<IShareMenuProps> = ({ project }) => {
   return (
     <Menu>
       <MenuTrigger>
-        <Button appearance="subtle" icon={<Share24Filled />} title="Share" />
+        <Button appearance="subtle" icon={<Share20Regular />} title="Share" />
       </MenuTrigger>
       <MenuPopover>
         <MenuList>

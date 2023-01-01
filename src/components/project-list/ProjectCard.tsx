@@ -1,16 +1,20 @@
 import { FC } from "react";
-import { Button, mergeClasses, Text, Title3 } from "@fluentui/react-components";
-import { Delete24Regular } from "@fluentui/react-icons";
-import { Card } from "@fluentui/react-components/unstable";
 import {
-  useCodeboxLiveContext,
-  useTeamsClientContext,
-} from "../../context-providers";
+  Button,
+  mergeClasses,
+  Text,
+  Title3,
+  tokens,
+} from "@fluentui/react-components";
+import { Card } from "@fluentui/react-components/unstable";
+import { useTeamsClientContext } from "../../context-providers";
 import { IProject } from "../../models";
 import { FlexRow } from "../flex";
 import { FrameContexts } from "@microsoft/teams-js";
 import { getTextClampStyles } from "../../styles/getTextStyles";
 import moment from "moment";
+import { ProjectOverflowMenu } from "../menus/ProjectOverflowMenu";
+import { ShareMenu } from "../menus";
 
 interface IProjectCardProps {
   project: IProject;
@@ -21,7 +25,6 @@ export const ProjectCard: FC<IProjectCardProps> = ({
   project,
   onSelectProject,
 }) => {
-  const { deleteProject } = useCodeboxLiveContext();
   const { teamsContext } = useTeamsClientContext();
   const { root: clampStyle, twoLines: twoLinesStyle } = getTextClampStyles();
   const selectText =
@@ -51,8 +54,14 @@ export const ProjectCard: FC<IProjectCardProps> = ({
           ).fromNow()}`}
         </Text>
       </FlexRow>
-      <FlexRow spaceBetween>
+      <FlexRow spaceBetween vAlign="center">
+        <FlexRow vAlign="center" marginSpacer="smaller">
+          <ShareMenu project={project} />
+          <ProjectOverflowMenu project={project} />
+        </FlexRow>
         <Button
+          appearance="subtle"
+          size="medium"
           onClick={() => {
             console.log(
               "ProjectList: opening project with containerId",
@@ -60,16 +69,12 @@ export const ProjectCard: FC<IProjectCardProps> = ({
             );
             onSelectProject(project);
           }}
+          style={{
+            color: tokens.colorBrandForeground1,
+          }}
         >
           {selectText}
         </Button>
-        <Button
-          appearance="subtle"
-          icon={<Delete24Regular />}
-          onClick={() => {
-            deleteProject(project);
-          }}
-        />
       </FlexRow>
     </Card>
   );

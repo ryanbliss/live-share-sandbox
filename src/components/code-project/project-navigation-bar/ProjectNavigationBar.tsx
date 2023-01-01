@@ -1,8 +1,8 @@
 import { Button, tokens } from "@fluentui/react-components";
 import { FC } from "react";
 import {
-  ShareScreenStart24Filled,
-  ShareScreenStop24Filled,
+  ShareScreenStart20Regular,
+  ShareScreenStop20Regular,
   PanelLeft20Filled,
   PanelRight20Filled,
 } from "@fluentui/react-icons";
@@ -13,6 +13,7 @@ import {
 import { NavigationBar } from "../../navigation-bar";
 import { ShareMenu } from "../../menus";
 import { FlexRow } from "../../flex";
+import { ProjectOverflowMenu } from "../../menus/ProjectOverflowMenu";
 
 interface IProjectNavigationBarProps {
   isLeftActive: boolean;
@@ -59,11 +60,11 @@ export const ProjectNavigationBar: FC<IProjectNavigationBarProps> = ({
               onClick={onToggleRightActive}
             />
           </FlexRow>
-          <FlexRow marginSpacer="smaller">
+          <FlexRow marginSpacer="smaller" vAlign="center">
             {currentProject && <ShareMenu project={currentProject} />}
             {followModeActive && (
               <Button
-                icon={<ShareScreenStop24Filled />}
+                icon={<ShareScreenStop20Regular />}
                 appearance="subtle"
                 title={"Stop follow mode"}
                 onClick={onEndFollowMode}
@@ -71,11 +72,14 @@ export const ProjectNavigationBar: FC<IProjectNavigationBarProps> = ({
             )}
             {!followModeActive && (
               <Button
-                icon={<ShareScreenStart24Filled />}
+                icon={<ShareScreenStart20Regular />}
                 appearance="subtle"
                 title={"Start follow mode"}
                 onClick={onInitiateFollowMode}
               />
+            )}
+            {currentProject && (
+              <ProjectOverflowMenu project={currentProject} redirectOnDelete />
             )}
           </FlexRow>
         </FlexRow>
