@@ -1,4 +1,4 @@
-import { Tab, TabList, Title1 } from "@fluentui/react-components";
+import { Tab, TabList, Text, Title1 } from "@fluentui/react-components";
 import { FrameContexts } from "@microsoft/teams-js";
 import { FC } from "react";
 import {
@@ -6,7 +6,7 @@ import {
   useTeamsClientContext,
 } from "../../context-providers";
 import { IProject } from "../../models";
-import { FlexColumn, FlexRow } from "../flex";
+import { FlexColumn, FlexItem, FlexRow } from "../flex";
 import { LoadableWrapper } from "../view-wrappers";
 import {
   CreateProjectViaGitDialog,
@@ -35,31 +35,41 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
             paddingRight: isSidePanel ? "0px" : "124px",
             paddingTop: isSidePanel ? "0px" : "60px",
             paddingBottom: isSidePanel ? "0px" : "16px",
+            height: "100%",
           }}
         >
           <Title1>{"Projects"}</Title1>
-          <FlexRow spaceBetween vAlign="center" wrap>
-            {!isSidePanel && (
-              <TabList selectedValue={"created"}>
-                <Tab value="created">{"Created"}</Tab>
-              </TabList>
-            )}
-            <FlexRow marginSpacer="small">
-              <CreateProjectViaGitDialog />
-              <CreateProjectViaTemplateDialog />
+          <FlexItem noShrink>
+            <FlexRow spaceBetween vAlign="center" wrap>
+              {!isSidePanel && (
+                <TabList selectedValue={"created"}>
+                  <Tab value="created">{"Created"}</Tab>
+                </TabList>
+              )}
+              <FlexRow marginSpacer="small">
+                <CreateProjectViaGitDialog />
+                <CreateProjectViaTemplateDialog />
+              </FlexRow>
             </FlexRow>
-          </FlexRow>
-          <FlexColumn expand="fill" marginSpacer="small">
-            {userProjects.map((project) => {
-              return (
-                <ProjectCard
-                  key={project._id}
-                  project={project}
-                  onSelectProject={onSelectProject}
-                />
-              );
-            })}
-          </FlexColumn>
+          </FlexItem>
+          {userProjects.length === 0 && (
+            <FlexColumn>
+              <Text>{"Create a project to get started"}</Text>
+            </FlexColumn>
+          )}
+          {userProjects.length > 0 && (
+            <FlexColumn expand="fill" marginSpacer="small">
+              {userProjects.map((project) => {
+                return (
+                  <ProjectCard
+                    key={project._id}
+                    project={project}
+                    onSelectProject={onSelectProject}
+                  />
+                );
+              })}
+            </FlexColumn>
+          )}
         </FlexColumn>
       </ScrollWrapper>
     </LoadableWrapper>
