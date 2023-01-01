@@ -18,7 +18,8 @@ import {
 } from "fluid-framework";
 import { IFollowModeStateValue, IProject } from "../models";
 import { FluidService, ProjectsService } from "../service";
-import { SharedClock } from "./internals";
+import { CodeboxLiveHost } from "./internals";
+import { HostTimestampProvider } from "@microsoft/live-share/bin/HostTimestampProvider";
 
 /**
  * Token Provider implementation for connecting to an Azure Function endpoint for
@@ -237,10 +238,11 @@ export async function getAzureContainer(
       currentProject!,
       projectService
     );
-    // Set the SharedClock
-    const sharedClock = new SharedClock(fluidService.getNtpTime);
-    LiveEvent.setTimestampProvider(sharedClock);
-    await sharedClock.start();
+    const timestampProvider = new HostTimestampProvider(
+      new CodeboxLiveHost(fluidService)
+    );
+    LiveEvent.setTimestampProvider(timestampProvider);
+    await timestampProvider.start();
   }
   // Setup AzureClient
   const connection = await getConnection(userId);

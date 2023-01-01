@@ -60,11 +60,7 @@ export const ProjectNavigationBar: FC<IProjectNavigationBarProps> = ({
             />
           </FlexRow>
           <FlexRow marginSpacer="smaller">
-            {currentProject && (
-              <ShareMenu
-                url={`${window.location.origin}/projects/${currentProject._id}`}
-              />
-            )}
+            {currentProject && <ShareMenu project={currentProject} />}
             {followModeActive && (
               <Button
                 icon={<ShareScreenStop24Filled />}
