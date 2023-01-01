@@ -23,6 +23,7 @@ import { FormRadioGroup, FormTextField } from "../form";
 import { FlexColumn } from "../flex";
 import { Alert } from "@fluentui/react-components/unstable";
 import { isUrlValid } from "../../utils";
+import { getFlexColumnStyles } from "../flex/column/FlexColumn-styles";
 
 interface ICreateProjectViaGitDialogProps {}
 
@@ -121,6 +122,8 @@ export const CreateProjectViaGitDialog: FC<
 
   const gitUrlValid = gitRemoteUrl && isUrlValid(gitRemoteUrl);
 
+  const { scroll: scrollStyle } = getFlexColumnStyles();
+
   return (
     <Dialog
       modalType={loading ? "alert" : "modal"}
@@ -135,7 +138,7 @@ export const CreateProjectViaGitDialog: FC<
       <DialogSurface>
         <DialogBody>
           <DialogTitle>{"Git clone"}</DialogTitle>
-          <DialogContent>
+          <DialogContent className={scrollStyle}>
             <FlexColumn marginSpacer="medium">
               <FormTextField
                 id="title"

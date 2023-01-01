@@ -22,6 +22,7 @@ import {
 import { FormRadioGroup } from "../form/FormRadioGroup";
 import { FlexColumn } from "../flex";
 import { Alert } from "@fluentui/react-components/unstable";
+import { getFlexColumnStyles } from "../flex/column/FlexColumn-styles";
 
 interface ICreateProjectViaTemplateDialogProps {}
 
@@ -132,6 +133,8 @@ export const CreateProjectViaTemplateDialog: FC<
       label: template.title,
     }));
 
+  const { scroll: scrollStyle } = getFlexColumnStyles();
+
   return (
     <Dialog
       modalType={loading ? "alert" : "modal"}
@@ -146,7 +149,7 @@ export const CreateProjectViaTemplateDialog: FC<
       <DialogSurface>
         <DialogBody>
           <DialogTitle>{"New project"}</DialogTitle>
-          <DialogContent>
+          <DialogContent className={scrollStyle}>
             <FlexColumn marginSpacer="medium">
               <FormRadioGroup
                 id={"language"}
