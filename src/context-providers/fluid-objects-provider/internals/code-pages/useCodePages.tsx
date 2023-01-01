@@ -64,7 +64,7 @@ export function useCodePages(
             // Set the handle for the DDS into the codePagesMap
             // TODO: allow more file types than tsx
             (container.initialObjects.codePagesMap as SharedMap).set(
-              `/${pageName}.tsx`,
+              `/${pageName}`,
               sharedString.handle
             );
             // Insert the starting text for the SharedString with an empty React component

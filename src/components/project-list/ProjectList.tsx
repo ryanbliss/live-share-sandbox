@@ -31,10 +31,10 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
         <FlexColumn
           marginSpacer="medium"
           style={{
-            paddingLeft: isSidePanel ? "0px" : "1.2rem",
-            paddingRight: isSidePanel ? "0px" : "1.2rem",
-            paddingTop: isSidePanel ? "0px" : "3rem",
-            paddingBottom: isSidePanel ? "0px" : "1.2rem",
+            paddingLeft: isSidePanel ? "0px" : "124px",
+            paddingRight: isSidePanel ? "0px" : "124px",
+            paddingTop: isSidePanel ? "0px" : "60px",
+            paddingBottom: isSidePanel ? "0px" : "16px",
           }}
         >
           <Title1>{"Projects"}</Title1>

@@ -1,4 +1,4 @@
 export * from "./flex";
 export * from "./popovers";
-export * from "./sandpack";
+export * from "./code-project";
 export * from "./view-wrappers";

@@ -2,10 +2,11 @@ import { meeting, FrameContexts } from "@microsoft/teams-js";
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { inTeams } from "../../utils/inTeams";
-import { LoadableWrapper, FlexColumn } from "../../components";
+import { LoadableWrapper, FlexColumn, FlexItem } from "../../components";
 import { useTeamsClientContext } from "../../context-providers";
 import { ProjectList } from "../../components/project-list/ProjectList";
 import { IProject } from "../../models";
+import { HomeNavigationBar } from "../../components/navigation-bar/HomeNavigationBar";
 
 export const ProjectsPage = () => {
   const [error, setError] = useState<Error | undefined>(undefined);
@@ -32,6 +33,9 @@ export const ProjectsPage = () => {
   return (
     <LoadableWrapper loading={false} error={error}>
       <FlexColumn expand="fill" vAlign="center" marginSpacer="small">
+        <FlexItem noShrink>
+          <HomeNavigationBar />
+        </FlexItem>
         <ProjectList
           onSelectProject={(project: IProject) => {
             if (teamsContext?.page?.frameContext === FrameContexts.sidePanel) {
