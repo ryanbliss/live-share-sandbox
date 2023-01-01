@@ -36,7 +36,7 @@ export const ProjectsPage = () => {
   return (
     <LoadableWrapper loading={false} error={error}>
       <FlexColumn expand="fill" vAlign="center" marginSpacer="small">
-        {isSidePanel && (
+        {!isSidePanel && (
           <FlexItem noShrink>
             <HomeNavigationBar />
           </FlexItem>

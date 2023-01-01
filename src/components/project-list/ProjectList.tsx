@@ -39,7 +39,7 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
         >
           <Title1>{"Projects"}</Title1>
           <FlexRow spaceBetween vAlign="center" wrap>
-            {isSidePanel && (
+            {!isSidePanel && (
               <TabList selectedValue={"created"}>
                 <Tab value="created">{"Created"}</Tab>
               </TabList>
