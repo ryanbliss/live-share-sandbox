@@ -9,12 +9,7 @@ import {
   ITokenProvider,
   ITokenResponse,
 } from "@fluidframework/routerlicious-driver";
-import {
-  EphemeralEvent,
-  EphemeralPresence,
-  EphemeralState,
-  ITimestampProvider,
-} from "@microsoft/live-share";
+import { LiveEvent, LivePresence, LiveState } from "@microsoft/live-share";
 import {
   ContainerSchema,
   IFluidContainer,
@@ -139,8 +134,8 @@ function getContainerSchema(): ContainerSchema {
     initialObjects: {
       codePagesMap: SharedMap,
       sandpackObjectsMap: SharedMap,
-      followModeState: EphemeralState<IFollowModeStateValue | undefined>,
-      presence: EphemeralPresence,
+      followModeState: LiveState<IFollowModeStateValue | undefined>,
+      presence: LivePresence,
     },
     dynamicObjectTypes: [SharedMap, SharedString],
   };
@@ -244,7 +239,7 @@ export async function getAzureContainer(
     );
     // Set the SharedClock
     const sharedClock = new SharedClock(fluidService.getNtpTime);
-    EphemeralEvent.setTimestampProvider(sharedClock);
+    LiveEvent.setTimestampProvider(sharedClock);
     await sharedClock.start();
   }
   // Setup AzureClient

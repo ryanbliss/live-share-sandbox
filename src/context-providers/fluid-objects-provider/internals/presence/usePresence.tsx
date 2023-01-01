@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  EphemeralPresence,
-  EphemeralPresenceUser,
+  LivePresence,
+  LivePresenceUser,
   PresenceState,
   UserMeetingRole,
 } from "@microsoft/live-share";
@@ -10,7 +10,7 @@ import * as microsoftTeams from "@microsoft/teams-js";
 import { IPresenceContext, IUser, ICursor } from "../../../../models";
 
 export const usePresence = (
-  presence: EphemeralPresence | undefined,
+  presence: LivePresence | undefined,
   context: microsoftTeams.app.Context | undefined,
   initialPageKey: string,
   followingUserId: string | undefined
@@ -98,7 +98,7 @@ export const usePresence = (
       return;
     console.info("usePresence: starting presence");
     const onPresenceChanged = (
-      userPresence: EphemeralPresenceUser,
+      userPresence: LivePresenceUser,
       local: boolean
     ) => {
       if (local) {

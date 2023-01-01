@@ -3,12 +3,7 @@ import {
   teamsDarkTheme,
   tokens,
 } from "@fluentui/react-components";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import {
   ProjectsPage,
   AppSettingsPage,

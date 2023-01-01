@@ -1,4 +1,4 @@
-import { EphemeralState, UserMeetingRole } from "@microsoft/live-share";
+import { LiveState, UserMeetingRole } from "@microsoft/live-share";
 import { useCallback, useEffect, useState } from "react";
 import {
   IFollowModeStateContext,
@@ -10,7 +10,7 @@ import { useStateRef } from "../../../../hooks";
 // are looking at. Only meeting presenters and organizers have the privilege
 // to start and end this mode.
 export function useFollowModeState(
-  followModeState: EphemeralState<IFollowModeStateValue> | undefined,
+  followModeState: LiveState<IFollowModeStateValue> | undefined,
   localUserId?: string,
   presentingUserId?: string
 ): IFollowModeStateContext {

@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 import { getAzureContainer } from "../../../../utils";
 import { useTeamsClientContext } from "../../../teams-client-provider";
 import { useCodeboxLiveProjects } from "../../../codebox-live-provider/internals";
-import { EphemeralPresence, EphemeralState } from "@microsoft/live-share";
+import { LivePresence, LiveState } from "@microsoft/live-share";
 
 /**
  * @hidden
@@ -92,8 +92,8 @@ export function useFluidContainerResults(): IFluidContainerResults {
       | SharedMap
       | undefined,
     followModeState: initialObjects?.followModeState as
-      | EphemeralState<IFollowModeStateValue>
+      | LiveState<IFollowModeStateValue>
       | undefined,
-    presence: initialObjects?.presence as EphemeralPresence | undefined,
+    presence: initialObjects?.presence as LivePresence | undefined,
   };
 }

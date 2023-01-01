@@ -10,6 +10,7 @@ import {
   IRegisterClientIdInfo,
   IFluidRequests,
   UserRole,
+  ContainerState,
 } from "@codeboxlive/hub-interfaces";
 import axios from "axios";
 import { IProject } from "../models";
@@ -59,7 +60,12 @@ export class FluidService {
     });
     const tenantInfo = response.data.data;
     if (isTenantInfo(tenantInfo)) {
-      return tenantInfo;
+      return {
+        ...tenantInfo,
+        // Return empty strings for deprecated endpoints
+        ordererEndpoint: "",
+        storageEndpoint: "",
+      };
     }
     throw Error("FluidService.getTenantInfo: invalid response");
   }
@@ -91,14 +97,21 @@ export class FluidService {
       return Promise.resolve({
         containerId: this.currentProject.sandboxContainerId,
         shouldCreate: false,
+        containerState: ContainerState.alreadyExists,
+        retryAfter: 100,
       });
     }
     const project = await this.projectService.getProject(
       this.currentProject._id
     );
+    const shouldCreate = !project.sandboxContainerId;
     return {
       containerId: project.sandboxContainerId,
       shouldCreate: !project.sandboxContainerId,
+      containerState: shouldCreate
+        ? ContainerState.notFound
+        : ContainerState.alreadyExists,
+      retryAfter: 100,
     };
   }
   async setFluidContainerId(
@@ -108,6 +121,8 @@ export class FluidService {
       return Promise.resolve({
         containerId: this.currentProject.sandboxContainerId,
         shouldCreate: false,
+        containerState: ContainerState.alreadyExists,
+        retryAfter: 100,
       });
     }
     const project = await this.projectService.setProject({
@@ -117,6 +132,8 @@ export class FluidService {
     return {
       containerId: project.sandboxContainerId,
       shouldCreate: !project.sandboxContainerId,
+      containerState: ContainerState.added,
+      retryAfter: 100,
     };
   }
   async getNtpTime(): Promise<INtpTimeInfo> {

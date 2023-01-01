@@ -1,4 +1,4 @@
-import { EphemeralPresence, EphemeralState } from "@microsoft/live-share";
+import { LivePresence, LiveState } from "@microsoft/live-share";
 import { IFluidContainer, SharedMap, SharedString } from "fluid-framework";
 import { MutableRefObject } from "react";
 import { IFollowModeStateValue } from "./IFollowModeStateValue";
@@ -16,8 +16,8 @@ export interface IFluidContainerResults {
   container: IFluidContainer | undefined;
   codePagesMap: SharedMap | undefined;
   sandpackObjectsMap: SharedMap | undefined;
-  followModeState: EphemeralState<IFollowModeStateValue> | undefined;
-  presence: EphemeralPresence | undefined;
+  followModeState: LiveState<IFollowModeStateValue> | undefined;
+  presence: LivePresence | undefined;
 }
 
 export interface ICodePagesContext {
