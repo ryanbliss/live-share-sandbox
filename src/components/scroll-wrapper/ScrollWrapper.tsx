@@ -8,7 +8,9 @@ interface IScrollWrapperProps {
 export const ScrollWrapper: FC<IScrollWrapperProps> = ({ children }) => {
   return (
     <FlexColumn scroll>
-      <FlexItem noShrink>{children}</FlexItem>
+      <FlexItem noShrink>
+        <FlexColumn expand="fill">{children}</FlexColumn>
+      </FlexItem>
     </FlexColumn>
   );
 };

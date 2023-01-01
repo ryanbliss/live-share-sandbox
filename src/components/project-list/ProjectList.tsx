@@ -38,7 +38,7 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
           }}
         >
           <Title1>{"Projects"}</Title1>
-          <FlexRow spaceBetween vAlign="center">
+          <FlexRow spaceBetween vAlign="center" wrap>
             <TabList selectedValue={"created"}>
               <Tab value="created">{"Created"}</Tab>
             </TabList>
@@ -47,7 +47,7 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
               <CreateProjectViaTemplateDialog />
             </FlexRow>
           </FlexRow>
-          <FlexColumn scroll expand="fill" marginSpacer="small">
+          <FlexColumn expand="fill" marginSpacer="small">
             {userProjects.map((project) => {
               return (
                 <ProjectCard

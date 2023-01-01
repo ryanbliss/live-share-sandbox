@@ -19,6 +19,7 @@ import {
   TabList,
   tokens,
 } from "@fluentui/react-components";
+import { ProjectNavigationBar } from "./project-navigation-bar/ProjectNavigationBar";
 
 enum LeftNavTabType {
   files = "Files",
@@ -36,6 +37,8 @@ const LEFT_NAV_TABS = [
 ];
 
 export const CodeProject: FC = () => {
+  const [isCodeActive, setCodeActive] = useState(true);
+  const [isPreviewActive, setPreviewActive] = useState(true);
   const [leftNavTabValue, setLeftNavTabValue] = useState<
     LeftNavTabType | undefined
   >(LeftNavTabType.files);
@@ -64,6 +67,18 @@ export const CodeProject: FC = () => {
 
   return (
     <>
+      <FlexItem noShrink>
+        <ProjectNavigationBar
+          isLeftActive={isCodeActive}
+          isRightActive={isPreviewActive}
+          onToggleLeftActive={() => {
+            setCodeActive(!isCodeActive);
+          }}
+          onToggleRightActive={() => {
+            setPreviewActive(!isPreviewActive);
+          }}
+        />
+      </FlexItem>
       <FlexRow expand="fill">
         <FlexColumn
           style={{
@@ -93,6 +108,9 @@ export const CodeProject: FC = () => {
             style={{
               height: "100%",
               width: "180px",
+              borderRightStyle: "solid",
+              borderRightColor: tokens.colorNeutralStroke1,
+              borderRightWidth: "1px",
             }}
           >
             <FileExplorer />
@@ -115,12 +133,13 @@ export const CodeProject: FC = () => {
                     editingEnabled={true}
                     style={{
                       position: "absolute",
-                      right: "50%",
+                      right: isPreviewActive ? "50%" : 0,
                       left: 0,
                       top: 0,
                       bottom: 0,
                       height: "100%",
-                      width: "50%",
+                      width: isPreviewActive ? "50%" : "100%",
+                      visibility: isCodeActive ? "visible" : "hidden",
                     }}
                   />
                   {/* Preview viewer for the compiled application */}
@@ -130,9 +149,10 @@ export const CodeProject: FC = () => {
                       top: 0,
                       right: 0,
                       bottom: 0,
-                      left: "50%",
+                      left: isCodeActive ? "50%" : 0,
                       height: "100%",
-                      width: "50%",
+                      width: isCodeActive ? "50%" : "100%",
+                      visibility: isPreviewActive ? "visible" : "hidden",
                     }}
                   />
                 </SandpackLayout>

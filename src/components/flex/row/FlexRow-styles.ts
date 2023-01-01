@@ -22,7 +22,7 @@ export const getFlexRowStyles = makeStyles({
   },
   marginSpacerSmaller: {
     "> :not(:last-child)": {
-      marginRight: "4px",
+      marginRight: "2px",
     },
   },
   marginSpacerSmall: {

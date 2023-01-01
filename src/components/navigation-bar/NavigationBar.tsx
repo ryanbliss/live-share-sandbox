@@ -1,5 +1,5 @@
 import { FrameContexts } from "@microsoft/teams-js";
-import { FC, ReactNode } from "react";
+import { CSSProperties, FC, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { inTeams } from "../../utils";
 import { FlexRow } from "../flex";
@@ -20,6 +20,15 @@ export const NavigationBar: FC<INavigationBarProps> = ({
 }) => {
   const { teamsContext } = useTeamsClientContext();
   const navigate = useNavigate();
+  const isSidePanel =
+    teamsContext?.page.frameContext === FrameContexts.sidePanel;
+  const sidePanelContainerStyle: CSSProperties = isSidePanel
+    ? {}
+    : {
+        borderBottomStyle: "solid",
+        borderBottomColor: tokens.colorNeutralStroke1,
+        borderBottomWidth: "1px",
+      };
   return (
     <FlexRow
       expand="horizontal"
@@ -28,16 +37,14 @@ export const NavigationBar: FC<INavigationBarProps> = ({
       vAlign="center"
       hAlign="start"
       style={{
-        borderBottomStyle: "solid",
-        borderBottomColor: tokens.colorNeutralStroke1,
-        borderBottomWidth: "1px",
+        ...sidePanelContainerStyle,
         height: "44px",
       }}
     >
       <FlexRow
         vAlign="center"
         marginSpacer="small"
-        style={{ paddingLeft: "8px" }}
+        style={{ paddingLeft: isSidePanel ? "0px" : "8px" }}
       >
         {teamsContext?.page?.frameContext !== FrameContexts.meetingStage &&
           teamsContext?.page?.frameContext !== FrameContexts.sidePanel && (
