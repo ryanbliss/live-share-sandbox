@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef } from "react";
 import { IFluidContainer, SharedMap, SharedString } from "fluid-framework";
 import { useStateRef } from "../../../../hooks";
-import { buildEmptyTSReactComponent } from "../../../../sandpack-templates";
+import {
+  buildEmptyTSReactComponent,
+  buildEmptyJSReactComponent,
+} from "../../../../sandpack-templates";
 import { ICodePagesContext } from "../../../../models";
 
 export function useCodePages(
@@ -72,6 +75,12 @@ export function useCodePages(
               sharedString.insertText(
                 0,
                 buildEmptyTSReactComponent(pageName.split(".tsx")[0])
+              );
+            } else if (pageName.includes(".jsx")) {
+              // Insert the starting text for the SharedString with an empty React component
+              sharedString.insertText(
+                0,
+                buildEmptyJSReactComponent(pageName.split(".jsx")[0])
               );
             }
           })
