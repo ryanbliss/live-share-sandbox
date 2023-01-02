@@ -118,6 +118,11 @@ export function useCodeboxLiveProjects(): {
           (checkProject) => checkProject._id !== project._id
         ),
       ]);
+      setRecentProjects([
+        ...recentProjectsRef.current.filter(
+          (checkProject) => checkProject._id !== project._id
+        ),
+      ]);
     },
     []
   );
