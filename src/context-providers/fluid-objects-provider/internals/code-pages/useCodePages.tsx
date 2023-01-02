@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { IFluidContainer, SharedMap, SharedString } from "fluid-framework";
 import { useStateRef } from "../../../../hooks";
-import { buildEmptyReactComponent } from "../../../../sandpack-templates";
+import { buildEmptyTSReactComponent } from "../../../../sandpack-templates";
 import { ICodePagesContext } from "../../../../models";
 
 export function useCodePages(
@@ -67,10 +67,13 @@ export function useCodePages(
               `/${pageName}`,
               sharedString.handle
             );
-            // Insert the starting text for the SharedString with an empty React component
-            // TODO: support JSX templates different templates and fill as empty if a vanilla
-            // JS, TS, HTML, or CSS component.
-            sharedString.insertText(0, buildEmptyReactComponent(pageName));
+            if (pageName.includes(".tsx")) {
+              // Insert the starting text for the SharedString with an empty React component
+              sharedString.insertText(
+                0,
+                buildEmptyTSReactComponent(pageName.split(".tsx")[0])
+              );
+            }
           })
           .catch((error) => console.error(error));
       }
