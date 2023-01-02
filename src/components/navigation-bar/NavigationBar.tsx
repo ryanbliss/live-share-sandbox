@@ -20,15 +20,6 @@ export const NavigationBar: FC<INavigationBarProps> = ({
 }) => {
   const { teamsContext } = useTeamsClientContext();
   const navigate = useNavigate();
-  const isSidePanel =
-    teamsContext?.page.frameContext === FrameContexts.sidePanel;
-  const sidePanelContainerStyle: CSSProperties = isSidePanel
-    ? {}
-    : {
-        borderBottomStyle: "solid",
-        borderBottomColor: tokens.colorNeutralStroke1,
-        borderBottomWidth: "1px",
-      };
   return (
     <FlexRow
       expand="horizontal"
@@ -37,39 +28,40 @@ export const NavigationBar: FC<INavigationBarProps> = ({
       vAlign="center"
       hAlign="start"
       style={{
-        ...sidePanelContainerStyle,
+        borderBottomStyle: "solid",
+        borderBottomColor: tokens.colorNeutralStroke1,
+        borderBottomWidth: "1px",
         height: "44px",
       }}
     >
       <FlexRow
         vAlign="center"
         marginSpacer="small"
-        style={{ paddingLeft: isSidePanel ? "0px" : "8px" }}
+        style={{ paddingLeft: "8px" }}
       >
-        {teamsContext?.page?.frameContext !== FrameContexts.meetingStage &&
-          teamsContext?.page?.frameContext !== FrameContexts.sidePanel && (
-            <>
-              {isL1 && (
-                <Button
-                  appearance="subtle"
-                  onClick={() => {
-                    navigate(`/?inTeams=${inTeams()}`);
-                  }}
-                >
-                  {"Codebox Live"}
-                </Button>
-              )}
-              {!isL1 && (
-                <Button
-                  icon={<Home28Filled />}
-                  appearance="subtle"
-                  onClick={() => {
-                    navigate(`/?inTeams=${inTeams()}`);
-                  }}
-                />
-              )}
-            </>
-          )}
+        {teamsContext?.page?.frameContext !== FrameContexts.meetingStage && (
+          <>
+            {isL1 && (
+              <Button
+                appearance="subtle"
+                onClick={() => {
+                  navigate(`/?inTeams=${inTeams()}`);
+                }}
+              >
+                {"Codebox Live"}
+              </Button>
+            )}
+            {!isL1 && (
+              <Button
+                icon={<Home28Filled />}
+                appearance="subtle"
+                onClick={() => {
+                  navigate(`/?inTeams=${inTeams()}`);
+                }}
+              />
+            )}
+          </>
+        )}
         {leftActions || null}
       </FlexRow>
       <FlexRow

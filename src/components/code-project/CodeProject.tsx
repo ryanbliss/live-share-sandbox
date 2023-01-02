@@ -43,12 +43,12 @@ const LEFT_NAV_TABS = [
 export const CodeProject: FC = () => {
   const { teamsContext } = useTeamsClientContext();
   const isSidePanel =
-    teamsContext?.page.frameContext !== FrameContexts.sidePanel;
+    teamsContext?.page.frameContext === FrameContexts.sidePanel;
   const [isCodeActive, setCodeActive] = useState<boolean>(!isSidePanel);
   const [isPreviewActive, setPreviewActive] = useState(true);
   const [leftNavTabValue, setLeftNavTabValue] = useState<
     LeftNavTabType | undefined
-  >(isSidePanel ? LeftNavTabType.files : undefined);
+  >(isSidePanel ? undefined : LeftNavTabType.files);
   const { codeFiles, mappedSandpackFiles } = useFluidObjectsContext();
   const { currentProject } = useCodeboxLiveProjects();
   // Setup Sandpack gateway hub
