@@ -9,12 +9,16 @@ import {
 import {
   MoreHorizontal20Regular,
   Delete20Regular,
+  Open20Regular,
 } from "@fluentui/react-icons";
 import { FC, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCodeboxLiveContext } from "../../context-providers";
+import {
+  useCodeboxLiveContext,
+  useTeamsClientContext,
+} from "../../context-providers";
 import { IProject } from "../../models";
-import { inTeams } from "../../utils";
+import { inTeams, openInStageView } from "../../utils";
 
 interface IProjectOverflowMenuProps {
   project: IProject;
@@ -25,6 +29,7 @@ export const ProjectOverflowMenu: FC<IProjectOverflowMenuProps> = ({
   project,
   redirectOnDelete,
 }) => {
+  const { teamsContext } = useTeamsClientContext();
   const { deleteProject } = useCodeboxLiveContext();
   const navigate = useNavigate();
 
@@ -38,6 +43,14 @@ export const ProjectOverflowMenu: FC<IProjectOverflowMenuProps> = ({
       console.error(error);
     }
   }, [project, redirectOnDelete, deleteProject, location, navigate]);
+
+  const onOpenStageView = useCallback(async () => {
+    try {
+      await openInStageView(project, teamsContext);
+    } catch (error: any) {
+      console.error(error);
+    }
+  }, [project, teamsContext]);
   return (
     <Menu>
       <MenuTrigger>
@@ -49,6 +62,9 @@ export const ProjectOverflowMenu: FC<IProjectOverflowMenuProps> = ({
       </MenuTrigger>
       <MenuPopover>
         <MenuList>
+          <MenuItem icon={<Open20Regular />} onClick={onOpenStageView}>
+            {"Open in pop out"}
+          </MenuItem>
           <MenuItem icon={<Delete20Regular />} onClick={onDelete}>
             {"Delete project"}
           </MenuItem>
