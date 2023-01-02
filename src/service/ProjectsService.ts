@@ -55,6 +55,103 @@ export class ProjectsService {
       new Error("CodeboxService: getUserProjects invalid response")
     );
   }
+  public async getRecentProjects(): Promise<IUserProjectsResponse> {
+    if (!this.userId) {
+      return Promise.reject(
+        new Error(
+          "CodeboxService: called getUserProjects before user is authorized"
+        )
+      );
+    }
+    const response = await axios.get(
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxgetrecentprojects?code=fDpkYTxrmZ3BT6qTHeDJloaM9M3MleSsKUeaR_m_RP1jAzFuYGXdfQ%3D%3D",
+      {
+        headers: {
+          Authorization: `Bearer ${this.userId}`,
+        },
+      }
+    );
+    const userProjects = response.data.data;
+    if (isUserProjectsResponse(userProjects)) {
+      return Promise.resolve(userProjects);
+    }
+    return Promise.reject(
+      new Error("CodeboxService: getUserProjects invalid response")
+    );
+  }
+  public async getTeamsPinnedProjects(
+    threadId: string
+  ): Promise<IUserProjectsResponse> {
+    if (!this.userId) {
+      return Promise.reject(
+        new Error(
+          "CodeboxService: called getUserProjects before user is authorized"
+        )
+      );
+    }
+    const response = await axios.post(
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxgetteamspinnedprojects?code=06yJSpejPQm99RNMV45S-1H_TUOKV-nccKzkVR4U9qvYAzFukmdYfA%3D%3D",
+      {
+        threadId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.userId}`,
+        },
+      }
+    );
+    const userProjects = response.data.data;
+    if (isUserProjectsResponse(userProjects)) {
+      return Promise.resolve(userProjects);
+    }
+    return Promise.reject(
+      new Error("CodeboxService: getUserProjects invalid response")
+    );
+  }
+  public async postProjectView(projectId: string): Promise<void> {
+    if (!this.userId) {
+      return Promise.reject(
+        new Error(
+          "CodeboxService: called getUserProjects before user is authorized"
+        )
+      );
+    }
+    await axios.post(
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxpostprojectview?code=QQNcobhUDCzyshVSdYKxURBVKmT2bxCqKWal1V7QeTvVAzFuv6qXHw%3D%3D",
+      {
+        projectId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.userId}`,
+        },
+      }
+    );
+  }
+  public async postTeamsProjectTeamsThreadPin(
+    projectId: string,
+    threadId: string
+  ): Promise<void> {
+    if (!this.userId) {
+      return Promise.reject(
+        new Error(
+          "CodeboxService: called getUserProjects before user is authorized"
+        )
+      );
+    }
+    await axios.post(
+      "https://codebox-live-functions-west-us.azurewebsites.net/api/codeboxpostprojectteamsthreadpin?code=fbXhSmMdlOfBYj_Ck1r7zLTQpbS0uWBFejst4Sy7OG4iAzFuyzMTjQ%3D%3D",
+      {
+        projectId,
+        threadId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.userId}`,
+        },
+      }
+    );
+  }
   public async postProject(
     projectData: IPostProject
   ): Promise<IPostProjectResponse> {

@@ -22,6 +22,8 @@ export const CodeboxLiveProvider: FC<{
   const {
     userProjects,
     userProjectsRef,
+    recentProjects,
+    recentProjectsRef,
     currentProject,
     projectTemplates,
     loading,
@@ -84,6 +86,8 @@ export const CodeboxLiveProvider: FC<{
       value={{
         userProjects,
         userProjectsRef,
+        recentProjects,
+        recentProjectsRef,
         currentProject,
         projectTemplates,
         loading,

@@ -1,6 +1,12 @@
-import { Tab, TabList, Text, Title1 } from "@fluentui/react-components";
+import {
+  SelectTabEventHandler,
+  Tab,
+  TabList,
+  Text,
+  Title1,
+} from "@fluentui/react-components";
 import { FrameContexts } from "@microsoft/teams-js";
-import { FC } from "react";
+import { FC, useCallback, useState } from "react";
 import {
   useCodeboxLiveContext,
   useTeamsClientContext,
@@ -19,11 +25,30 @@ interface IProjectListProps {
   onSelectProject: (project: IProject) => void;
 }
 
+enum ProjectListTabType {
+  recent = "Recent",
+  owned = "Owned",
+}
+
+function isProjectListTabType(value: any): value is ProjectListTabType {
+  return Object.values(ProjectListTabType).includes(value);
+}
+
 export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
-  const { userProjects, loading, error } = useCodeboxLiveContext();
+  const [selectedTab, setSelectedTab] = useState<ProjectListTabType>(
+    ProjectListTabType.recent
+  );
+  const { recentProjects, userProjects, loading, error } =
+    useCodeboxLiveContext();
   const { teamsContext } = useTeamsClientContext();
   const isSidePanel =
     teamsContext?.page.frameContext === FrameContexts.sidePanel;
+
+  const onTabSelect: SelectTabEventHandler = useCallback((ev, data) => {
+    if (isProjectListTabType(data.value)) {
+      setSelectedTab(data.value);
+    }
+  }, []);
 
   return (
     <LoadableWrapper loading={loading} error={error}>
@@ -42,8 +67,9 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
           <FlexItem noShrink>
             <FlexRow spaceBetween vAlign="center" wrap>
               {!isSidePanel && (
-                <TabList selectedValue={"created"}>
-                  <Tab value="created">{"Created"}</Tab>
+                <TabList selectedValue={selectedTab} onTabSelect={onTabSelect}>
+                  <Tab value={ProjectListTabType.recent}>{"Recent"}</Tab>
+                  <Tab value={ProjectListTabType.owned}>{"Owned"}</Tab>
                 </TabList>
               )}
               <FlexRow marginSpacer="small">
@@ -52,23 +78,49 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
               </FlexRow>
             </FlexRow>
           </FlexItem>
-          {userProjects.length === 0 && (
-            <FlexColumn>
-              <Text>{"Create a project to get started"}</Text>
-            </FlexColumn>
+          {selectedTab === ProjectListTabType.recent && (
+            <>
+              {recentProjects.length === 0 && (
+                <FlexColumn>
+                  <Text>{"Create a project to get started"}</Text>
+                </FlexColumn>
+              )}
+              {recentProjects.length > 0 && (
+                <FlexColumn expand="fill" marginSpacer="small">
+                  {recentProjects.map((project) => {
+                    return (
+                      <ProjectCard
+                        key={`recent-project-${project._id}`}
+                        project={project}
+                        onSelectProject={onSelectProject}
+                      />
+                    );
+                  })}
+                </FlexColumn>
+              )}
+            </>
           )}
-          {userProjects.length > 0 && (
-            <FlexColumn expand="fill" marginSpacer="small">
-              {userProjects.map((project) => {
-                return (
-                  <ProjectCard
-                    key={project._id}
-                    project={project}
-                    onSelectProject={onSelectProject}
-                  />
-                );
-              })}
-            </FlexColumn>
+          {selectedTab === ProjectListTabType.owned && (
+            <>
+              {userProjects.length === 0 && (
+                <FlexColumn>
+                  <Text>{"Create a project to get started"}</Text>
+                </FlexColumn>
+              )}
+              {userProjects.length > 0 && (
+                <FlexColumn expand="fill" marginSpacer="small">
+                  {userProjects.map((project) => {
+                    return (
+                      <ProjectCard
+                        key={`owned-project-${project._id}`}
+                        project={project}
+                        onSelectProject={onSelectProject}
+                      />
+                    );
+                  })}
+                </FlexColumn>
+              )}
+            </>
           )}
         </FlexColumn>
       </ScrollWrapper>

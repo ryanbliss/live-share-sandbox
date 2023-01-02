@@ -20,6 +20,8 @@ import { useTeamsClientContext } from "../../teams-client-provider";
 export function useCodeboxLiveProjects(): {
   userProjects: IProject[];
   userProjectsRef: MutableRefObject<IProject[]>;
+  recentProjects: IProject[];
+  recentProjectsRef: MutableRefObject<IProject[]>;
   currentProject: IProject | undefined;
   projectTemplates: IProjectTemplate[] | undefined;
   loading: boolean;
@@ -34,12 +36,16 @@ export function useCodeboxLiveProjects(): {
   const [userProjects, userProjectsRef, setUserProjects] = useStateRef<
     IProject[]
   >([]);
+  const [recentProjects, recentProjectsRef, setRecentProjects] = useStateRef<
+    IProject[]
+  >([]);
   const [currentProject, currentProjectRef, setCurrentProject] = useStateRef<
     IProject | undefined
   >(undefined);
   const [projectTemplates, projectTemplatesRef, setProjectTemplates] =
     useStateRef<IProjectTemplate[] | undefined>(undefined);
   const loadingRef = useRef(true);
+  const lastViewIdRef = useRef<string>();
   const [error, setError] = useState<Error>();
 
   const { teamsContext } = useTeamsClientContext();
@@ -59,14 +65,12 @@ export function useCodeboxLiveProjects(): {
         //   ),
         //   project,
         // ]);
-        return Promise.resolve(projectResponse.project);
+        return projectResponse.project;
       } catch (err: any) {
         if (err instanceof Error) {
-          return Promise.reject(err);
+          throw err;
         }
-        return Promise.reject(
-          new Error("useCodeboxLiveClient: unable to process request")
-        );
+        throw new Error("useCodeboxLiveClient: unable to process request");
       }
     },
     []
@@ -82,14 +86,25 @@ export function useCodeboxLiveProjects(): {
             (checkProject) => checkProject._id !== project._id
           ),
         ]);
-        return Promise.resolve(project);
+        try {
+          await clientRef.current.postProjectView(project._id);
+        } catch (error) {
+          console.error(error);
+          // TODO: display error
+        }
+        const newRecentProjects = [
+          project,
+          ...recentProjectsRef.current.filter(
+            (checkProject) => checkProject._id !== project._id
+          ),
+        ];
+        setRecentProjects(newRecentProjects);
+        return project;
       } catch (err: any) {
         if (err instanceof Error) {
-          return Promise.reject(err);
+          throw err;
         }
-        return Promise.reject(
-          new Error("useCodeboxLiveClient: unable to process request")
-        );
+        throw new Error("useCodeboxLiveClient: unable to process request");
       }
     },
     []
@@ -117,7 +132,6 @@ export function useCodeboxLiveProjects(): {
           .getUserProjects()
           .then((response) => {
             if (initializedRef.current) {
-              loadingRef.current = false;
               const projects = [...response.projects];
               projects.sort((a, b) => {
                 const isAfter = moment(a.createdAt).isBefore(b.createdAt);
@@ -146,10 +160,30 @@ export function useCodeboxLiveProjects(): {
             }
           });
         clientRef.current
+          .getRecentProjects()
+          .then((response) => {
+            if (initializedRef.current) {
+              loadingRef.current = false;
+              const projects = [...response.projects];
+              setRecentProjects(projects);
+            }
+          })
+          .catch((err: any) => {
+            console.error(err);
+            if (err instanceof Error) {
+              setError(err);
+            } else {
+              setError(
+                new Error(
+                  "useCodeboxLiveProject: an unknown error occurred when getting user projects"
+                )
+              );
+            }
+          });
+        clientRef.current
           .getTemplates()
           .then((templates) => {
             if (initializedRef.current) {
-              loadingRef.current = false;
               setProjectTemplates([...templates]);
             }
           })
@@ -187,20 +221,43 @@ export function useCodeboxLiveProjects(): {
     const projectId = params["projectId"];
     if (projectId) {
       const refreshCurrentProject = async () => {
-        const project = userProjectsRef.current.find(
-          (project) => project._id === projectId
+        let project = userProjectsRef.current.find(
+          (checkProject) => checkProject._id === projectId
         );
+        if (!project) {
+          project = recentProjectsRef.current.find(
+            (checkProject) => checkProject._id === projectId
+          );
+        }
         if (project) {
           if (project._id !== currentProjectRef.current?._id) {
             setCurrentProject(project);
           }
         } else {
           try {
-            const newProject = await clientRef.current.getProject(projectId);
-            setCurrentProject(newProject);
+            project = await clientRef.current.getProject(projectId);
+            setCurrentProject(project);
           } catch (error) {
             console.error(error);
+            // TODO: display error
           }
+        }
+        if (project && project._id !== lastViewIdRef.current) {
+          lastViewIdRef.current = project._id;
+          try {
+            await clientRef.current.postProjectView(project._id);
+          } catch (error) {
+            console.error(error);
+            lastViewIdRef.current = undefined;
+            // TODO: display error
+          }
+          const newRecentProjects = [
+            project,
+            ...recentProjectsRef.current.filter(
+              (checkProject) => checkProject._id !== projectId
+            ),
+          ];
+          setRecentProjects(newRecentProjects);
         }
       };
       refreshCurrentProject();
@@ -210,6 +267,8 @@ export function useCodeboxLiveProjects(): {
   return {
     userProjects,
     userProjectsRef,
+    recentProjects,
+    recentProjectsRef,
     currentProject,
     projectTemplates,
     // Use ref because it will always be set along with userProjects
