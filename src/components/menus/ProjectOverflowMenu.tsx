@@ -10,6 +10,7 @@ import {
   MoreHorizontal20Regular,
   Delete20Regular,
   Open20Regular,
+  ArrowCircleRight20Regular,
 } from "@fluentui/react-icons";
 import { FC, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,11 +24,13 @@ import { inTeams, openInStageView } from "../../utils";
 interface IProjectOverflowMenuProps {
   project: IProject;
   redirectOnDelete?: boolean;
+  onOpen?: () => void;
 }
 
 export const ProjectOverflowMenu: FC<IProjectOverflowMenuProps> = ({
   project,
   redirectOnDelete,
+  onOpen,
 }) => {
   const { teamsContext } = useTeamsClientContext();
   const { deleteProject } = useCodeboxLiveContext();
@@ -62,6 +65,11 @@ export const ProjectOverflowMenu: FC<IProjectOverflowMenuProps> = ({
       </MenuTrigger>
       <MenuPopover>
         <MenuList>
+          {!!onOpen && (
+            <MenuItem icon={<ArrowCircleRight20Regular />} onClick={onOpen}>
+              {"Open"}
+            </MenuItem>
+          )}
           <MenuItem icon={<Open20Regular />} onClick={onOpenStageView}>
             {"Open in pop out"}
           </MenuItem>

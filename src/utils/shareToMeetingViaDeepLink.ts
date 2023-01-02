@@ -1,5 +1,6 @@
 import { app } from "@microsoft/teams-js";
 import { v4 as uuid } from "uuid";
+import { AppConfig } from "../constants";
 import { inTeams } from "./inTeams";
 
 const USE_MEET_NOW_ENABLED = true;
@@ -9,7 +10,7 @@ export const shareToMeetingViaDeepLink = async (
 ): Promise<void> => {
   const appContext = JSON.stringify({
     appSharingUrl,
-    appId: "ffb8bede-d6d3-4fc1-8f2f-d7d7861c8f1a",
+    appId: AppConfig.teamsAppId,
     useMeetNow: USE_MEET_NOW_ENABLED,
   });
   const encodedContext = encodeURIComponent(appContext)

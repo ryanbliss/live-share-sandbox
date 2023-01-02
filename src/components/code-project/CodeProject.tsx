@@ -9,7 +9,10 @@ import {
 import { FileExplorer } from "./file-explorer/FileExplorer";
 import { FlexColumn, FlexItem, FlexRow } from "../flex";
 import { MonacoEditor } from "./monaco-editor/MonacoEditor";
-import { useFluidObjectsContext } from "../../context-providers";
+import {
+  useFluidObjectsContext,
+  useTeamsClientContext,
+} from "../../context-providers";
 import { useSandpackMessages } from "../../hooks";
 import { useCodeboxLiveProjects } from "../../context-providers/codebox-live-provider/internals";
 import { LanguageType } from "../../models";
@@ -20,6 +23,7 @@ import {
   tokens,
 } from "@fluentui/react-components";
 import { ProjectNavigationBar } from "./project-navigation-bar/ProjectNavigationBar";
+import { FrameContexts } from "@microsoft/teams-js";
 
 enum LeftNavTabType {
   files = "Files",
@@ -37,11 +41,14 @@ const LEFT_NAV_TABS = [
 ];
 
 export const CodeProject: FC = () => {
-  const [isCodeActive, setCodeActive] = useState(true);
+  const { teamsContext } = useTeamsClientContext();
+  const isSidePanel =
+    teamsContext?.page.frameContext !== FrameContexts.sidePanel;
+  const [isCodeActive, setCodeActive] = useState<boolean>(!isSidePanel);
   const [isPreviewActive, setPreviewActive] = useState(true);
   const [leftNavTabValue, setLeftNavTabValue] = useState<
     LeftNavTabType | undefined
-  >(LeftNavTabType.files);
+  >(isSidePanel ? LeftNavTabType.files : undefined);
   const { codeFiles, mappedSandpackFiles } = useFluidObjectsContext();
   const { currentProject } = useCodeboxLiveProjects();
   // Setup Sandpack gateway hub

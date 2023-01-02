@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useCallback } from "react";
 import {
   Button,
   mergeClasses,
@@ -10,27 +10,44 @@ import { Card } from "@fluentui/react-components/unstable";
 import { useTeamsClientContext } from "../../context-providers";
 import { IProject } from "../../models";
 import { FlexRow } from "../flex";
-import { FrameContexts } from "@microsoft/teams-js";
+import { FrameContexts, meeting } from "@microsoft/teams-js";
 import { getTextClampStyles } from "../../styles/getTextStyles";
 import moment from "moment";
 import { ProjectOverflowMenu } from "../menus/ProjectOverflowMenu";
 import { ShareMenu } from "../menus";
+import { useNavigate } from "react-router-dom";
+import { inTeams } from "../../utils";
 
 interface IProjectCardProps {
   project: IProject;
-  onSelectProject: (project: IProject) => void;
 }
 
-export const ProjectCard: FC<IProjectCardProps> = ({
-  project,
-  onSelectProject,
-}) => {
+export const ProjectCard: FC<IProjectCardProps> = ({ project }) => {
   const { teamsContext } = useTeamsClientContext();
   const { root: clampStyle, twoLines: twoLinesStyle } = getTextClampStyles();
-  const selectText =
-    teamsContext?.page?.frameContext === FrameContexts.sidePanel
-      ? "Code together"
-      : "Open";
+  const navigate = useNavigate();
+  const isSidePanel =
+    teamsContext?.page?.frameContext === FrameContexts.sidePanel;
+  const selectText = isSidePanel ? "Code together" : "Open";
+
+  const onOpen = useCallback(() => {
+    navigate(`/projects/${project._id}?inTeams=${inTeams()}`);
+  }, [project]);
+
+  const onSelectProject = useCallback(() => {
+    const isInTeams = inTeams();
+    if (
+      isInTeams &&
+      teamsContext?.page?.frameContext === FrameContexts.sidePanel
+    ) {
+      meeting.shareAppContentToStage((error) => {
+        console.error(error);
+      }, `${window.location.origin}/projects/${project._id}?inTeams=true`);
+    } else {
+      onOpen();
+    }
+  }, [project, teamsContext, onOpen]);
+
   return (
     <Card
       appearance="filled"
@@ -57,18 +74,15 @@ export const ProjectCard: FC<IProjectCardProps> = ({
       <FlexRow spaceBetween vAlign="center">
         <FlexRow vAlign="center" marginSpacer="smaller">
           <ShareMenu project={project} />
-          <ProjectOverflowMenu project={project} />
+          <ProjectOverflowMenu
+            project={project}
+            onOpen={isSidePanel ? onOpen : undefined}
+          />
         </FlexRow>
         <Button
           appearance="subtle"
           size="medium"
-          onClick={() => {
-            console.log(
-              "ProjectList: opening project with containerId",
-              project.containerId
-            );
-            onSelectProject(project);
-          }}
+          onClick={onSelectProject}
           style={{
             color: tokens.colorBrandForeground1,
           }}

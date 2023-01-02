@@ -11,7 +11,6 @@ import {
   useCodeboxLiveContext,
   useTeamsClientContext,
 } from "../../context-providers";
-import { IProject } from "../../models";
 import { FlexColumn, FlexItem, FlexRow } from "../flex";
 import { LoadableWrapper } from "../view-wrappers";
 import {
@@ -21,9 +20,7 @@ import {
 import { ProjectCard } from "./ProjectCard";
 import { ScrollWrapper } from "../scroll-wrapper/ScrollWrapper";
 
-interface IProjectListProps {
-  onSelectProject: (project: IProject) => void;
-}
+interface IProjectListProps {}
 
 enum ProjectListTabType {
   recent = "Recent",
@@ -34,7 +31,7 @@ function isProjectListTabType(value: any): value is ProjectListTabType {
   return Object.values(ProjectListTabType).includes(value);
 }
 
-export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
+export const ProjectList: FC<IProjectListProps> = ({}) => {
   const [selectedTab, setSelectedTab] = useState<ProjectListTabType>(
     ProjectListTabType.recent
   );
@@ -92,7 +89,6 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
                       <ProjectCard
                         key={`recent-project-${project._id}`}
                         project={project}
-                        onSelectProject={onSelectProject}
                       />
                     );
                   })}
@@ -114,7 +110,6 @@ export const ProjectList: FC<IProjectListProps> = ({ onSelectProject }) => {
                       <ProjectCard
                         key={`owned-project-${project._id}`}
                         project={project}
-                        onSelectProject={onSelectProject}
                       />
                     );
                   })}
