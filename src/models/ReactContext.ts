@@ -71,6 +71,7 @@ export interface ITeamsClientContext {
 export interface ICodeboxLiveContext {
   userProjects: IProject[];
   recentProjects: IProject[];
+  pinnedProjects: IProject[];
   currentProject: IProject | undefined;
   projectTemplates: IProjectTemplate[] | undefined;
   loading: boolean;
@@ -78,4 +79,5 @@ export interface ICodeboxLiveContext {
   createProject: (template: IProjectTemplate) => Promise<void>;
   setProject: (projectData: ISetProject) => Promise<IProject>;
   deleteProject: (project: IProject) => Promise<void>;
+  pinProjectToTeams: (project: IProject, threadId: string) => Promise<void>;
 }

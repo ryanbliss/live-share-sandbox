@@ -3,8 +3,9 @@ import { FlexColumn, FlexItem } from "../../components";
 import { useTeamsClientContext } from "../../context-providers";
 import { ProjectList } from "../../components/project-list/ProjectList";
 import { HomeNavigationBar } from "../../components/navigation-bar/HomeNavigationBar";
+import { memo } from "react";
 
-export const ProjectsPage = () => {
+export const ProjectsPage = memo(() => {
   const { teamsContext } = useTeamsClientContext();
 
   const isSidePanel =
@@ -20,4 +21,4 @@ export const ProjectsPage = () => {
       <ProjectList />
     </FlexColumn>
   );
-};
+});

@@ -14,6 +14,7 @@ import { useTeamsClientContext } from "../../teams-client-provider";
 export function useCodeboxLiveProjects(): {
   userProjects: IProject[];
   recentProjects: IProject[];
+  pinnedProjects: IProject[];
   currentProject: IProject | undefined;
   projectTemplates: IProjectTemplate[] | undefined;
   loading: boolean;
@@ -21,6 +22,7 @@ export function useCodeboxLiveProjects(): {
   postProject: (projectData: IPostProject) => Promise<IProject>;
   setProject: (projectData: ISetProject) => Promise<IProject>;
   deleteProject: (project: IProject) => Promise<void>;
+  pinProjectToTeams: (project: IProject, threadId: string) => Promise<void>;
 } {
   const params = useParams();
   const clientRef = useRef(new ProjectsService());
@@ -31,10 +33,13 @@ export function useCodeboxLiveProjects(): {
   >([]);
   const [recentProjectIds, recentProjectIdsRef, setRecentProjectIds] =
     useStateRef<string[]>([]);
+  const [pinnedProjectIds, pinnedProjectIdsRef, setPinnedProjectIds] =
+    useStateRef<string[]>([]);
   const [currentProjectId, currentProjectIdRef, setCurrentProjectId] =
     useStateRef<string | undefined>(undefined);
-  const [projectTemplates, projectTemplatesRef, setProjectTemplates] =
-    useStateRef<IProjectTemplate[] | undefined>(undefined);
+  const [projectTemplates, setProjectTemplates] = useState<
+    IProjectTemplate[] | undefined
+  >(undefined);
   const loadingRef = useRef(true);
   const lastViewIdRef = useRef<string>();
   const [error, setError] = useState<Error>();
@@ -67,6 +72,36 @@ export function useCodeboxLiveProjects(): {
     []
   );
 
+  const pinProjectToTeams = useCallback(
+    async (project: IProject, threadId: string) => {
+      try {
+        await clientRef.current.postTeamsProjectTeamsThreadPin(
+          project._id,
+          threadId
+        );
+        setPinnedProjectIds([project._id, ...pinnedProjectIdsRef.current]);
+      } catch (error: any) {
+        console.error(error);
+      }
+    },
+    []
+  );
+
+  const markProjectAsViewed = useCallback(async (project: IProject) => {
+    try {
+      await clientRef.current.postProjectView(project._id);
+    } catch (error) {
+      console.error(error);
+      // TODO: display error
+    }
+    setRecentProjectIds([
+      project._id,
+      ...recentProjectIdsRef.current.filter(
+        (checkProjectId) => checkProjectId !== project._id
+      ),
+    ]);
+  }, []);
+
   const setProject = useCallback(
     async (projectData: ISetProject): Promise<IProject> => {
       try {
@@ -78,18 +113,17 @@ export function useCodeboxLiveProjects(): {
             (checkProjectId) => checkProjectId !== project._id
           ),
         ]);
-        try {
-          await clientRef.current.postProjectView(project._id);
-        } catch (error) {
-          console.error(error);
-          // TODO: display error
+        const threadId = teamsContext?.chat?.id || teamsContext?.channel?.id;
+        if (threadId) {
+          try {
+            const pinPromise = pinProjectToTeams(project, threadId);
+            const viewPromise = markProjectAsViewed(project);
+            await Promise.all([pinPromise, viewPromise]);
+          } catch (error) {
+            console.error(error);
+            // TODO: display error
+          }
         }
-        setRecentProjectIds([
-          project._id,
-          ...recentProjectIdsRef.current.filter(
-            (checkProjectId) => checkProjectId !== project._id
-          ),
-        ]);
         return project;
       } catch (err: any) {
         if (err instanceof Error) {
@@ -98,23 +132,34 @@ export function useCodeboxLiveProjects(): {
         throw new Error("useCodeboxLiveClient: unable to process request");
       }
     },
-    []
+    [teamsContext, pinProjectToTeams, markProjectAsViewed]
   );
 
   const deleteProject = useCallback(
     async (project: IProject): Promise<void> => {
       await clientRef.current.deleteProject(project);
       projectsRef.current.delete(project._id);
-      setUserProjectIds([
-        ...userProjectIdsRef.current.filter(
-          (checkProjectId) => checkProjectId !== project._id
-        ),
-      ]);
-      setRecentProjectIds([
-        ...recentProjectIdsRef.current.filter(
-          (checkProjectId) => checkProjectId !== project._id
-        ),
-      ]);
+      if (userProjectIdsRef.current.length > 0) {
+        setUserProjectIds([
+          ...userProjectIdsRef.current.filter(
+            (checkProjectId) => checkProjectId !== project._id
+          ),
+        ]);
+      }
+      if (recentProjectIdsRef.current.length > 0) {
+        setRecentProjectIds([
+          ...recentProjectIdsRef.current.filter(
+            (checkProjectId) => checkProjectId !== project._id
+          ),
+        ]);
+      }
+      if (pinnedProjectIdsRef.current.length > 0) {
+        setPinnedProjectIds([
+          ...pinnedProjectIdsRef.current.filter(
+            (checkProjectId) => checkProjectId !== project._id
+          ),
+        ]);
+      }
     },
     []
   );
@@ -125,6 +170,7 @@ export function useCodeboxLiveProjects(): {
     clientRef.current
       .authorize(teamsContext.user.id)
       .then(() => {
+        // Get projects created by user
         clientRef.current
           .getUserProjects()
           .then((response) => {
@@ -161,6 +207,7 @@ export function useCodeboxLiveProjects(): {
               );
             }
           });
+        // Get recent projects
         clientRef.current
           .getRecentProjects()
           .then((response) => {
@@ -187,6 +234,37 @@ export function useCodeboxLiveProjects(): {
               );
             }
           });
+        // If in a chat or channel thread, get pinned projects
+        const threadId: string | undefined =
+          teamsContext.chat?.id || teamsContext.channel?.id;
+        if (threadId) {
+          clientRef.current
+            .getTeamsPinnedProjects(threadId)
+            .then((response) => {
+              if (initializedRef.current) {
+                const pinnedProjects = [...response.projects];
+                pinnedProjects.forEach((pinnedProject) => {
+                  projectsRef.current.set(pinnedProject._id, pinnedProject);
+                });
+                setPinnedProjectIds(
+                  pinnedProjects.map((pinnedProject) => pinnedProject._id)
+                );
+              }
+            })
+            .catch((err: any) => {
+              console.error(err);
+              if (err instanceof Error) {
+                setError(err);
+              } else {
+                setError(
+                  new Error(
+                    "useCodeboxLiveProject: an unknown error occurred when getting user projects"
+                  )
+                );
+              }
+            });
+        }
+        // Get project templates
         clientRef.current
           .getTemplates()
           .then((templates) => {
@@ -267,10 +345,13 @@ export function useCodeboxLiveProjects(): {
 
   const userProjects = userProjectIds
     .map((projectId) => projectsRef.current.get(projectId))
-    .filter((userProject) => userProject !== undefined) as IProject[];
+    .filter((project) => project !== undefined) as IProject[];
   const recentProjects = recentProjectIds
     .map((projectId) => projectsRef.current.get(projectId))
-    .filter((userProject) => userProject !== undefined) as IProject[];
+    .filter((project) => project !== undefined) as IProject[];
+  const pinnedProjects = pinnedProjectIds
+    .map((projectId) => projectsRef.current.get(projectId))
+    .filter((project) => project !== undefined) as IProject[];
   let currentProject: IProject | undefined = currentProjectId
     ? projectsRef.current.get(currentProjectId)
     : undefined;
@@ -278,6 +359,7 @@ export function useCodeboxLiveProjects(): {
   return {
     userProjects,
     recentProjects,
+    pinnedProjects,
     currentProject,
     projectTemplates,
     // Use ref because it will always be set along with userProjects
@@ -286,5 +368,6 @@ export function useCodeboxLiveProjects(): {
     postProject,
     setProject,
     deleteProject,
+    pinProjectToTeams,
   };
 }

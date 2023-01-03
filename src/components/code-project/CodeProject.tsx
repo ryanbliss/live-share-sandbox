@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, memo, useCallback, useState } from "react";
 import { DocumentMultiple24Filled } from "@fluentui/react-icons";
 import {
   SandpackLayout,
@@ -40,7 +40,7 @@ const LEFT_NAV_TABS = [
   },
 ];
 
-export const CodeProject: FC = () => {
+export const CodeProject: FC = memo(() => {
   const { teamsContext } = useTeamsClientContext();
   const isSidePanel =
     teamsContext?.page.frameContext === FrameContexts.sidePanel;
@@ -131,13 +131,7 @@ export const CodeProject: FC = () => {
                 <SandpackLayout>
                   {/* Custom MonacoEditor for viewing & editing the text of the code */}
                   <MonacoEditor
-                    language={
-                      currentProject.language === LanguageType.typescript
-                        ? "typescript"
-                        : "javascript"
-                    }
                     theme="vs-dark"
-                    editingEnabled={true}
                     style={{
                       position: "absolute",
                       right: isPreviewActive ? "50%" : 0,
@@ -170,4 +164,4 @@ export const CodeProject: FC = () => {
       </FlexRow>
     </>
   );
-};
+});

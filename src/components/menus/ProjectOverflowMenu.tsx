@@ -10,6 +10,7 @@ import {
   MoreHorizontal20Regular,
   Delete20Regular,
   Open20Regular,
+  Pin20Regular,
   ArrowCircleRight20Regular,
 } from "@fluentui/react-icons";
 import { FC, useCallback } from "react";
@@ -33,7 +34,8 @@ export const ProjectOverflowMenu: FC<IProjectOverflowMenuProps> = ({
   onOpen,
 }) => {
   const { teamsContext } = useTeamsClientContext();
-  const { deleteProject } = useCodeboxLiveContext();
+  const { pinnedProjects, deleteProject, pinProjectToTeams } =
+    useCodeboxLiveContext();
   const navigate = useNavigate();
 
   const onDelete = useCallback(async () => {
@@ -54,6 +56,22 @@ export const ProjectOverflowMenu: FC<IProjectOverflowMenuProps> = ({
       console.error(error);
     }
   }, [project, teamsContext]);
+
+  const onPinProjectToTeams = useCallback(async () => {
+    const threadId = teamsContext?.channel?.id || teamsContext?.chat?.id;
+    if (threadId) {
+      try {
+        await pinProjectToTeams(project, threadId);
+      } catch (error: any) {
+        console.error(error);
+      }
+    }
+  }, [project, teamsContext, pinProjectToTeams]);
+
+  const showPin = !!teamsContext?.channel?.id || !!teamsContext?.chat?.id;
+  const isPinned = !!pinnedProjects.find(
+    (checkProject) => checkProject._id === project._id
+  );
   return (
     <Menu>
       <MenuTrigger>
@@ -73,6 +91,11 @@ export const ProjectOverflowMenu: FC<IProjectOverflowMenuProps> = ({
           <MenuItem icon={<Open20Regular />} onClick={onOpenStageView}>
             {"Open in pop out"}
           </MenuItem>
+          {showPin && !isPinned && (
+            <MenuItem icon={<Pin20Regular />} onClick={onPinProjectToTeams}>
+              {`Pin to ${teamsContext?.channel ? "channel" : "chat"}`}
+            </MenuItem>
+          )}
           <MenuItem icon={<Delete20Regular />} onClick={onDelete}>
             {"Delete project"}
           </MenuItem>

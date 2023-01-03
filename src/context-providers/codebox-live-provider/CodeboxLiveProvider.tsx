@@ -22,6 +22,7 @@ export const CodeboxLiveProvider: FC<{
   const {
     userProjects,
     recentProjects,
+    pinnedProjects,
     currentProject,
     projectTemplates,
     loading,
@@ -29,6 +30,7 @@ export const CodeboxLiveProvider: FC<{
     postProject,
     setProject,
     deleteProject,
+    pinProjectToTeams,
   } = useCodeboxLiveProjects();
   const { teamsContext } = useTeamsClientContext();
 
@@ -84,6 +86,7 @@ export const CodeboxLiveProvider: FC<{
       value={{
         userProjects,
         recentProjects,
+        pinnedProjects,
         currentProject,
         projectTemplates,
         loading,
@@ -91,6 +94,7 @@ export const CodeboxLiveProvider: FC<{
         createProject,
         setProject,
         deleteProject,
+        pinProjectToTeams,
       }}
     >
       {children}
