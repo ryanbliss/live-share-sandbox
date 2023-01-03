@@ -21,9 +21,7 @@ export const CodeboxLiveProvider: FC<{
 }> = ({ children }) => {
   const {
     userProjects,
-    userProjectsRef,
     recentProjects,
-    recentProjectsRef,
     currentProject,
     projectTemplates,
     loading,
@@ -85,9 +83,7 @@ export const CodeboxLiveProvider: FC<{
     <CodeboxLiveContext.Provider
       value={{
         userProjects,
-        userProjectsRef,
         recentProjects,
-        recentProjectsRef,
         currentProject,
         projectTemplates,
         loading,

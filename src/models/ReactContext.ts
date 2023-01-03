@@ -70,9 +70,7 @@ export interface ITeamsClientContext {
 
 export interface ICodeboxLiveContext {
   userProjects: IProject[];
-  userProjectsRef: MutableRefObject<IProject[]>;
   recentProjects: IProject[];
-  recentProjectsRef: MutableRefObject<IProject[]>;
   currentProject: IProject | undefined;
   projectTemplates: IProjectTemplate[] | undefined;
   loading: boolean;

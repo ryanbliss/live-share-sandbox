@@ -1,10 +1,4 @@
-import {
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import moment from "moment";
 import { useStateRef } from "../../../hooks";
@@ -19,9 +13,7 @@ import { useTeamsClientContext } from "../../teams-client-provider";
 
 export function useCodeboxLiveProjects(): {
   userProjects: IProject[];
-  userProjectsRef: MutableRefObject<IProject[]>;
   recentProjects: IProject[];
-  recentProjectsRef: MutableRefObject<IProject[]>;
   currentProject: IProject | undefined;
   projectTemplates: IProjectTemplate[] | undefined;
   loading: boolean;
@@ -33,15 +25,14 @@ export function useCodeboxLiveProjects(): {
   const params = useParams();
   const clientRef = useRef(new ProjectsService());
   const initializedRef = useRef(false);
-  const [userProjects, userProjectsRef, setUserProjects] = useStateRef<
-    IProject[]
+  const projectsRef = useRef<Map<string, IProject>>(new Map());
+  const [userProjectIds, userProjectIdsRef, setUserProjectIds] = useStateRef<
+    string[]
   >([]);
-  const [recentProjects, recentProjectsRef, setRecentProjects] = useStateRef<
-    IProject[]
-  >([]);
-  const [currentProject, currentProjectRef, setCurrentProject] = useStateRef<
-    IProject | undefined
-  >(undefined);
+  const [recentProjectIds, recentProjectIdsRef, setRecentProjectIds] =
+    useStateRef<string[]>([]);
+  const [currentProjectId, currentProjectIdRef, setCurrentProjectId] =
+    useStateRef<string | undefined>(undefined);
   const [projectTemplates, projectTemplatesRef, setProjectTemplates] =
     useStateRef<IProjectTemplate[] | undefined>(undefined);
   const loadingRef = useRef(true);
@@ -59,11 +50,11 @@ export function useCodeboxLiveProjects(): {
         // May want to uncomment if use case ever pops up
         // for creating a project without a container
         // const project = projectResponse.project;
-        // setUserProjects([
-        //   ...userProjectsRef.current.filter(
-        //     (checkProject) => checkProject._id !== project._id
+        // setUserProjectIds([
+        //   ...userProjectIdsRef.current.filter(
+        //     (checkProjectId) => checkProjectId !== project._id
         //   ),
-        //   project,
+        //   project._id,
         // ]);
         return projectResponse.project;
       } catch (err: any) {
@@ -80,10 +71,11 @@ export function useCodeboxLiveProjects(): {
     async (projectData: ISetProject): Promise<IProject> => {
       try {
         const project = await clientRef.current.setProject(projectData);
-        setUserProjects([
-          project,
-          ...userProjectsRef.current.filter(
-            (checkProject) => checkProject._id !== project._id
+        projectsRef.current.set(project._id, project);
+        setUserProjectIds([
+          project._id,
+          ...userProjectIdsRef.current.filter(
+            (checkProjectId) => checkProjectId !== project._id
           ),
         ]);
         try {
@@ -92,13 +84,12 @@ export function useCodeboxLiveProjects(): {
           console.error(error);
           // TODO: display error
         }
-        const newRecentProjects = [
-          project,
-          ...recentProjectsRef.current.filter(
-            (checkProject) => checkProject._id !== project._id
+        setRecentProjectIds([
+          project._id,
+          ...recentProjectIdsRef.current.filter(
+            (checkProjectId) => checkProjectId !== project._id
           ),
-        ];
-        setRecentProjects(newRecentProjects);
+        ]);
         return project;
       } catch (err: any) {
         if (err instanceof Error) {
@@ -113,14 +104,15 @@ export function useCodeboxLiveProjects(): {
   const deleteProject = useCallback(
     async (project: IProject): Promise<void> => {
       await clientRef.current.deleteProject(project);
-      setUserProjects([
-        ...userProjectsRef.current.filter(
-          (checkProject) => checkProject._id !== project._id
+      projectsRef.current.delete(project._id);
+      setUserProjectIds([
+        ...userProjectIdsRef.current.filter(
+          (checkProjectId) => checkProjectId !== project._id
         ),
       ]);
-      setRecentProjects([
-        ...recentProjectsRef.current.filter(
-          (checkProject) => checkProject._id !== project._id
+      setRecentProjectIds([
+        ...recentProjectIdsRef.current.filter(
+          (checkProjectId) => checkProjectId !== project._id
         ),
       ]);
     },
@@ -137,8 +129,8 @@ export function useCodeboxLiveProjects(): {
           .getUserProjects()
           .then((response) => {
             if (initializedRef.current) {
-              const projects = [...response.projects];
-              projects.sort((a, b) => {
+              const userProjects = [...response.projects];
+              userProjects.sort((a, b) => {
                 const isAfter = moment(a.createdAt).isBefore(b.createdAt);
                 if (isAfter) {
                   return 1;
@@ -149,7 +141,12 @@ export function useCodeboxLiveProjects(): {
                 }
                 return -1;
               });
-              setUserProjects(projects);
+              userProjects.forEach((userProject) => {
+                projectsRef.current.set(userProject._id, userProject);
+              });
+              setUserProjectIds(
+                userProjects.map((userProject) => userProject._id)
+              );
             }
           })
           .catch((err: any) => {
@@ -169,8 +166,13 @@ export function useCodeboxLiveProjects(): {
           .then((response) => {
             if (initializedRef.current) {
               loadingRef.current = false;
-              const projects = [...response.projects];
-              setRecentProjects(projects);
+              const recentProjects = [...response.projects];
+              recentProjects.forEach((recentProject) => {
+                projectsRef.current.set(recentProject._id, recentProject);
+              });
+              setRecentProjectIds(
+                recentProjects.map((recentProject) => recentProject._id)
+              );
             }
           })
           .catch((err: any) => {
@@ -226,54 +228,56 @@ export function useCodeboxLiveProjects(): {
     const projectId = params["projectId"];
     if (projectId) {
       const refreshCurrentProject = async () => {
-        let project = userProjectsRef.current.find(
-          (checkProject) => checkProject._id === projectId
-        );
-        if (!project) {
-          project = recentProjectsRef.current.find(
-            (checkProject) => checkProject._id === projectId
-          );
-        }
-        if (project) {
-          if (project._id !== currentProjectRef.current?._id) {
-            setCurrentProject(project);
+        let currentProject = projectsRef.current.get(projectId);
+        if (currentProject) {
+          if (currentProject._id !== currentProjectIdRef.current) {
+            setCurrentProjectId(projectId);
           }
         } else {
           try {
-            project = await clientRef.current.getProject(projectId);
-            setCurrentProject(project);
+            currentProject = await clientRef.current.getProject(projectId);
+            projectsRef.current.set(projectId, currentProject);
+            setCurrentProjectId(projectId);
           } catch (error) {
             console.error(error);
             // TODO: display error
           }
         }
-        if (project && project._id !== lastViewIdRef.current) {
-          lastViewIdRef.current = project._id;
+        if (currentProject && currentProject._id !== lastViewIdRef.current) {
+          lastViewIdRef.current = projectId;
           try {
-            await clientRef.current.postProjectView(project._id);
+            await clientRef.current.postProjectView(projectId);
           } catch (error) {
             console.error(error);
             lastViewIdRef.current = undefined;
             // TODO: display error
           }
-          const newRecentProjects = [
-            project,
-            ...recentProjectsRef.current.filter(
-              (checkProject) => checkProject._id !== projectId
+          const newRecentProjectIds = [
+            projectId,
+            ...recentProjectIdsRef.current.filter(
+              (checkId) => checkId !== projectId
             ),
           ];
-          setRecentProjects(newRecentProjects);
+          setRecentProjectIds(newRecentProjectIds);
         }
       };
       refreshCurrentProject();
     }
-  }, [params, userProjects]);
+  }, [params]);
+
+  const userProjects = userProjectIds
+    .map((projectId) => projectsRef.current.get(projectId))
+    .filter((userProject) => userProject !== undefined) as IProject[];
+  const recentProjects = recentProjectIds
+    .map((projectId) => projectsRef.current.get(projectId))
+    .filter((userProject) => userProject !== undefined) as IProject[];
+  let currentProject: IProject | undefined = currentProjectId
+    ? projectsRef.current.get(currentProjectId)
+    : undefined;
 
   return {
     userProjects,
-    userProjectsRef,
     recentProjects,
-    recentProjectsRef,
     currentProject,
     projectTemplates,
     // Use ref because it will always be set along with userProjects
