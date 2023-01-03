@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { Dispatch, FC, SetStateAction, useCallback, useState } from "react";
 import {
   Button,
   Dialog,
@@ -25,7 +25,10 @@ import { Alert } from "@fluentui/react-components/unstable";
 import { isUrlValid } from "../../utils";
 import { getFlexColumnStyles } from "../flex/column/FlexColumn-styles";
 
-interface ICreateProjectViaGitDialogProps {}
+interface ICreateProjectViaGitDialogProps {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}
 
 const LANGUAGE_TYPE_RADIO_ITEMS: IRadioItem[] = [
   {
@@ -61,11 +64,11 @@ const FRAMEWORK_TYPE_RADIO_ITEMS: IRadioItem[] = [
   },
 ];
 
-export const CreateProjectViaGitDialog: FC<
-  ICreateProjectViaGitDialogProps
-> = ({}) => {
+export const CreateProjectViaGitDialog: FC<ICreateProjectViaGitDialogProps> = ({
+  open,
+  setOpen,
+}) => {
   const { createProject } = useCodeboxLiveContext();
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const [title, setTitle] = useState<string>("");
@@ -130,11 +133,6 @@ export const CreateProjectViaGitDialog: FC<
       open={open}
       onOpenChange={(event, data) => setOpen(data.open)}
     >
-      <DialogTrigger>
-        <Button appearance="subtle" size="medium">
-          {"Git clone"}
-        </Button>
-      </DialogTrigger>
       <DialogSurface>
         <DialogBody>
           <DialogTitle>{"Git clone"}</DialogTitle>

@@ -4,6 +4,7 @@ import { getFlexRowStyles } from "./FlexRow-styles";
 
 interface IFlexRowProps {
   children: ReactNode;
+  className?: string;
   expand?: "horizontal" | "vertical" | "fill";
   hAlign?: "start" | "center" | "end";
   vAlign?: "start" | "center" | "end";
@@ -15,6 +16,7 @@ interface IFlexRowProps {
 
 export const FlexRow: FC<IFlexRowProps> = ({
   children,
+  className,
   expand,
   hAlign,
   vAlign,
@@ -40,7 +42,8 @@ export const FlexRow: FC<IFlexRowProps> = ({
     marginSpacer === "medium" ? flexRowStyles.marginSpacerMedium : "",
     marginSpacer === "large" ? flexRowStyles.marginSpacerLarge : "",
     spaceBetween ? flexRowStyles.spaceBetween : "",
-    wrap ? flexRowStyles.wrap : ""
+    wrap ? flexRowStyles.wrap : "",
+    className ? className : ""
   );
   return (
     <div className={mergedClasses} style={style}>

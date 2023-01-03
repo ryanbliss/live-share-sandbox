@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { Dispatch, FC, SetStateAction, useCallback, useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,6 +8,7 @@ import {
   DialogSurface,
   DialogTitle,
   DialogTrigger,
+  MenuItem,
   Spinner,
   Text,
 } from "@fluentui/react-components";
@@ -24,7 +25,10 @@ import { FlexColumn } from "../flex";
 import { Alert } from "@fluentui/react-components/unstable";
 import { getFlexColumnStyles } from "../flex/column/FlexColumn-styles";
 
-interface ICreateProjectViaTemplateDialogProps {}
+interface ICreateProjectViaTemplateDialogProps {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}
 
 const LANGUAGE_TYPE_RADIO_ITEMS: IRadioItem[] = [
   {
@@ -62,9 +66,8 @@ const FRAMEWORK_TYPE_RADIO_ITEMS: IRadioItem[] = [
 
 export const CreateProjectViaTemplateDialog: FC<
   ICreateProjectViaTemplateDialogProps
-> = ({}) => {
+> = ({ open, setOpen }) => {
   const { createProject, projectTemplates } = useCodeboxLiveContext();
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const [language, setLanguage] = useState<LanguageType>(
@@ -139,13 +142,10 @@ export const CreateProjectViaTemplateDialog: FC<
     <Dialog
       modalType={loading ? "alert" : "modal"}
       open={open}
-      onOpenChange={(event, data) => setOpen(data.open)}
+      onOpenChange={(event, data) => {
+        setOpen(data.open);
+      }}
     >
-      <DialogTrigger>
-        <Button appearance="primary" size="medium">
-          {"New project"}
-        </Button>
-      </DialogTrigger>
       <DialogSurface>
         <DialogBody>
           <DialogTitle>{"New project"}</DialogTitle>

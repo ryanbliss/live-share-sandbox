@@ -14,6 +14,7 @@ import {
 import { FlexColumn, FlexItem, FlexRow } from "../flex";
 import { LoadableWrapper } from "../view-wrappers";
 import {
+  CreateProjectActions,
   CreateProjectViaGitDialog,
   CreateProjectViaTemplateDialog,
 } from "../create-project";
@@ -62,22 +63,17 @@ export const ProjectList: FC<IProjectListProps> = memo(({}) => {
             height: "100%",
           }}
         >
-          <Title1>{"Projects"}</Title1>
+          {!isSidePanel && <Title1>{"Projects"}</Title1>}
           <FlexItem noShrink>
             <FlexRow spaceBetween vAlign="center" wrap>
-              {!isSidePanel && (
-                <TabList selectedValue={selectedTab} onTabSelect={onTabSelect}>
-                  {!!threadId && (
-                    <Tab value={ProjectListTabType.pinned}>{"Pinned"}</Tab>
-                  )}
-                  <Tab value={ProjectListTabType.recent}>{"Recent"}</Tab>
-                  <Tab value={ProjectListTabType.owned}>{"Owned"}</Tab>
-                </TabList>
-              )}
-              <FlexRow marginSpacer="small">
-                <CreateProjectViaGitDialog />
-                <CreateProjectViaTemplateDialog />
-              </FlexRow>
+              <TabList selectedValue={selectedTab} onTabSelect={onTabSelect}>
+                {!!threadId && (
+                  <Tab value={ProjectListTabType.pinned}>{"Pinned"}</Tab>
+                )}
+                <Tab value={ProjectListTabType.recent}>{"Recent"}</Tab>
+                <Tab value={ProjectListTabType.owned}>{"Owned"}</Tab>
+              </TabList>
+              <CreateProjectActions />
             </FlexRow>
           </FlexItem>
           {selectedTab === ProjectListTabType.pinned && (

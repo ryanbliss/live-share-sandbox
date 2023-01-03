@@ -123,6 +123,13 @@ export function useCodeboxLiveProjects(): {
             console.error(error);
             // TODO: display error
           }
+        } else {
+          try {
+            await markProjectAsViewed(project);
+          } catch (error) {
+            console.error(error);
+            // TODO: display error
+          }
         }
         return project;
       } catch (err: any) {
