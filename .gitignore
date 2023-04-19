@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # Teams app package zip
-package.zip
+CodeboxLivePackage.zip

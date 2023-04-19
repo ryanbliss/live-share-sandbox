@@ -1,96 +1,95 @@
 {
-    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
-    "version": "1.0.1",
-    "manifestVersion": "1.12",
-    "id": "ffb8bede-d6d3-4fc1-8f2f-d7d7861c8f1a",
-    "packageName": "app.live-share-sandbox.codebox",
-    "name": {
-        "short": "Codebox",
-        "full": "Codebox Live"
-    },
-    "developer": {
-        "name": "Ryan Bliss",
-        "mpnId": "",
-        "websiteUrl": "https://www.example.com",
-        "privacyUrl": "https://www.example.com/PrivacyStatement",
-        "termsOfUseUrl": "https://www.example.com/TermsOfUse"
-    },
-    "description": {
-        "short": "Collaboratively build meeting extensions.",
-        "full": "Live Share sandbox is a code playground for building Teams apps collaboratively with your colleagues!"
-    },
-    "icons": {
-        "outline": "outline.png",
-        "color": "color.png"
-    },
-    "accentColor": "#38a2ff",
-    "configurableTabs": [
-        {
-            "configurationUrl": "https://live-share-sandbox.vercel.app/app-settings?inTeams=true",
-            "canUpdateConfiguration": false,
-            "scopes": [
-                "groupchat",
-                "team"
-            ],
-            "context": [
-                "meetingSidePanel",
-                "meetingStage",
-                "meetingChatTab",
-                "channelTab",
-                "personalTab",
-                "privateChatTab"
-            ]
-        }
-    ],
-    "staticTabs": [
-        {
-            "entityId": "projects",
-            "scopes": [
-                "personal"
-            ],
-            "context": [
-                "personalTab",
-                "channelTab"
-            ],
-            "name": "Projects",
-            "contentUrl": "https://live-share-sandbox.vercel.app/?inTeams=true",
-            "websiteUrl": "https://live-share-sandbox.vercel.app/?inTeams=false",
-            "searchUrl": "https://live-share-sandbox.vercel.app/?inTeams=false"
-        }
-    ],
-    "validDomains": [
-        "live-share-sandbox.vercel.app",
-        "https://1-2-2-sandpack.codesandbox.io"
-    ],
-    "showLoadingIndicator": true,
-    "authorization": {
-        "permissions": {
-            "resourceSpecific": [
-                {
-                    "name": "MeetingStage.Write.Chat",
-                    "type": "Delegated"
-                },
-                {
-                    "name": "ChannelMeetingStage.Write.Group",
-                    "type": "Delegated"
-                },
-                {
-                    "name": "LiveShareSession.ReadWrite.Chat",
-                    "type": "Delegated"
-                },
-                {
-                    "name": "LiveShareSession.ReadWrite.Group",
-                    "type": "Delegated"
-                },
-                {
-                    "name": "OnlineMeetingIncomingAudio.Detect.Chat",
-                    "type": "Delegated"
-                },
-                {
-                    "name": "OnlineMeetingIncomingAudio.Detect.Group",
-                    "type": "Delegated"
-                }
-            ]
-        }
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.12/MicrosoftTeams.schema.json",
+  "version": "1.0.1",
+  "manifestVersion": "1.12",
+  "id": "ffb8bede-d6d3-4fc1-8f2f-d7d7861c8f1a",
+  "packageName": "app.live-share-sandbox.codebox",
+  "name": {
+    "short": "Codebox",
+    "full": "Codebox Live"
+  },
+  "developer": {
+    "name": "Ryan Bliss",
+    "mpnId": "",
+    "websiteUrl": "https://www.example.com",
+    "privacyUrl": "https://www.example.com/PrivacyStatement",
+    "termsOfUseUrl": "https://www.example.com/TermsOfUse"
+  },
+  "description": {
+    "short": "Collaboratively build meeting extensions.",
+    "full": "Live Share sandbox is a code playground for building Teams apps collaboratively with your colleagues!"
+  },
+  "icons": {
+    "outline": "outline.png",
+    "color": "color.png"
+  },
+  "accentColor": "#38a2ff",
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://live-share-sandbox.vercel.app/app-settings?inTeams=true",
+      "canUpdateConfiguration": false,
+      "scopes": ["groupchat", "team"],
+      "context": [
+        "meetingSidePanel",
+        "meetingStage",
+        "meetingChatTab",
+        "channelTab",
+        "personalTab",
+        "privateChatTab"
+      ]
     }
+  ],
+  "staticTabs": [
+    {
+      "entityId": "projects",
+      "scopes": ["personal"],
+      "context": ["personalTab", "channelTab"],
+      "name": "Projects",
+      "contentUrl": "https://live-share-sandbox.vercel.app/?inTeams=true",
+      "websiteUrl": "https://live-share-sandbox.vercel.app/?inTeams=false",
+      "searchUrl": "https://live-share-sandbox.vercel.app/?inTeams=false"
+    }
+  ],
+  "validDomains": [
+    "live-share-sandbox.vercel.app",
+    "https://1-2-2-sandpack.codesandbox.io"
+  ],
+  "showLoadingIndicator": true,
+  "authorization": {
+    "permissions": {
+      "resourceSpecific": [
+        {
+          "name": "MeetingStage.Write.Chat",
+          "type": "Delegated"
+        },
+        {
+          "name": "ChannelMeetingStage.Write.Group",
+          "type": "Delegated"
+        },
+        {
+          "name": "LiveShareSession.ReadWrite.Chat",
+          "type": "Delegated"
+        },
+        {
+          "name": "LiveShareSession.ReadWrite.Group",
+          "type": "Delegated"
+        },
+        {
+          "name": "OnlineMeetingIncomingAudio.Detect.Chat",
+          "type": "Delegated"
+        },
+        {
+          "name": "OnlineMeetingIncomingAudio.Detect.Group",
+          "type": "Delegated"
+        }
+      ]
+    }
+  },
+  "devicePermissions": [
+    "media",
+    "geolocation",
+    "notifications",
+    "midi",
+    "openExternal"
+  ]
 }
