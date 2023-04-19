@@ -1,5 +1,6 @@
 import { CSSProperties, FC, memo, useEffect } from "react";
 import { useMonacoFluidAdapter } from "./adapter";
+import { useSandpackIFramePermissions } from "../../../hooks/sandpack/useSandpackIFramePermissions";
 
 interface IMonacoEditorProps {
   theme: "vs-dark" | "light";
@@ -10,6 +11,7 @@ export const MonacoEditor: FC<IMonacoEditorProps> = memo((props) => {
   // Set up the Monaco editor and apply/post changes
   // to/from SharedString
   useMonacoFluidAdapter("container", props.theme);
+  useSandpackIFramePermissions();
 
   useEffect(() => {
     return () => {
